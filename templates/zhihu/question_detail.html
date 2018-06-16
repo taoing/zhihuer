@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}问题详情-知乎儿{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+
+<div class="container-fluit">
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="question-title">
+        <h3>{{ question.title }}</h3>
+      </div>
+      <p>{{ question.content }}</p>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="question-info">
+        <p>关注者: 99</p>
+        <p>被浏览: 999</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <p>答案: 示例文本</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

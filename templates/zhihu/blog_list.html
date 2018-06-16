@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}博客列表{% endblock %}
+
+{% block nav_blog_active %}active{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-9">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>博客列表 <small>(共{{ blogs.count }}遍博客)</small></span></h4>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-group">
+                    {% for blog in blogs %}
+                    <li class="list-group-item blog-item">
+                            <a href="{% url 'blog:blog_detail' blog.id %}"><h3>{{ blog.title }}</h3></a>
+                            <div class="blog-meta text-muted">
+                                <p><span class="glyphicon glyphicon-user"></span>&nbsp;作者: {{ blog.author.username }}&nbsp;|&nbsp;<span class="glyphicon glyphicon-time"></span>&nbsp;发表时间: {{ blog.publish_time }}&nbsp;|&nbsp;<span class="glyphicon glyphicon-time"></span>&nbsp;更新时间: {{ blog.update_time }}&nbsp;|&nbsp;<span class="glyphicon glyphicon-eye-open"></span>&nbsp;阅读: {{ blog.read_nums }}</p>
+                            </div>
+                            <p>{{ blog.content|truncatechars:200|safe }}</p>
+                    </li>
+
+                    {% empty %}
+                    <p>暂时没有博客</p>
+                    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4>博客分类</h4>
+                </div>
+                <div class="panel-body">
+                    <ul class="blog-type">
+                    {% for blog_type in blog_types %}
+                        <li><a href="{% url 'blog:blog_type' blog_type.id %}">{{ blog_type.type_name }} ({{ blog_type.blog_nums }})</a></li>
+                    {% empty %}
+                        <p>暂时没有分类</p>
+                    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">标签</div>
+                <div class="panel-body">
+                  <p>
+                    {% for tag in tags %}
+                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-tags"></span>&nbsp;{{ tag.tag_name }}</button>
+                    {% empty %}
+                    暂时没有标签
+                    {% endfor %}
+                  </p>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">日期归档</div>
+                <div class="panel-body">
+                  <ul class="blog-type">
+                    {% for blog_date, blog_nums in blog_dates.items %}
+                        <li><a href="{% url 'blog:blog_date' blog_date.year blog_date.month %}">{{ blog_date|date:'Y年m月' }} ({{ blog_nums }})</a></li>
+                    {% empty %}
+                    
+                    {% endfor %}
+                  </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

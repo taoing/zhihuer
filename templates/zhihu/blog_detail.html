@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ blog.title }}{% endblock %}
+
+{% block nav_blog_active %}active{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-10 col-sm-offset-1">
+                <div class="blog-item site-box">
+                    <h3 class="text-center">{{ blog.title }}</h3>
+                    <div class="blog-meta text-muted">
+                        <p><span class="glyphicon glyphicon-user"></span>&nbsp;作者: {{ blog.author.username }}</p>
+                        <p><span class="glyphicon glyphicon-time"></span>&nbsp;发表时间: {{ blog.publish_time }}</p>
+                        <p><span class="glyphicon glyphicon-time"></span>&nbsp;更新时间: {{ blog.update_time }}</p>
+                        <p><span class="glyphicon glyphicon-eye-open"></span>&nbsp;阅读: {{ blog.read_nums }}</p>
+                        <p><span class="glyphicon glyphicon-tag"></span> 分类: {{ blog.blog_type.type_name }}&ensp;&ensp;
+                            <span class="glyphicon glyphicon-tags"></span> 标签:
+                            {% for tag in blog.tags.all %}
+                            &nbsp;{{ tag.tag_name }}&nbsp;|
+                            {% endfor %}
+                        </p>
+                    </div>
+                    <p>{{ blog.content|safe }}</p>
+                </div>
+
+                <div class="site-box">
+                    <p>上一篇: {% if previous_blog %}<a href="{% url 'blog:blog_detail' previous_blog.id %}">{{ previous_blog.title }}</a>{% else %}没有了{% endif %}</p>
+                    <p>下一篇: {% if next_blog %}<a href="{% url 'blog:blog_detail' next_blog.id %}">{{ next_blog.title }}</a>{% else %}没有了{% endif %}</p>
+                </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

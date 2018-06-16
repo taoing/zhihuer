@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}知乎儿{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="header-box">
+      <div class="container">
+        <ul class="nav navbar-nav">
+          <li><a href="">提问</a></li>
+          <li><a href="">回答</a></li>
+          <li><a href="">写文章</a></li>
+          <li><a href="">写想法</a></li>
+        </ul>
+      </div>
+      </div>
+
+      {% for answer in all_answers %}
+          <div class="answer-item site-box">
+            <p class="text-muted">来自话题:话题分类</p>
+            <div class="media">
+              <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
+              <div class="media-body">
+                <h4 class="media-heading">用户昵称 <small>一点示例文本, 一点示例文本</small></h4>
+              </div>
+            </div>
+            <div class="question-title">
+                <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
+            </div>
+            <div class="question-answer">
+                <p>{{ answer.content|truncatechars:200|safe }}</p>
+            </div>
+            <div class="answer-meta">
+              <a href=""><button type="button" class="btn btn-default btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span>99</button></a>
+              <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+              <a href=""><button type="button" class="btn btn-default">19 条评论</button></a>
+              <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+              <span>{{ answer.pub_time }}</span>         
+            </div>
+            
+          </div>
+      {% empty %}
+      <p>没有问答</p>
+      {% endfor %}
+
+    </div>
+
+    <div class="col-sm-4">
+
+
+    <div class="site-box">
+      <div class="media">
+          <div class="media-left">
+              <img src="" alt="头像" class="media-object">
+          </div>
+          <div class="media-body">
+              <h4 class="media-heading">Allen</h4>
+              <p>这是一些示例文本</p>
+          </div>
+      </div>
+      <hr>
+      <div class="">
+        <ul class="nav nav-stacked">
+        <li><a href=""><span class="badge pull-right">29</span><b>我的收藏</b></a></li>
+        <li><a href=""><span class="badge pull-right">14</span><b>我关注的问题</b></a></li>
+        </ul>
+        </div>
+      </div>
+    
+
+    <div class="site-box">
+      <p>加入知乎儿, 留下手印</p>
+      <p>
+        <button class="btn btn-primary btn-lg btn-block">注册</button>
+        <button class="btn btn-default btn-lg btn-block">登录</button>
+      </p>
+    </div>
+
+
+    <div class="panel panel-default">
+      <div class="panel-heading">标签</div>
+      <div class="panel-body">
+        <p>
+          {% for tag in tags %}
+          <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-tags"></span>&nbsp;没有</button>
+          {% empty %}
+          暂时没有标签
+          {% endfor %}
+        </p>
+      </div>
+    </div>
+
+
+      <div class="panel panel-default">
+        <div class="panel-heading">热门推荐</div>
+        <div class="panel-body">
+          <ul class="blog-hot">
+
+            <li><a href="">什么都没有</a></li>
+          </ul>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+</div>
+
+{% endblock %}
