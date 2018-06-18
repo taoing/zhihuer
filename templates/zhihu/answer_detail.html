@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}回答详情-知乎儿{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+
+{% include 'zhihu/question.html' with question=answer.question %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="site-box">
+        <div class="answer-item">
+          <div class="media">
+            <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
+            <div class="media-body">
+              <h4 class="media-heading">用户昵称</h4>
+              <p>一点示例文本, 一点示例文本</p>
+            </div>
+          </div>
+          <p class="text-muted">{{ answer.get_vote_on_nums }} 人赞同了该回答</p>
+          <p>
+            {{ answer.content }}
+          </p>
+          <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
+          <div class="answer-meta">
+            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span>99</button></a>
+            <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+            <a href=""><button type="button" class="btn btn-default">19 条评论</button></a>
+            <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+            <span>{{ answer.pub_time }}</span>         
+          </div>
+        </div>
+      </div>
+
+      <div class="site-box">
+        <div class="clearfix">
+          <strong>110 个评论</strong>
+          <span class="pull-right dropdown">
+            <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">默认排序<span class="caret"></span></button>
+            <ul class="dropdown-menu">
+              <li class="active"><a href="">默认排序</a></li>
+              <li><a href="">时间排序</a></li>
+            </ul>
+          </span>
+        </div>
+        <hr>
+
+        <div class="comment">
+
+        {% for comment in answer.answercomment_set.all %}
+          <div class="media">
+            <a href="" class="meida-left"><img src="" alt="" class="media-object"></a>
+            <div class="media-body"><h4 class="media-heading">用户昵称</h4></div>
+            <div class="pull-right">{{ comment.add_time }}</div>
+          </div>
+          <p>{{ comment.comment }}</p>
+          <hr>
+          {% empty %}
+          <p>暂时没有评论</p>
+          {% endfor %}
+
+          <form action="" class="form-inline">
+            <input type="text" class="form-control" name='comment' placeholder="写下你的评论">
+            <button class="btn btn-primary" type="submit">评论</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="site-box">
+        <div class="media">
+          <a href="" class="media-left"><img src="" alt="头像" class="meida-object"></a>
+          <div class="media-body">
+            <h4 class="media-heading">关于作者</h4>
+            <p>示例文本, 我很溜</p>
+          </div>
+        </div>
+        <hr>
+        <div class="author-meta">
+          <ul class="nav nav-pills nav-stacked">
+            <li><a href=""><span class="badge pull-right">12</span>回答</a></li>
+            <li><a href=""><span class="badge pull-right">3</span>文章</a></li>
+            <li><a href=""><span class="badge pull-right">49</span>关注者</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="site-box">
+        <p class="strong">被收藏了111次</p>
+      </div>
+      <div class="site-box">
+        <h4>相关问题</h4>
+        <hr>
+        {% for question in relate_questions %}
+          <p><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a> <span class="text-muted">{{ question.get_answer_nums }} 个回答</span></p>
+        {% empty %}
+        <p>没有相关问题</p>
+        {% endfor %}
+      </div>
+      <div class="site-box">
+        <h4>相关推荐</h4>
+        <hr>
+        <p><a href="">推荐文章</a> <span class="text-muted">2 个回答</span></p>
+        <p><a href="">推荐文章</a> <span class="text-muted">2 个回答</span></p>
+        <p><a href="">推荐文章</a> <span class="text-muted">2 个回答</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

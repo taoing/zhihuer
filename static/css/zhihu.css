@@ -19,14 +19,13 @@ body {
 .site-box {
     padding: 20px;
     background: #ffffff;
-    margin-bottom: 10px;
+    margin: 20px 0;
     border-radius: 3px;
     box-shadow: 0 3px 5px rgba(0,0,0,0.1);
 }
 
 .question-item, .answer-item {
-    padding: 20px 20px;
-    margin-bottom: 10px;
+    padding: 20px;
 }
 
 .question-title {
@@ -35,14 +34,36 @@ body {
 
 .question-meta, .answer-meta {
     margin: 5px 0 20px 0;
-    font-size: 12px;
+    font-size: 14px;
+}
+
+.question-answer a {
+    color: #333;
 }
 
 p {
     letter-spacing: 1px;
 }
 
+.strong {
+    font-weight: bold;
+}
+
+.question-detail {
+    padding: 20px;
+    background: #ffffff;
+}
+
 .question-info {
+    padding-top:40px;
     font-size: 16px;
     font-weight: bold;
+}
+
+.container-fluit {
+    background: #ffffff;
+}
+
+.author-meta {
+
 }

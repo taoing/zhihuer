@@ -6,30 +6,62 @@
 
 {% block content %}
 
-<div class="container-fluit">
+{% include 'zhihu/question.html' %}
+
 <div class="container">
   <div class="row">
     <div class="col-sm-8">
-      <div class="question-title">
-        <h3>{{ question.title }}</h3>
+      <div class="site-box">
+      <div class="clearfix">
+        <strong>{{ question_answer.count }} 个回答</strong>
+        <span class="pull-right dropdown">
+          <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">默认排序<span class="caret"></span></button>
+          <ul class="dropdown-menu">
+            <li class="active"><a href="">默认排序</a></li>
+            <li><a href="">时间排序</a></li>
+          </ul>
+        </span>
+        </div>
+      <hr>
+
+      {% for answer in question_answer %}
+        <div class="answer-item">
+          <div class="media">
+            <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
+            <div class="media-body">
+              <h4 class="media-heading">用户昵称</h4>
+              <p>一点示例文本, 一点示例文本</p>
+            </div>
+          </div>
+          <p class="text-muted">{{ answer.get_vote_on_nums }} 人赞同了该回答</p>
+          <p>
+            {{ answer.content }}
+          </p>
+          <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
+          <div class="answer-meta">
+            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span>99</button></a>
+            <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">19 条评论</button></a>
+            <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+            <span>{{ answer.pub_time }}</span>         
+          </div>
+        </div>
+        {% empty %}
+        <p>暂时没有回答</p>
+        {% endfor %}
       </div>
-      <p>{{ question.content }}</p>
     </div>
 
     <div class="col-sm-4">
-      <div class="question-info">
-        <p>关注者: 99</p>
-        <p>被浏览: 999</p>
+      <div class="site-box">
+        <h4>相关问题</h4>
+        <hr>
+        {% for question in relate_questions %}
+        <p><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a> <span class="text-muted">{{ question.get_answer_nums }} 个回答</span></p>
+        {% empty %}
+        <p>没有相关问题</p>
+        {% endfor %}
       </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8">
-      <p>答案: 示例文本</p>
     </div>
   </div>
 </div>

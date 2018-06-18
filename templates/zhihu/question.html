@@ -1,0 +1,31 @@
+<div class="container-fluit">
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+    <div class="question-detail">
+      <p>
+        {% for topic in question.topics.all %}
+        <button class="btn btn-default" type="button"><a href="">{{ topic.name }}</a></button>
+        {% endfor %}
+      </p>
+      <div class="question-title">
+        <a href="{% url 'question_detail' question.id %}"><h3>{{ question.title }}</h3></a>
+      </div>
+      <p>{{ question.content }}</p>
+      <div class="question-meta">
+        <a href=""><button type="button" class="btn btn-primary">关注问题</button></a>
+        <a href=""><button type="button" class="btn btn-default">写回答</button></a>
+        <span>{{ question.pub_time }}</span>
+      </div>
+    </div>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="question-info text-center">
+        <p>关注者: 99</p>
+        <p>被浏览: 999</p>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

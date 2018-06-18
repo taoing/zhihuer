@@ -28,6 +28,10 @@ class Question(models.Model):
     class Meta:
         ordering = ['-pub_time']
 
+    def get_answer_nums(self):
+        '''获取回答数量'''
+        return self.answer_set.all().count()
+
 
 class Answer(models.Model):
     '''回答模型'''
@@ -38,12 +42,27 @@ class Answer(models.Model):
     voteup_nums = models.IntegerField('认同数', default=0)
     votedown_nums = models.IntegerField('不认同数', default=0)
 
+    def get_vote_on_nums(self):
+        '''获取回答点赞数'''
+        return self.userfollowanswer_set.all().filter(follow_type=1).count()
+
+    def get_follow_nums(self):
+        '''获取回答的被收藏数'''
+        return self.userfollowanswer_set.all().filter(follow_type=2).count()
+
+    def __str__(self):
+        return self.content[:50]
+
 
 class AnswerComment(models.Model):
     '''回答评论模型'''
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='用户')
     answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING, verbose_name='回答')
     comment = models.CharField('评论', max_length=300)
+    add_time = models.DateTimeField('添加时间', auto_now_add=True)
+
+    def __str__(self):
+        return self.comment[:50]
 
 
 class UserFollowQuestion(models.Model):
