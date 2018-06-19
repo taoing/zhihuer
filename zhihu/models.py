@@ -32,6 +32,13 @@ class Question(models.Model):
         '''获取回答数量'''
         return self.answer_set.all().count()
 
+    def get_follow_est_answer(self):
+        '''获取点赞和收藏最多的回答'''
+        return self.answer_set.all().annotate(follow_nums=models.Count('userfollowanswer')).order_by('-follow_nums').first().content
+
+    def get_topic_name(self):
+        return self.topics.all().first().name
+
 
 class Answer(models.Model):
     '''回答模型'''

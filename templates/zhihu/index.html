@@ -2,8 +2,6 @@
 
 {% block title %}知乎儿{% endblock %}
 
-{% block nav_home_active %}active{% endblock %}
-
 {% block content %}
 
 <div class="container">
@@ -20,7 +18,7 @@
       </div>
       </div>
 
-      {% for answer in all_answers %}
+      {% for answer in page.object_list %}
           <div class="answer-item site-box">
             <p class="text-muted">来自话题:话题分类</p>
             <div class="media">
@@ -47,6 +45,8 @@
       {% empty %}
       <p>没有问答</p>
       {% endfor %}
+
+      {% include 'zhihu/paginator.html' %}
 
     </div>
 

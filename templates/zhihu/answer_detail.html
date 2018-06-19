@@ -62,6 +62,8 @@
           <p>暂时没有评论</p>
           {% endfor %}
 
+          {% include 'zhihu/paginator.html' %}
+
           <form action="" class="form-inline">
             <input type="text" class="form-control" name='comment' placeholder="写下你的评论">
             <button class="btn btn-primary" type="submit">评论</button>

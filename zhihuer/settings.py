@@ -134,3 +134,13 @@ STATICFILES_DIRS = [
 
 # 自定用户模型
 AUTH_USER_MODEL = 'user.User'
+
+# 分页
+ANSWER_PER_PAGE = 5
+QUESTION_PER_PAGE = 5
+COMMENT_PER_PAGE = 5
+
+# 边缘显示页数
+MARGIN_PAGES = 2
+# 中间显示页数
+PAGE_RANGE = 4

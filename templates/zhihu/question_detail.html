@@ -13,7 +13,7 @@
     <div class="col-sm-8">
       <div class="site-box">
       <div class="clearfix">
-        <strong>{{ question_answer.count }} 个回答</strong>
+        <strong>{{ page.paginator.count }} 个回答</strong>
         <span class="pull-right dropdown">
           <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">默认排序<span class="caret"></span></button>
           <ul class="dropdown-menu">
@@ -24,7 +24,7 @@
         </div>
       <hr>
 
-      {% for answer in question_answer %}
+      {% for answer in page.object_list %}
         <div class="answer-item">
           <div class="media">
             <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
@@ -50,6 +50,9 @@
         <p>暂时没有回答</p>
         {% endfor %}
       </div>
+
+      {% include 'zhihu/paginator.html' %}
+
     </div>
 
     <div class="col-sm-4">

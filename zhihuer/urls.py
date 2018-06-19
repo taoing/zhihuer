@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from zhihu.views import index, question_detail, answer_detail
+from zhihu.views import index, question_detail, answer_detail, explore
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,4 +24,5 @@ urlpatterns = [
     # path('zhihu/', include('zhihu.urls', namespace='zhihu')),
     path('question/detail/<int:question_id>/', question_detail, name='question_detail'),
     path('answer/detail/<int:answer_id>/', answer_detail, name='answer_detail'),
+    path('explore/', explore, name='explore'),
 ]

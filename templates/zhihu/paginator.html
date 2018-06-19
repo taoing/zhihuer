@@ -1,0 +1,21 @@
+<nav style="text-align: center">
+  <ul class="pagination center_block">
+    {% if page.has_previous %}
+    <li><a href="?page={{ page.previous_page_number }}">上一页</a></li>
+    {% endif %}
+    {% for page_number in page.page_range_ex %}
+      {% if page %}
+        {% if page_number == page.number %}
+        <li class="active"><a href="?page={{ page_number }}">{{ page_number }}</a></li>
+        {% else %}
+        <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>
+        {% endif %}
+      {% else %}
+        <li><a href="">...</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if page.has_next %}
+    <li><a href="?page={{ page.next_page_number }}">下一页</a></li>
+    {% endif %}
+  </ul>
+</nav>
