@@ -71,3 +71,10 @@ p {
 .recommend {
     
 }
+
+.form-register, .form-login {
+    max-width: 350px;
+    padding: 20px;
+    background: #ffffff;
+    margin: 0 auto;
+}

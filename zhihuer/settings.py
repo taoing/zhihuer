@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'zhihu',
     'user',
+    # 第三方验证码
+    'captcha',
 ]
 
 MIDDLEWARE = [
