@@ -57,6 +57,10 @@ class Answer(models.Model):
         '''获取回答的被收藏数'''
         return self.userfollowanswer_set.all().filter(follow_type=2).count()
 
+    def get_comment_nums(self):
+        '''获取评论数量'''
+        return self.answercomment_set.all().count()
+
     def __str__(self):
         return self.content[:50]
 

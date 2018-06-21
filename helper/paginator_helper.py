@@ -42,3 +42,4 @@ def paginator_helper(request, object_list, per_page=10):
     else:
         page.page_range_ex = paginator.page_range
     return page
+    

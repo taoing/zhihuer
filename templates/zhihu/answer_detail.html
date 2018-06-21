@@ -16,7 +16,7 @@
           <div class="media">
             <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
             <div class="media-body">
-              <h4 class="media-heading">用户昵称</h4>
+              <h4 class="media-heading">{{ answer.author.username }}</h4>
               <p>一点示例文本, 一点示例文本</p>
             </div>
           </div>
@@ -26,9 +26,9 @@
           </p>
           <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
           <div class="answer-meta">
-            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span>99</button></a>
+            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_vote_on_nums }}</button></a>
             <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-            <a href=""><button type="button" class="btn btn-default">19 条评论</button></a>
+            <a href=""><button type="button" class="btn btn-default">{{ answer.get_comment_nums }} 条评论</button></a>
             <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
             <span>{{ answer.pub_time }}</span>         
           </div>
@@ -37,7 +37,7 @@
 
       <div class="site-box">
         <div class="clearfix">
-          <strong>110 个评论</strong>
+          <strong>{{ answer.get_comment_nums }} 个评论</strong>
           <span class="pull-right dropdown">
             <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">默认排序<span class="caret"></span></button>
             <ul class="dropdown-menu">
@@ -77,7 +77,7 @@
         <div class="media">
           <a href="" class="media-left"><img src="" alt="头像" class="meida-object"></a>
           <div class="media-body">
-            <h4 class="media-heading">关于作者</h4>
+            <h4 class="media-heading">{{ answer.author.username }}</h4>
             <p>示例文本, 我很溜</p>
           </div>
         </div>
@@ -91,7 +91,7 @@
         </div>
       </div>
       <div class="site-box">
-        <p class="strong">被收藏了111次</p>
+        <p class="strong">被收藏了{{ answer.get_follow_nums }}次</p>
       </div>
       <div class="site-box">
         <h4>相关问题</h4>

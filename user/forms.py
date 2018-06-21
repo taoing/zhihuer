@@ -10,7 +10,7 @@ class RegisterForm(forms.Form):
     email = forms.EmailField(label="邮箱", max_length=40)
     password = forms.CharField(label="密码", widget=forms.PasswordInput)
     password2 = forms.CharField(label="重复密码", widget=forms.PasswordInput)
-    captcha = CaptchaField()
+    captcha = CaptchaField(label='验证码')
 
     def clean_password2(self):
         password = self.cleaned_data.get('password')

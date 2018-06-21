@@ -24,6 +24,14 @@
 <body>
   <div class="container">
     <div class="form-login">
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <p{% if message.tags %} active="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       <h3>登录</h3>
       <p>登录知乎儿, 发现不同</p>
       <form action="{% url 'user_login' %}", method="post">

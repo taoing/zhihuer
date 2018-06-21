@@ -5,6 +5,14 @@
 {% block content %}
 
 <div class="container">
+  {% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+    <p class="alert alert-info alert-dismissable">
+      <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
   <div class="row">
     <div class="col-sm-8">
       <div class="header-box">
@@ -20,7 +28,7 @@
 
       {% for answer in page.object_list %}
           <div class="answer-item site-box">
-            <p class="text-muted">来自话题:话题分类</p>
+            <p class="text-muted">来自话题:{{ answer.question.get_topic_name }}</p>
             <div class="media">
               <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
               <div class="media-body">
@@ -34,9 +42,9 @@
                 <a href="{% url 'answer_detail' answer.id %}"><p>{{ answer.content|truncatechars:200|safe }}</p></a>
             </div>
             <div class="answer-meta">
-              <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span>99</button></a>
+              <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_vote_on_nums }}</button></a>
               <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-              <a href=""><button type="button" class="btn btn-default">19 条评论</button></a>
+              <a href=""><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
               <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
               <span>{{ answer.pub_time }}</span>         
             </div>
@@ -54,6 +62,10 @@
 
 
     <div class="site-box">
+      {% if request.user.is_authenticated and request.user.confirmed == False %}
+      <p>你的账户还没确认, 请前往邮箱确认.</p>
+      <p>没收到确认邮件, 点击 <a class="send-email" href="{% url 'resend_confirm_email' %}">重新发送</a></p>
+      {% endif %}
       <div class="media">
           <div class="media-left">
               <img src="" alt="头像" class="media-object">
@@ -76,7 +88,7 @@
     <div class="site-box">
       <h4>加入知乎儿, 留下手印</h4>
       <p>
-        <a target="_blank" href="{% url 'register' %}"><button class="btn btn-default btn-lg btn-block">注册</button></a>
+        <a target="_blank" href="{% url 'register' %}"><button class="btn btn-primary btn-lg btn-block">注册</button></a>
         <a target="_blank" href="{% url 'user_login' %}"><button class="btn btn-default btn-lg btn-block">登录</button></a>
       </p>
     </div>

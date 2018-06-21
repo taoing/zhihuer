@@ -39,9 +39,9 @@
           </p>
           <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
           <div class="answer-meta">
-            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span>99</button></a>
+            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_vote_on_nums }}</button></a>
             <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">19 条评论</button></a>
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
             <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
             <span>{{ answer.pub_time }}</span>         
           </div>

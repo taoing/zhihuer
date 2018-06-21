@@ -1,0 +1,9 @@
+{{ user.username }}, 你好
+
+欢迎加入知乎儿!
+
+请点击以下链接确认账户:
+
+{% url 'user_confirm' token %}
+
+该邮件来自知乎儿, 不用回复.

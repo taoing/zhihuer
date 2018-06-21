@@ -146,3 +146,16 @@ COMMENT_PER_PAGE = 5
 MARGIN_PAGES = 2
 # 中间显示页数
 PAGE_RANGE = 4
+
+# 邮箱配置
+EMAIL_HOST = 'smtp.sina.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'taomiantm@sina.com'
+EMAIL_HOST_PASSWORD = 'tm105047'
+EMAIL_USE_TLS = False
+EMAIL_FROM = 'taomiantm@sina.com'
+
+# 自定认证后端
+AUTHENTICATION_BACKENDS = [
+    'user.views.CustomModelBackend',
+]

@@ -9,7 +9,7 @@ from helper.paginator_helper import paginator_helper
 
 def index(request):
     '''首页'''
-    all_answers = Answer.objects.all().order_by('-pub_time')
+    all_answers = Answer.objects.annotate(comment_nums=Count('answercomment')).order_by('-pub_time')
 
     # 分页
     page = paginator_helper(request, all_answers, per_page=settings.ANSWER_PER_PAGE)
@@ -23,7 +23,8 @@ def question_detail(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
     # 问题的回答
-    question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer')).order_by('-follow_nums')
+    question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer')).annotate(\
+        comment_nums=Count('answercomment')).order_by('-follow_nums')
 
     # 分页
     page = paginator_helper(request, question_answers, per_page=settings.ANSWER_PER_PAGE)
