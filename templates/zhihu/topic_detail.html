@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}话题广场-知乎儿{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="site-box">
+        <div class="media">
+          <div class="media-left"><img src="" alt="话题" class="media-object"></div>
+          <div class="media-body">
+            <h3 class="media-heading">{{ topic.name }}</h3>
+            <p>{{ topic.description }}</p>
+          </div>
+        </div>
+        <hr>
+        <button class="btn btn-primary btn-lg">关注话题</button>
+      </div>
+
+      <div class="site-box">
+        <ul class="nav nav-pills">
+          <li class="active"><a href="">讨论</a></li>
+          <li><a href="">精华</a></li>
+          <li><a href="">等待回答</a></li>
+        </ul>
+        <hr>
+        {% for answer in page.object_list %}
+        <div class="answer-item">
+          <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
+          <div class="media">
+            <a href="" class="media-left">
+              <img src="" alt="头像" class="media-object">
+            </a>
+            <div class="media-body">
+              <h4 class="media-heading">{{ answer.author.nickname }} <span class=text-muted><small>, {{ answer.author.description }}</small></span></h4>
+            </div>
+          </div>
+          <div class="answer-content">
+            <a href="{% url 'answer_detail' answer.id %}"><p>{{ answer.content|truncatechars:200|safe }}</p></a>
+          </div>
+          <div class="answer-meta">
+            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
+            <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
+            <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+            <span>{{ answer.pub_time }}</span>         
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% include 'zhihu/paginator.html' %}
+    </div>
+
+    <div class="col-sm-4">
+      <div class="site-box">
+        <p>关注者: <strong>{{ topic.get_user_nums }}</strong></p>
+        <p>问题数: <strong>{{ topic.get_question_nums }}</strong></p>
+      </div>
+      <div class="site-box">
+        <h4><strong>活跃回答者</strong><a href="" class="look-more text-muted">查看更多</a></h4>
+        <hr>
+        {% for user in most_active_users %}
+        <div class="media">
+          <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
+          <div class="media-body">
+            <h4 class="media-heading">{{ user.nickname }}</h4>
+            <p>共{{ user.answer_nums }}回答, {{ user.follow_nums }}赞同</p>
+          </div>
+        </div>
+        <hr>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

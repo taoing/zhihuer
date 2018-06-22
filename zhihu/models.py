@@ -6,10 +6,21 @@ from user.models import User
 class Topic(models.Model):
     '''话题分类'''
     name = models.CharField('话题', max_length=40)
+    description = models.CharField('话题描述', max_length=200, null=True, blank=True)
     add_time = models.DateTimeField('添加时间', auto_now_add=True)
+
+    users = models.ManyToManyField(User, blank=True, verbose_name='用户话题')
 
     def __str__(self):
         return self.name
+
+    def get_user_nums(self):
+        '''获取关注者数量'''
+        return self.users.all().count()
+
+    def get_question_nums(self):
+        '''获取话题的问题数'''
+        return self.question_set.all().count()
 
 
 class Question(models.Model):
@@ -33,7 +44,7 @@ class Question(models.Model):
         return self.answer_set.all().count()
 
     def get_follow_est_answer(self):
-        '''获取点赞和收藏最多的回答'''
+        '''获取点赞最多的回答'''
         return self.answer_set.all().annotate(follow_nums=models.Count('userfollowanswer')).order_by('-follow_nums').first().content
 
     def get_topic_name(self):
@@ -49,13 +60,13 @@ class Answer(models.Model):
     voteup_nums = models.IntegerField('认同数', default=0)
     votedown_nums = models.IntegerField('不认同数', default=0)
 
-    def get_vote_on_nums(self):
-        '''获取回答点赞数'''
-        return self.userfollowanswer_set.all().filter(follow_type=1).count()
-
     def get_follow_nums(self):
+        '''获取回答点赞数'''
+        return self.userfollowanswer_set.all().count()
+
+    def get_collect_nums(self):
         '''获取回答的被收藏数'''
-        return self.userfollowanswer_set.all().filter(follow_type=2).count()
+        return self.usercollectanswer_set.all().count()
 
     def get_comment_nums(self):
         '''获取评论数量'''
@@ -84,8 +95,13 @@ class UserFollowQuestion(models.Model):
 
 
 class UserFollowAnswer(models.Model):
-    '''用户点赞回答, 收藏回答模型'''
+    '''用户点赞回答模型'''
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='用户')
     answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING, verbose_name='回答')
-    follow_type = models.IntegerField(choices=((1, '点赞'), (2, '收藏')), null=True, blank=True)
+    add_time = models.DateTimeField('添加时间', auto_now_add=True)
+
+class UserCollectAnswer(models.Model):
+    '''用户收藏回答模型'''
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='用户')
+    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING, verbose_name='回答')
     add_time = models.DateTimeField('添加时间', auto_now_add=True)

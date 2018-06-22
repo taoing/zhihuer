@@ -37,7 +37,7 @@ body {
     font-size: 14px;
 }
 
-.question-answer a {
+.answer-content a {
     color: #333;
 }
 
@@ -77,4 +77,18 @@ p {
     padding: 20px;
     background: #ffffff;
     margin: 0 auto;
+}
+
+.topic-item {
+    padding: 15px;
+    position: relative;
+    float: left;
+    width: 50%;
+    border-bottom: 1px dotted #ddd;
+}
+
+.topic-follow, .look-more {
+    font-size: 14px;
+    right: 25px;
+    position: absolute;
 }

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}回答详情-知乎儿{% endblock %}
+{% block title %}发现-知乎儿{% endblock %}
 
 {% block nav_home_active %}active{% endblock %}
 
@@ -9,86 +9,90 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-8">
-      <p>编辑推荐</p>
-      <hr>
-      <div class="recommend">
-        {% for question in recommend_questions %}
-        {% if forloop.counter == 1 %}
-        <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h4>
-        <div class="media">
-          <a href="" class="media-left">
-            <img src="" alt="头像" class="media-object">
-          </a>
-          <div class="media-body">
-            <h4 class="media-heading">{{ question.author.nickname }}, <small>个人说明</small></h4>
-            <p>{{ question.get_follow_est_answer|truncatechars:200|safe }}</p>
+      <div class="site-box">
+        <p>编辑推荐</p>
+        <hr>
+        <div class="recommend">
+          {% for question in recommend_questions %}
+          {% if forloop.counter == 1 %}
+          <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h4>
+          <div class="media">
+            <a href="" class="media-left">
+              <img src="" alt="头像" class="media-object">
+            </a>
+            <div class="media-body">
+              <h4 class="media-heading">{{ question.author.nickname }}, <small>个人说明</small></h4>
+              <p>{{ question.get_follow_est_answer|truncatechars:200|safe }}</p>
+            </div>
           </div>
+          <hr>
+          {% else %}
+          <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a><small class="text-muted pull-right">{{ question.get_topic_name }}</small></h4>
+          <hr>
+          {% endif %}
+          {% endfor %}
         </div>
-        <hr>
-        {% else %}
-        <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a><small class="text-muted pull-right">{{ question.get_topic_name }}</small></h4>
-        <hr>
-        {% endif %}
-        {% endfor %}
-      </div>
 
-      <div>
-        <ul class="nav nav-tabs">
-          <li class="active"><a href="#today" data-toggle="tab">今日最热</a></li>
-          <li class=""><a href="#month" data-toggle="tab">本月最热</a></li>
-        </ul>
-        <div class="tab-content">
-          <div class="tab-pane fade in active" id="today">
-            {% for answer in page_today.object_list %}
-              <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
-              <div class="media">
-                <a href="" class="media-left">
-                  <img src="" alt="头像" class="media-object">
-                </a>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ answer.question.author.nickname }}, <small>个人说明</small></h4>
-                  <p>{{ answer.content|truncatechars:200|safe }}</p>
+        <div>
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#today" data-toggle="tab">今日最热</a></li>
+            <li class=""><a href="#month" data-toggle="tab">本月最热</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade in active" id="today">
+              {% for answer in page_today.object_list %}
+                <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
+                <div class="media">
+                  <a href="" class="media-left">
+                    <img src="" alt="头像" class="media-object">
+                  </a>
+                  <div class="media-body">
+                    <h4 class="media-heading">{{ answer.question.author.nickname }}, <small>个人说明</small></h4>
+                    <p>{{ answer.content|truncatechars:200|safe }}</p>
+                  </div>
                 </div>
-              </div>
-              <hr>
-            {% empty %}
-              <p>暂时没有今日热门</p>
-            {% endfor %}
+                <hr>
+              {% empty %}
+                <p>暂时没有今日热门</p>
+              {% endfor %}
 
-            {% include 'zhihu/paginator.html' with page=page_today %}
+              {% include 'zhihu/paginator.html' with page=page_today %}
 
-          </div>
-          <div class="tab-pane fade" id="month">
-            {% for answer in page_month.object_list %}
-              <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
-              <div class="media">
-                <a href="" class="media-left">
-                  <img src="" alt="头像" class="media-object">
-                </a>
-                <div class="media-body">
-                  <h4 class="media-heading">{{ answer.question.author.nickname }}, <small>个人说明</small></h4>
-                  <p class="question-answer"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200|safe }}</a></p>
+            </div>
+            <div class="tab-pane fade" id="month">
+              {% for answer in page_month.object_list %}
+                <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
+                <div class="media">
+                  <a href="" class="media-left">
+                    <img src="" alt="头像" class="media-object">
+                  </a>
+                  <div class="media-body">
+                    <h4 class="media-heading">{{ answer.question.author.nickname }}, <small>个人说明</small></h4>
+                    <p class="question-answer"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200|safe }}</a></p>
+                  </div>
                 </div>
-              </div>
-              <hr>
-            {% empty %}
-              <p>暂时没有本月热门</p>
-            {% endfor %}
+                <hr>
+              {% empty %}
+                <p>暂时没有本月热门</p>
+              {% endfor %}
 
-            {% include 'zhihu/paginator.html' with page=page_month %}
+              {% include 'zhihu/paginator.html' with page=page_month %}
 
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="col-sm-4">
-      <h4>热门话题<a href="" class="text-muted pull-right"><small>更多话题</small></a></h4>
-      <hr>
-      {% for topic in hot_topics %}
-      <p><a href="">{{ topic.name }}</a></p>
-      <hr>
-      {% endfor %}
+      <div class="site-box">
+        <h4>热门话题<a href="" class="text-muted pull-right"><small>更多话题</small></a></h4>
+        <hr>
+        {% for topic in hot_topics %}
+        <p><a href="">{{ topic.name }}</a></p>
+        <hr>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </div>

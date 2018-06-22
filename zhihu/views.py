@@ -2,14 +2,17 @@ from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
+from django.http import HttpResponse
 
-from .models import Question, Answer, Topic
+from .models import Question, Answer, Topic, UserFollowAnswer
 from zhihuer import settings
 from helper.paginator_helper import paginator_helper
+from user.views import User
 
 def index(request):
     '''首页'''
-    all_answers = Answer.objects.annotate(comment_nums=Count('answercomment')).order_by('-pub_time')
+    all_answers = Answer.objects.annotate(comment_nums=Count('answercomment', distinct=True))\
+        .annotate(follow_nums=Count('userfollowanswer', distinct=True)).order_by('-pub_time')
 
     # 分页
     page = paginator_helper(request, all_answers, per_page=settings.ANSWER_PER_PAGE)
@@ -22,7 +25,7 @@ def question_detail(request, question_id):
     '''问题详情'''
     question = get_object_or_404(Question, pk=question_id)
 
-    # 问题的回答
+    # 问题的回答, 点赞数排序
     question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer')).annotate(\
         comment_nums=Count('answercomment')).order_by('-follow_nums')
 
@@ -88,3 +91,60 @@ def explore(request):
     context['hot_topics'] = hot_topics
 
     return render(request, 'zhihu/explore.html', context)
+
+def topic_list(request):
+    '''话题广场'''
+    # 话题根据关注用户的数量排序
+    all_topics = Topic.objects.all().order_by('add_time')
+    # 热门话题, 关注者最多的话题
+    hot_topics = Topic.objects.all().annotate(user_nums=Count('users')).order_by('-user_nums')[:5]
+    page = paginator_helper(request, all_topics, per_page = settings.TOPIC_PER_PAGE)
+
+    context = {}
+    context['page'] = page
+    context['hot_topics'] = hot_topics
+
+    return render(request, 'zhihu/topic_list.html', context)
+
+def topic_detail(request, topic_id):
+    '''话题详情'''
+    topic = Topic.objects.get(pk=topic_id)
+    # 话题下最新讨论(回答)
+    topic_answers = Answer.objects.filter(question__in=topic.question_set.all()).annotate(follow_nums\
+        =Count('userfollowanswer', distince=True)).annotate(comment_nums=Count('answercomment', distinct=True)).order_by('-pub_time')
+
+    # 话题下回答问题的最活跃回答者, 按用户的回答赞同数排序
+    # 用distinct去除重复的user_id, 但mysql数据库不支持, 使用set类型集合
+    # 该话题下, 有回答的用户ID列表
+    user_ids = set()
+    for answer in topic_answers:
+        user_ids.add(answer.author_id)
+    # 最活跃用户取前5
+    most_active_users = User.objects.filter(id__in=user_ids)\
+        .annotate(follow_nums=Count('userfollowanswer',distinct=True), answer_nums=Count('answer', distinct=True)).order_by('-follow_nums')[:5]
+
+
+    page = paginator_helper(request, topic_answers, per_page=settings.ANSWER_PER_PAGE)
+
+    context = {}
+    context['topic'] = topic
+    context['most_active_users'] = most_active_users
+    context['page'] = page
+    return render(request, 'zhihu/topic_detail.html', context)
+
+def add_follow_answer(request):
+    '''赞同答案'''
+    if request.method == 'POST':
+        answer_id = int(request.POST.get('id'))
+        try:
+            answer = Answer.objects.get(id=answer_id)
+            answer_follow_exist = UserFollowAnswer.objects.filter(user=request.user, answer=answer).first()
+            if answer_follow_exist:
+                answer_follow_exist.delete()
+                return HttpResponse('{"status":"success", "message":"收藏"}', content_type='application/json')
+            else:
+                answer_follow = UserFollowAnswer(user=request.user, answer=answer)
+                answer.save()
+                return HttpResponse('{"status":"success", "message":"已收藏"}', content_type='application/json')
+        except Exception as e:
+            return HttpResponse('{"status":"fail", "message":"发生错误"}', content_type='application/json')

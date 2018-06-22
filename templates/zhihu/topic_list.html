@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}话题广场-知乎儿{% endblock %}
+
+{% block nav_home_active %}active{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="site-box">
+        <h4>话题广场</h4>
+        <hr>
+        {% if request.user.is_authenticated %}
+        <p>已关注 {{ request.user.get_topic_nums }} 个话题</p>
+
+        <div class="user-topic">
+        {% for topic in request.user.topic_set.all %}
+          <a href="{% url 'topic-detail' topic.id %}"><button class="btn btn-default" type="button">{{ topic.name }}</button></a>
+        {% empty %}
+        <p>暂时没有关注话题</p>
+        {% endfor %}
+        </div>
+        <hr>
+        {% endif %}
+
+        <div class="topic-list">
+          {% for topic in page.object_list %}
+          <div class="topic-item">
+            <div class="meida">
+              <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img src="" alt="话题" class="media-object"></a>
+              <div class="media-body">
+                <h4 class="media-heading"><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a> <span class="topic-follow text-muted">关注</span></h4>
+                <p>{{ topic.description }}</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% include 'zhihu/paginator.html' %}
+      </div>
+
+    </div>
+
+    <div class="col-sm-4">
+      <div class="site-box">
+        <h4>热门话题</h4>
+        <hr>
+        {% for topic in hot_topics %}
+        <div class="media">
+          <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img src="" alt="话题" class="media-object"></a>
+          <div class="media-body">
+            <h4 class="media-heading"><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
+            <p>{{ topic.user_nums }} 人关注</p>
+          </div>
+        </div>
+        <hr>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

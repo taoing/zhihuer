@@ -20,6 +20,9 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    def get_topic_nums(self):
+        return self.topic_set.all().count()
+
     def generate_confirm_token(self):
         '''生成用户确认签名'''
         token = signing.dumps({'confirm': self.id})

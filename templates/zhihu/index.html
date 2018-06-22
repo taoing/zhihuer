@@ -32,20 +32,20 @@
             <div class="media">
               <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
               <div class="media-body">
-                <h4 class="media-heading">用户昵称 <small>一点示例文本, 一点示例文本</small></h4>
+                <h4 class="media-heading">{{ answer.author.nickname }} <small>{{ answer.author.description }}</small></h4>
               </div>
             </div>
             <div class="question-title">
                 <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
             </div>
-            <div class="question-answer">
+            <div class="answer-content">
                 <a href="{% url 'answer_detail' answer.id %}"><p>{{ answer.content|truncatechars:200|safe }}</p></a>
             </div>
             <div class="answer-meta">
-              <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_vote_on_nums }}</button></a>
-              <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-              <a href=""><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
-              <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+              <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
+              <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+              <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
+              <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
               <span>{{ answer.pub_time }}</span>         
             </div>
             
@@ -122,5 +122,35 @@
 
     </div>
 </div>
+
+{% endblock %}
+
+{% block custom_js %}
+
+<script>
+  function add_follow(current_elem) {
+    $.ajax({
+      cache:false,
+      type:'POST',
+      url:"{% url 'add_follow_answer' %}",
+      data:{'id':current_elem.attr('answer-id')},
+      async:true,
+      beforeSend:function(xhr, settings) {
+        xhr.setRequestHeader('X-CSRFToken', "{{ csrf_token }}");
+      },
+      success:function(data) {
+        if(data.status == 'fail') {
+          alert(data.message);
+        }else if (data.status == 'success'){
+          window.location.reload();
+        }
+      },
+    });
+  }
+
+  $('#add-follow-answer').on('click', function() {
+    add_follow($(this));
+  });
+</script>
 
 {% endblock %}
