@@ -46,7 +46,7 @@
               <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
               <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
               <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
-              <span>{{ answer.pub_time }}</span>         
+              <span>{{ answer.pub_time }}</span>        
             </div>
             
           </div>
@@ -60,7 +60,7 @@
 
     <div class="col-sm-4">
 
-
+    {% if request.user.is_authenticated %}
     <div class="site-box">
       {% if request.user.is_authenticated and request.user.confirmed == False %}
       <p>你的账户还没确认, 请前往邮箱确认.</p>
@@ -71,20 +71,19 @@
               <img src="" alt="头像" class="media-object">
           </div>
           <div class="media-body">
-              <h4 class="media-heading">Allen</h4>
-              <p>这是一些示例文本</p>
+              <h4 class="media-heading">{{ request.user.nickname }}</h4>
+              <p>{{ request.user.description }}</p>
           </div>
       </div>
       <hr>
       <div class="">
         <ul class="nav nav-stacked">
-        <li><a href=""><span class="badge pull-right">29</span><b>我的收藏</b></a></li>
-        <li><a href=""><span class="badge pull-right">14</span><b>我关注的问题</b></a></li>
+        <li><a href=""><span class="badge pull-right">{{ request.user.get_collect_answer_nums }}</span><b>我的收藏</b></a></li>
+        <li><a href=""><span class="badge pull-right">{{ request.user.get_follow_question_nums }}</span><b>我关注的问题</b></a></li>
         </ul>
         </div>
       </div>
-    
-
+    {% else %}
     <div class="site-box">
       <h4>加入知乎儿, 留下手印</h4>
       <p>
@@ -92,6 +91,7 @@
         <a target="_blank" href="{% url 'user_login' %}"><button class="btn btn-default btn-lg btn-block">登录</button></a>
       </p>
     </div>
+    {% endif %}
 
 
     <div class="panel panel-default">
@@ -122,35 +122,5 @@
 
     </div>
 </div>
-
-{% endblock %}
-
-{% block custom_js %}
-
-<script>
-  function add_follow(current_elem) {
-    $.ajax({
-      cache:false,
-      type:'POST',
-      url:"{% url 'add_follow_answer' %}",
-      data:{'id':current_elem.attr('answer-id')},
-      async:true,
-      beforeSend:function(xhr, settings) {
-        xhr.setRequestHeader('X-CSRFToken', "{{ csrf_token }}");
-      },
-      success:function(data) {
-        if(data.status == 'fail') {
-          alert(data.message);
-        }else if (data.status == 'success'){
-          window.location.reload();
-        }
-      },
-    });
-  }
-
-  $('#add-follow-answer').on('click', function() {
-    add_follow($(this));
-  });
-</script>
 
 {% endblock %}

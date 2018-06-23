@@ -2,12 +2,13 @@ from datetime import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
-from .models import Question, Answer, Topic, UserFollowAnswer
+from .models import Question, Answer, Topic, UserFollowAnswer, AnswerComment, UserFollowQuestion, UserCollectAnswer
 from zhihuer import settings
 from helper.paginator_helper import paginator_helper
 from user.views import User
+from .forms import CommentForm
 
 def index(request):
     '''首页'''
@@ -24,6 +25,14 @@ def index(request):
 def question_detail(request, question_id):
     '''问题详情'''
     question = get_object_or_404(Question, pk=question_id)
+    # get请求一次, 浏览量+1
+    question.read_nums += 1
+    question.save()
+
+    has_follow_question = False
+    if request.user.is_authenticated:
+        if UserFollowQuestion.objects.filter(user=request.user, question=question):
+            has_follow_question = True
 
     # 问题的回答, 点赞数排序
     question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer')).annotate(\
@@ -39,6 +48,7 @@ def question_detail(request, question_id):
 
     context = {}
     context['question'] = question
+    context['has_follow_question'] = has_follow_question
     context['page'] = page
     context['relate_questions'] = relate_questions
     return render(request, 'zhihu/question_detail.html', context)
@@ -46,21 +56,35 @@ def question_detail(request, question_id):
 def answer_detail(request, answer_id):
     '''回答详情'''
     answer = get_object_or_404(Answer, pk=answer_id)
+    question = answer.question
 
-    # 归属问题话题的相关问题, 按点赞数和收藏数之和排序
+    has_follow_question = False
+    has_collect_answer = False
+    if request.user.is_authenticated:
+        if UserFollowQuestion.objects.filter(user=request.user, question=question):
+            has_follow_question = True
+        if UserCollectAnswer.objects.filter(user=request.user, answer=answer):
+            has_collect_answer = True
+
+
+    # 归属问题话题的相关问题, 按阅读量排序
     # 回答归属question归属话题, 取第一个话题
-    question_topic = answer.question.topics.all().first()
+    question_topic = question.topics.all().first()
     # 话题相关question, 取前5个
     relate_questions = question_topic.question_set.all().order_by('-read_nums')[:5]
-
-    # 回答评论
-    pass
+    # 评论表单
+    comment_form = CommentForm()
     # 评论分页
-    pass
+    answer_comments = answer.answercomment_set.all().order_by('-add_time')
+    page = paginator_helper(request, answer_comments, per_page=settings.COMMENT_PER_PAGE)
 
     context = {}
     context['answer'] = answer
+    context['has_follow_question'] = has_follow_question
+    context['has_collect_answer'] = has_collect_answer
     context['relate_questions'] = relate_questions
+    context['comment_form'] = comment_form
+    context['page'] = page
     return render(request, 'zhihu/answer_detail.html', context)
 
 def explore(request):
@@ -132,19 +156,76 @@ def topic_detail(request, topic_id):
     context['page'] = page
     return render(request, 'zhihu/topic_detail.html', context)
 
-def add_follow_answer(request):
+def add_follow_answer(request, answer_id):
     '''赞同答案'''
+    # if request.method == 'POST':
+    try:
+        answer = get_object_or_404(Answer, id=answer_id)
+        answer_follow_existed = UserFollowAnswer.objects.filter(user=request.user, answer=answer).first()
+        if answer_follow_existed:
+            answer_follow_existed.delete()
+            return JsonResponse({"status":"success"})
+        else:
+            answer_follow = UserFollowAnswer(user=request.user, answer=answer)
+            answer_follow.save()
+            return JsonResponse({"status":"success"})
+    except Exception as e:
+        return JsonResponse({"status":"fail", "message":"发生错误"})
+
+def cancel_follow_answer(request, answer_id):
+    '''取消赞同'''
+    # if request.method == 'POST':
+    try:
+        answer = get_object_or_404(Answer, id=answer_id)
+        answer_follow_existed = UserFollowAnswer.objects.filter(user=request.user, answer=answer).first()
+        if answer_follow_existed:
+            answer_follow_existed.delete()
+            return JsonResponse({'status':'success'})
+        else:
+            return JsonResponse({'status':None})
+    except Exception as e:
+        print(e)
+        return JsonResponse({'status':'fail', 'message':'发生错误'})
+
+def comment_answer(request, answer_id):
+    '''评论回答'''
     if request.method == 'POST':
-        answer_id = int(request.POST.get('id'))
-        try:
-            answer = Answer.objects.get(id=answer_id)
-            answer_follow_exist = UserFollowAnswer.objects.filter(user=request.user, answer=answer).first()
-            if answer_follow_exist:
-                answer_follow_exist.delete()
-                return HttpResponse('{"status":"success", "message":"收藏"}', content_type='application/json')
-            else:
-                answer_follow = UserFollowAnswer(user=request.user, answer=answer)
-                answer.save()
-                return HttpResponse('{"status":"success", "message":"已收藏"}', content_type='application/json')
-        except Exception as e:
-            return HttpResponse('{"status":"fail", "message":"发生错误"}', content_type='application/json')
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.cleaned_data.get('comment')
+            answer = get_object_or_404(Answer, id=answer_id)
+            answer_comment = AnswerComment(user=request.user, answer=answer, comment=comment)
+            answer_comment.save()
+            return JsonResponse({'status':'success'})
+        else:
+            return JsonResponse({'message':'评论不能为空'})
+
+def follow_question(request, question_id):
+    '''关注问题'''
+    try:
+        question = get_object_or_404(Question, id=question_id)
+        follow_question_existed = UserFollowQuestion.objects.filter(user=request.user, question=question).first()
+        if follow_question_existed:
+            follow_question_existed.delete()
+            return JsonResponse({'status':'success', 'message':'关注问题'})
+        else:
+            follow_question = UserFollowQuestion(user=request.user, question=question)
+            follow_question.save()
+            return JsonResponse({'status':'success', 'message':'已关注'})
+    except Exception as e:
+        return JsonResponse({'status':'fail', 'message':'发生错误'})
+
+def collect_answer(request, answer_id):
+    '''收藏答案'''
+    try:
+        answer = get_object_or_404(Answer, id=answer_id)
+        collect_answer_existed = UserCollectAnswer.objects.filter(user=request.user, answer=answer).first()
+        if collect_answer_existed:
+            collect_answer_existed.delete()
+            return JsonResponse({'status':'success', 'message':'收藏'})
+        else:
+            collect_answer = UserCollectAnswer(user=request.user, answer=answer)
+            collect_answer.save()
+            return JsonResponse({'status':'success', 'message':'已收藏'})
+    except Exception as e:
+        return JsonResponse({'status':'fail', 'message':'发生错误'})

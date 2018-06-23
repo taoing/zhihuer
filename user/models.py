@@ -23,6 +23,22 @@ class User(AbstractUser):
     def get_topic_nums(self):
         return self.topic_set.all().count()
 
+    def get_collect_answer_nums(self):
+        return self.usercollectanswer_set.all().count()
+
+    def get_follow_question_nums(self):
+        return self.userfollowquestion_set.all().count()
+
+    def get_answer_by_followed_nums(self):
+        '''获取所有回答的被关注数量'''
+        from zhihu.models import UserFollowAnswer
+        return UserFollowAnswer.objects.filter(answer__author=self).count()
+
+    def get_answer_by_collected_nums(self):
+        '''获取所有回答的被关注数量'''
+        from zhihu.models import UserCollectAnswer
+        return UserCollectAnswer.objects.filter(answer__author=self).count()
+
     def generate_confirm_token(self):
         '''生成用户确认签名'''
         token = signing.dumps({'confirm': self.id})

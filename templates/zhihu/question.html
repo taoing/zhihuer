@@ -5,7 +5,7 @@
     <div class="question-detail">
       <p>
         {% for topic in question.topics.all %}
-        <button class="btn btn-default" type="button"><a href="">{{ topic.name }}</a></button>
+        <a href="{% url 'topic_detail' topic.id %}"><button class="btn btn-default" type="button">{{ topic.name }}</button></a>
         {% endfor %}
       </p>
       <div class="question-title">
@@ -13,7 +13,7 @@
       </div>
       <p>{{ question.content }}</p>
       <div class="question-meta">
-        <a href=""><button type="button" class="btn btn-primary">关注问题</button></a>
+        <button type="button" class="btn btn-primary follow-question">{% if has_follow_question %}已关注{% else %}关注问题{% endif %}</button>
         <a href=""><button type="button" class="btn btn-default">写回答</button></a>
         <span>{{ question.pub_time }}</span>
       </div>
@@ -22,10 +22,23 @@
 
     <div class="col-sm-4">
       <div class="question-info text-center">
-        <p>关注者: 99</p>
-        <p>被浏览: 999</p>
+        <p>关注者: {{ question.get_follow_nums }}</p>
+        <p>被浏览: {{ question.read_nums }}</p>
       </div>
     </div>
   </div>
 </div>
 </div>
+
+<script>
+  //关注问题
+  $('.follow-question').on('click', function() {
+    $.get("{% url 'follow_question' question.id %}", function(data) {
+      if(data.status == 'success') {
+        $('.follow-question').text(data.message);
+      }else if(data.status == 'fail') {
+        alert(data.message);
+      }  
+    });
+  });
+</script>

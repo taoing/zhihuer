@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
+from itertools import chain
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
 from django.contrib import messages
@@ -8,8 +9,11 @@ from django.db.models import Q
 from django.http import HttpResponse
 
 from .models import User
+from zhihu.models import Answer, Question
 from .forms import RegisterForm, LoginForm
 from helper.send_email import send_email
+from helper.paginator_helper import paginator_helper
+from zhihuer import settings
 
 class CustomModelBackend(ModelBackend):
     '''自定认证后端类, 重写ModelBackend的authenticate方法, 可以使用username和email同时登录'''
@@ -72,6 +76,7 @@ def user_logout(request):
     return redirect(reverse('index'))
 
 def user_confirm(request, token):
+    '''确认账户'''
     if request.user.confirmed:
         return redirect(reverse('index'))
     if request.user.confirm(token):
@@ -82,8 +87,36 @@ def user_confirm(request, token):
         return redirect(reverse('index'))
 
 def resend_confirm_email(request):
+    '''重新发送确认链接'''
     user = request.user
     token = user.generate_confirm_token()
     send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, user=user, token=token)
     messages.info(request, '确认邮件已发送')
     return redirect(reverse('index'))
+
+def get_time(obj):
+    '''返回对象的创建时间, 在sorted中以对象的创建时间比较'''
+    if isinstance(obj, Answer) or isinstance(obj, Question):
+        return obj.pub_time
+    else:
+        return obj.add_time
+
+def user_home(request, user_id):
+    '''用户主页'''
+    user = get_object_or_404(User, id=user_id)
+
+    user_answers = user.answer_set.all()
+    user_questions = user.question_set.all()
+    user_follow_answers = user.userfollowanswer_set.all()
+    user_collect_answers = user.usercollectanswer_set.all()
+    user_follow_questions = user.userfollowquestion_set.all()
+    # 使用itertools.chain合并多个queryset, 反应用户的动态
+    user_trend = chain(user_answers, user_questions, user_follow_answers, user_collect_answers, user_follow_questions)
+    user_trend_sorted = sorted(user_trend, key=get_time, reverse=True)
+    # 分页
+    user_trend_sorted_page = paginator_helper(request, user_trend_sorted, per_page=settings.TREND_PER_PAGE)
+
+    context = {}
+    context['user'] = user
+    context['user_trend_sorted_page'] = user_trend_sorted_page
+    return render(request, 'user/user_home.html', context)

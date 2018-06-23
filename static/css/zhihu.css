@@ -87,8 +87,11 @@ p {
     border-bottom: 1px dotted #ddd;
 }
 
-.topic-follow, .look-more {
+.topic-follow, .look-more, .time-right {
     font-size: 14px;
     right: 25px;
     position: absolute;
+}
+.trend-item {
+    
 }

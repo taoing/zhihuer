@@ -26,11 +26,10 @@
           </p>
           <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
           <div class="answer-meta">
-            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button></a>
-            <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+            <button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button>
+            <button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button>
             <a href=""><button type="button" class="btn btn-default">{{ answer.get_comment_nums }} 条评论</button></a>
-            <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
-            <span>{{ answer.pub_time }}</span>         
+            <button type="button" class="btn btn-default collect-answer"><span class="glyphicon glyphicon-star"></span>{% if has_collect_answer %}已收藏{% else %}收藏{% endif %}</button>        
           </div>
         </div>
       </div>
@@ -50,11 +49,11 @@
 
         <div class="comment">
 
-        {% for comment in answer.answercomment_set.all %}
+        {% for comment in page.object_list %}
           <div class="media">
-            <a href="" class="meida-left"><img src="" alt="" class="media-object"></a>
-            <div class="media-body"><h4 class="media-heading">用户昵称</h4></div>
-            <div class="pull-right">{{ comment.add_time }}</div>
+            <a href="" class="meida-left"><img src="" alt="头像" class="media-object"></a>
+            <div class="media-body"><h4 class="media-heading">{{ comment.user.nickname }}</h4></div>
+            <div class="pull-right text-muted"><small>{{ comment.add_time }}</small></div>
           </div>
           <p>{{ comment.comment }}</p>
           <hr>
@@ -64,9 +63,16 @@
 
           {% include 'zhihu/paginator.html' %}
 
-          <form action="" class="form-inline">
-            <input type="text" class="form-control" name='comment' placeholder="写下你的评论">
-            <button class="btn btn-primary" type="submit">评论</button>
+          <form class='comment-form'>
+            {% csrf_token %}
+            {% for field in comment_form %}
+            <div class="form-group">
+              {{ field.errors }}
+              {{ field.label_tag }}
+              {{ field.as_widget }}
+            </div>
+            {% endfor %}
+            <button id="comment-submit" class="btn btn-primary" type="submit">评论</button>
           </form>
         </div>
       </div>
@@ -77,8 +83,8 @@
         <div class="media">
           <a href="" class="media-left"><img src="" alt="头像" class="meida-object"></a>
           <div class="media-body">
-            <h4 class="media-heading">{{ answer.author.username }}</h4>
-            <p>示例文本, 我很溜</p>
+            <h4 class="media-heading">{{ answer.author.nickname }}</h4>
+            <p>{{ answer.author.description }}</p>
           </div>
         </div>
         <hr>
@@ -112,5 +118,68 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block custom_js %}
+
+<script>
+  //点赞
+  function add_follow(url) {
+    $.ajax({
+      cache:false,
+      type:'GET',
+      url:url,
+      async:true,
+      success:function(data) {
+        if(data.status == 'fail') {
+          alert(data.message);
+        }else if (data.status == 'success'){
+          window.location.reload();
+        }
+      },
+    });
+  }
+  // 点赞
+  $('.btnvote-up').on('click', function() {
+    add_follow("{% url 'add_follow_answer' answer.id %}");
+  });
+  // 取消点赞
+  $('.btnvote-down').on('click', function() {
+    add_follow("{% url 'cancel_follow_answer' answer.id %}")
+  });
+
+  // 回答评论
+  $('#comment-submit').on('click', function() {
+    var old_href = window.location.href;
+    $.ajax({
+      cache:false,
+      type:'POST',
+      dataType:'json',
+      url:"{% url 'comment_answer' answer.id %}",
+      data:$('.comment-form').serialize(),
+      async:true,
+      success:function(data) {
+        if(data.status == 'fail') {
+          alert(data.message);
+        }else if(data.status == 'success') {
+          //alert('已评论');
+          window.location.href=old_href;
+        }
+      },
+    });
+  });
+
+  //收藏答案
+  $('.collect-answer').on('click', function() {
+    $.get("{% url 'collect_answer' answer.id %}", function(data) {
+      if(data.status == 'success') {
+        $('.collect-answer').text(data.message);
+      }else if(data.status == 'fail') {
+        alert(data.message);
+      }  
+    });
+  });
+</script>
 
 {% endblock %}

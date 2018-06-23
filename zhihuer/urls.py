@@ -16,8 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer
-from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email
+from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
+    , collect_answer
+from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,10 +34,16 @@ urlpatterns = [
     path('logout/', user_logout, name='user_logout'),
     path('confirm/<str:token>/', user_confirm, name='user_confirm'),
     path('resend_confirm_email/', resend_confirm_email, name='resend_confirm_email'),
+    path('user/<int:user_id>/', user_home, name='user_home'),
 
     path('topic_list/', topic_list, name='topic_list'),
     path('topic_detail/<int:topic_id>/', topic_detail, name='topic_detail'),
-    path('add_follow_answer/', add_follow_answer, name='add_follow_answer'),
+
+    path('answer/detail/<int:answer_id>/add_follow_answer/', add_follow_answer, name='add_follow_answer'),
+    path('answer/detail/<int:answer_id>/cancel_follow_answer/', cancel_follow_answer, name='cancel_follow_answer'),
+    path('answer/detail/<int:answer_id>/comment_answer/', comment_answer, name='comment_answer'),
+    path('question/detail/<int:question_id>/follow_question/', follow_question, name='follow_question'),
+    path('answer/detail/<int:answer_id>/collect_answer/', collect_answer, name='collect_answer'),
 ]
 
 # 第三方验证码url配置

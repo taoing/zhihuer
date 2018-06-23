@@ -48,7 +48,12 @@ class Question(models.Model):
         return self.answer_set.all().annotate(follow_nums=models.Count('userfollowanswer')).order_by('-follow_nums').first().content
 
     def get_topic_name(self):
+        '''获取话题名'''
         return self.topics.all().first().name
+
+    def get_follow_nums(self):
+        '''获取关注者数量'''
+        return self.userfollowquestion_set.all().count()
 
 
 class Answer(models.Model):
