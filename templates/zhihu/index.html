@@ -93,34 +93,9 @@
     </div>
     {% endif %}
 
-
-    <div class="panel panel-default">
-      <div class="panel-heading">标签</div>
-      <div class="panel-body">
-        <p>
-          {% for tag in tags %}
-          <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-tags"></span>&nbsp;没有</button>
-          {% empty %}
-          暂时没有标签
-          {% endfor %}
-        </p>
-      </div>
     </div>
 
-
-      <div class="panel panel-default">
-        <div class="panel-heading">热门推荐</div>
-        <div class="panel-body">
-          <ul class="blog-hot">
-
-            <li><a href="">什么都没有</a></li>
-          </ul>
-
-          </div>
-        </div>
-      </div>
-
-    </div>
+  </div>
 </div>
 
 {% endblock %}

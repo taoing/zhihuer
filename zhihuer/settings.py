@@ -161,3 +161,6 @@ EMAIL_FROM = 'taomiantm@sina.com'
 AUTHENTICATION_BACKENDS = [
     'user.views.CustomModelBackend',
 ]
+
+# login_required重定向url
+LOGIN_URL = '/login/'

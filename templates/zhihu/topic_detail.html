@@ -13,11 +13,11 @@
           <div class="media-left"><img src="" alt="话题" class="media-object"></div>
           <div class="media-body">
             <h3 class="media-heading">{{ topic.name }}</h3>
-            <p>{{ topic.description }}</p>
+            <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
           </div>
         </div>
         <hr>
-        <button class="btn btn-primary btn-lg">关注话题</button>
+        <button id="follow-topic" class="btn btn-primary btn-lg">{% if has_follow_topic %}已关注{% else %}关注话题{% endif %}</button>
       </div>
 
       <div class="site-box">
@@ -76,5 +76,24 @@
     </div>
   </div>
 </div>
+
+{% endblock %}
+
+{% block custom_js %}
+<script>
+  //关注话题
+  $('#follow-topic').on('click', function() {
+    var old_path = window.location.pathname;
+    $.get("{% url 'follow_topic' topic.id %}", function(data) {
+      if(data.status == 'success') {
+        $('#follow-topic').text(data.message);
+      }else if(data.status == 'fail') {
+        alert(data.message);
+      }else {
+        window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+      }  
+    });
+  });
+</script>
 
 {% endblock %}

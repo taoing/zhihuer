@@ -60,11 +60,16 @@ def user_login(request):
             username = login_form.cleaned_data.get('username')
             password = login_form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
-            if user is not None:
+            if user and user.is_active:
                 login(request, user)
+                # 登录成功后跳转到上一个界面
+                # 检查提交表单的next值
+                redirect_next = request.POST.get('next')
+                if redirect_next:
+                    return redirect(redirect_next)
                 return redirect(reverse('index'))
             else:
-                messages.warning(request, '用户名或密码错误')
+                messages.info(request, '用户名或密码错误')
 
     context = {}
     context['login_form'] = login_form

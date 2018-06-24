@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
-    , collect_answer
+    , collect_answer, follow_topic
 from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home
 
 urlpatterns = [
@@ -44,6 +44,7 @@ urlpatterns = [
     path('answer/detail/<int:answer_id>/comment_answer/', comment_answer, name='comment_answer'),
     path('question/detail/<int:question_id>/follow_question/', follow_question, name='follow_question'),
     path('answer/detail/<int:answer_id>/collect_answer/', collect_answer, name='collect_answer'),
+    path('topic_detail/<int:topic_id>/follow_topic/', follow_topic, name='follow_topic'),
 ]
 
 # 第三方验证码url配置

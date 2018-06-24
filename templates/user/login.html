@@ -28,13 +28,15 @@
       {% if messages %}
       <div class="messages">
         {% for message in messages %}
-        <p{% if message.tags %} active="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        <p class="alert alert-info alert-dismissable">
+          <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
         {% endfor %}
       </div>
       {% endif %}
 
       <h3>登录</h3>
       <p>登录知乎儿, 发现不同</p>
+      <hr>
       <form action="{% url 'user_login' %}", method="post">
         {% csrf_token %}
         {% for field in login_form %}
@@ -44,6 +46,7 @@
           {{ field|widget_add_class:'form-control' }}
         </div>
         {% endfor %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
         <input type="submit" name="" value="登录">
       </form>
       <hr>

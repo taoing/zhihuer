@@ -31,8 +31,8 @@
             <div class="meida">
               <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img src="" alt="话题" class="media-object"></a>
               <div class="media-body">
-                <h4 class="media-heading"><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a> <span class="topic-follow text-muted">关注</span></h4>
-                <p>{{ topic.description }}</p>
+                <h4 class="media-heading"><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a> <span class="topic-follow text-muted"><a href="{% url 'topic_detail' topic.id %}">关注</a></span></h4>
+                <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
               </div>
             </div>
           </div>

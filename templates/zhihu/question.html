@@ -33,11 +33,14 @@
 <script>
   //关注问题
   $('.follow-question').on('click', function() {
+    var old_path = window.location.pathname;
     $.get("{% url 'follow_question' question.id %}", function(data) {
       if(data.status == 'success') {
         $('.follow-question').text(data.message);
       }else if(data.status == 'fail') {
         alert(data.message);
+      }else {
+        window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
       }  
     });
   });

@@ -3,6 +3,7 @@ from datetime import datetime
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
 
 from .models import Question, Answer, Topic, UserFollowAnswer, AnswerComment, UserFollowQuestion, UserCollectAnswer
 from zhihuer import settings
@@ -133,6 +134,11 @@ def topic_list(request):
 def topic_detail(request, topic_id):
     '''话题详情'''
     topic = Topic.objects.get(pk=topic_id)
+
+    has_follow_topic = False
+    if request.user.is_authenticated:
+        if topic in request.user.topic_set.all():
+            has_follow_topic = True
     # 话题下最新讨论(回答)
     topic_answers = Answer.objects.filter(question__in=topic.question_set.all()).annotate(follow_nums\
         =Count('userfollowanswer', distince=True)).annotate(comment_nums=Count('answercomment', distinct=True)).order_by('-pub_time')
@@ -152,10 +158,12 @@ def topic_detail(request, topic_id):
 
     context = {}
     context['topic'] = topic
+    context['has_follow_topic'] = has_follow_topic
     context['most_active_users'] = most_active_users
     context['page'] = page
     return render(request, 'zhihu/topic_detail.html', context)
 
+@login_required
 def add_follow_answer(request, answer_id):
     '''赞同答案'''
     # if request.method == 'POST':
@@ -172,6 +180,7 @@ def add_follow_answer(request, answer_id):
     except Exception as e:
         return JsonResponse({"status":"fail", "message":"发生错误"})
 
+@login_required
 def cancel_follow_answer(request, answer_id):
     '''取消赞同'''
     # if request.method == 'POST':
@@ -182,11 +191,12 @@ def cancel_follow_answer(request, answer_id):
             answer_follow_existed.delete()
             return JsonResponse({'status':'success'})
         else:
-            return JsonResponse({'status':None})
+            return JsonResponse({'status':'nothing'})
     except Exception as e:
         print(e)
         return JsonResponse({'status':'fail', 'message':'发生错误'})
 
+@login_required
 def comment_answer(request, answer_id):
     '''评论回答'''
     if request.method == 'POST':
@@ -198,8 +208,9 @@ def comment_answer(request, answer_id):
             answer_comment.save()
             return JsonResponse({'status':'success'})
         else:
-            return JsonResponse({'message':'评论不能为空'})
+            return JsonResponse({'status':'fail', 'message':'评论不能为空'})
 
+@login_required
 def follow_question(request, question_id):
     '''关注问题'''
     try:
@@ -215,6 +226,7 @@ def follow_question(request, question_id):
     except Exception as e:
         return JsonResponse({'status':'fail', 'message':'发生错误'})
 
+@login_required
 def collect_answer(request, answer_id):
     '''收藏答案'''
     try:
@@ -227,5 +239,19 @@ def collect_answer(request, answer_id):
             collect_answer = UserCollectAnswer(user=request.user, answer=answer)
             collect_answer.save()
             return JsonResponse({'status':'success', 'message':'已收藏'})
+    except Exception as e:
+        return JsonResponse({'status':'fail', 'message':'发生错误'})
+
+@login_required
+def follow_topic(request, topic_id):
+    '''关注问题'''
+    try:
+        topic = get_object_or_404(Topic, id=topic_id)
+        if topic in request.user.topic_set.all():
+            request.user.topic_set.remove(topic)
+            return JsonResponse({'status':'success', 'message':'关注话题'})
+        else:
+            request.user.topic_set.add(topic)
+            return JsonResponse({'status':'success', 'message':'已关注'})
     except Exception as e:
         return JsonResponse({'status':'fail', 'message':'发生错误'})

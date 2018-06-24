@@ -28,7 +28,7 @@
           <div class="answer-meta">
             <button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button>
             <button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button>
-            <a href=""><button type="button" class="btn btn-default">{{ answer.get_comment_nums }} 条评论</button></a>
+            <a href="#comment-form"><button type="button" class="btn btn-default">{{ answer.get_comment_nums }} 条评论</button></a>
             <button type="button" class="btn btn-default collect-answer"><span class="glyphicon glyphicon-star"></span>{% if has_collect_answer %}已收藏{% else %}收藏{% endif %}</button>        
           </div>
         </div>
@@ -63,7 +63,7 @@
 
           {% include 'zhihu/paginator.html' %}
 
-          <form class='comment-form'>
+          <form class='comment-form' id="comment-form" method='post'>
             {% csrf_token %}
             {% for field in comment_form %}
             <div class="form-group">
@@ -124,6 +124,7 @@
 {% block custom_js %}
 
 <script>
+  var old_path = window.location.pathname;
   //点赞
   function add_follow(url) {
     $.ajax({
@@ -134,8 +135,11 @@
       success:function(data) {
         if(data.status == 'fail') {
           alert(data.message);
-        }else if (data.status == 'success'){
+        }else if (data.status == 'success') {
           window.location.reload();
+        }else if (data.status == 'nothing') { 
+        }else {
+          window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
         }
       },
     });
@@ -155,7 +159,6 @@
     $.ajax({
       cache:false,
       type:'POST',
-      dataType:'json',
       url:"{% url 'comment_answer' answer.id %}",
       data:$('.comment-form').serialize(),
       async:true,
@@ -165,6 +168,8 @@
         }else if(data.status == 'success') {
           //alert('已评论');
           window.location.href=old_href;
+        }else{
+          window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
         }
       },
     });
@@ -177,7 +182,9 @@
         $('.collect-answer').text(data.message);
       }else if(data.status == 'fail') {
         alert(data.message);
-      }  
+      }else {
+        window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+      }
     });
   });
 </script>
