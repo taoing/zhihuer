@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.nickname }}的主页-知乎儿{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="site-box">
+        <div class="media">
+          <div class="media-left"><img src="" alt="头像" class="media-left"></div>
+          <div class="media-body">
+            <h3 class="media-heading"><strong>{{ user.nickname }}</strong></h3>
+            <p><strong>{{ user.description }}</strong></p>
+            {% if user == request.user %}
+            <div class="pull-right"><a href="">编辑个人资料</a></div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="site-box">
+        <div class="nav nav-pills header-bar">
+          <li class="{% url 'user_home' user.id %}"><a href="">动态</a></li>
+          <li><a href="{% url 'user_answer' user.id %}">回答</a></li>
+          <li><a href="{% url 'user_question' user.id %}">提问</a></li>
+          <li><a href="">想法</a></li>
+        </div>
+        <hr>
+        {% block user_content %}
+        
+        {% endblock %}
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <div class="site-box">
+        <h4>个人成就</h4>
+        <hr>
+        <p><span class="glyphicon glyphicon-thumbs-up"></span> 获得 {{ user.get_answer_by_followed_nums }} 次赞同</p>
+        <p><span class="glyphicon glyphicon-star"></span> 获得 {{ user.get_answer_by_collected_nums }} 次收藏</p>
+      </div>
+      <div class="site-box">
+        <div class="nav nav-pills nav-stacked">
+          <li><a href=""><span class="badge pull-right">12</span>关注了</a></li>
+          <li><a href=""><span class="badge pull-right">15</span>关注者</a></li>
+        </div>
+      </div>
+      <div class="site-box">
+        <div class="nav nav-pills nav-stacked">
+          <li><a href=""><span class="badge pull-right">37</span>关注的话题</a></li>
+          <li><a href=""><span class="badge pull-right">35</span>关注的问题</a></li>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

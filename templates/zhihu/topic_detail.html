@@ -12,16 +12,16 @@
         <div class="media">
           <div class="media-left"><img src="" alt="话题" class="media-object"></div>
           <div class="media-body">
-            <h3 class="media-heading">{{ topic.name }}</h3>
+            <h3 class="big-topic">{{ topic.name }}</h3>
             <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
           </div>
         </div>
         <hr>
-        <button id="follow-topic" class="btn btn-primary btn-lg">{% if has_follow_topic %}已关注{% else %}关注话题{% endif %}</button>
+        <button id="follow-topic" class="btn btn-primary">{% if has_follow_topic %}已关注{% else %}关注话题{% endif %}</button>
       </div>
 
       <div class="site-box">
-        <ul class="nav nav-pills">
+        <ul class="nav nav-pills header-bar">
           <li class="active"><a href="">讨论</a></li>
           <li><a href="">精华</a></li>
           <li><a href="">等待回答</a></li>
@@ -56,11 +56,11 @@
 
     <div class="col-sm-4">
       <div class="site-box">
-        <p>关注者: <strong>{{ topic.get_user_nums }}</strong></p>
-        <p>问题数: <strong>{{ topic.get_question_nums }}</strong></p>
+        <p>关注者: <span class="rightdes-num">{{ topic.get_user_nums }}</span></p>
+        <p>问题数: <span class="rightdes-num">{{ topic.get_question_nums }}</span></p>
       </div>
       <div class="site-box">
-        <h4><strong>活跃回答者</strong><a href="" class="look-more text-muted">查看更多</a></h4>
+        <h4><strong>活跃回答者</strong><a href="" class="text-muted right-info">查看更多</a></h4>
         <hr>
         {% for user in most_active_users %}
         <div class="media">

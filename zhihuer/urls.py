@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
     , collect_answer, follow_topic
-from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home
+from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home, user_answer, user_question
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,6 +37,8 @@ urlpatterns = [
     path('confirm/<str:token>/', user_confirm, name='user_confirm'),
     path('resend_confirm_email/', resend_confirm_email, name='resend_confirm_email'),
     path('user/<int:user_id>/', user_home, name='user_home'),
+    path('user/<int:user_id>/answer/', user_answer, name='user_answer'),
+    path('user/<int:user_id>/question/', user_question, name='user_question'),
 
     path('topic_list/', topic_list, name='topic_list'),
     path('topic_detail/<int:topic_id>/', topic_detail, name='topic_detail'),
@@ -49,3 +53,5 @@ urlpatterns = [
 
 # 第三方验证码url配置
 urlpatterns += [path('captcha/', include('captcha.urls'))]
+# 在调试模式中访问用户上传文件需配置
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

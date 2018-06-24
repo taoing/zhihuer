@@ -125,3 +125,21 @@ def user_home(request, user_id):
     context['user'] = user
     context['user_trend_sorted_page'] = user_trend_sorted_page
     return render(request, 'user/user_home.html', context)
+
+def user_answer(request, user_id):
+    '''用户主页--回答'''
+    user = get_object_or_404(User, id=user_id)
+    user_answers = user.answer_set.all()
+    context = {}
+    context['user'] = user
+    context['user_answers'] = user_answers
+    return render(request, 'user/user_answer.html', context)
+
+def user_question(request, user_id):
+    '''用户主页--提问'''
+    user = get_object_or_404(User, id=user_id)
+    user_questions = user.question_set.all()
+    context = {}
+    context['user'] = user
+    context['user_questions'] = user_questions
+    return render(request, 'user/user_question.html', context)

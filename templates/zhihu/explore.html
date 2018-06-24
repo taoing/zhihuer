@@ -10,7 +10,7 @@
   <div class="row">
     <div class="col-sm-8">
       <div class="site-box">
-        <p>编辑推荐</p>
+        <p>编辑推荐<a href="" class="right-info">更多推荐</a></p>
         <hr>
         <div class="recommend">
           {% for question in recommend_questions %}
@@ -21,13 +21,13 @@
               <img src="" alt="头像" class="media-object">
             </a>
             <div class="media-body">
-              <h4 class="media-heading">{{ question.author.nickname }}, <small>个人说明</small></h4>
+              <h4 class="media-heading">{{ question.author.nickname }}<small>, {{ question.author.description }}</small></h4>
               <p>{{ question.get_follow_est_answer|truncatechars:200|safe }}</p>
             </div>
           </div>
           <hr>
           {% else %}
-          <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a><small class="text-muted pull-right">{{ question.get_topic_name }}</small></h4>
+          <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a><span class="text-muted right-info">{{ question.get_topic_name }}</span></h4>
           <hr>
           {% endif %}
           {% endfor %}
@@ -47,8 +47,8 @@
                     <img src="" alt="头像" class="media-object">
                   </a>
                   <div class="media-body">
-                    <h4 class="media-heading">{{ answer.question.author.nickname }}, <small>个人说明</small></h4>
-                    <p>{{ answer.content|truncatechars:200|safe }}</p>
+                    <h4 class="media-heading">{{ answer.question.author.nickname }}<small>, {{ answer.question.author.description }}</small></h4>
+                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200|safe }}</a></p>
                   </div>
                 </div>
                 <hr>
@@ -67,8 +67,8 @@
                     <img src="" alt="头像" class="media-object">
                   </a>
                   <div class="media-body">
-                    <h4 class="media-heading">{{ answer.question.author.nickname }}, <small>个人说明</small></h4>
-                    <p class="question-answer"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200|safe }}</a></p>
+                    <h4 class="media-heading">{{ answer.question.author.nickname }}<small>, {{ answer.question.author.description }}</small></h4>
+                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200|safe }}</a></p>
                   </div>
                 </div>
                 <hr>
@@ -86,10 +86,11 @@
 
     <div class="col-sm-4">
       <div class="site-box">
-        <h4>热门话题<a href="" class="text-muted pull-right"><small>更多话题</small></a></h4>
+        <h4>热门话题<a href="" class="text-muted right-info">更多话题</a></h4>
         <hr>
         {% for topic in hot_topics %}
-        <p><a href="">{{ topic.name }}</a></p>
+        <p><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></p>
+        <p class="text-muted">{{ topic.get_user_nums }} 人关注</p>
         <hr>
         {% endfor %}
       </div>

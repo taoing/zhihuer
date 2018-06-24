@@ -1,0 +1,34 @@
+{% extends 'user/user_base.html' %}
+
+{% block user_content %}
+
+<h4>{% if user == request.user %}我的回答{% else %}他的回答{% endif %}</h4>
+<hr>
+
+{% for answer in user_answers %}
+<div class="trend-item">
+  
+  <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
+  <div class="media">
+    <a href="{% url 'user_home' answer.question.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
+    <div class="media-body">
+      <p class="media-heading">{{ answer.author.nickname }}</p>
+    </div>
+  </div>
+  <p class="text-muted">{{ answer.get_follow_nums }} 人赞同了该回答</p>
+  <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200 }}</a></p>
+  <div class="answer-meta">
+    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button></a>
+    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">{{ answer.get_comment_nums }} 条评论</button></a>
+    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span> 收藏</button></a>
+    {% if user == request.user %}
+    <button type="button" class="btn btn-default"><span class="delete-answer glyphicon glyphicon-trash"></span> 删除</button>
+    {% endif %}
+  </div>
+</div>
+<hr>
+{% endfor %}
+
+
+{% endblock %}

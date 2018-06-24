@@ -30,9 +30,9 @@
           <div class="answer-item site-box">
             <p class="text-muted">来自话题:{{ answer.question.get_topic_name }}</p>
             <div class="media">
-              <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
+              <a href="" class="media-left"><img width="24px" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
               <div class="media-body">
-                <h4 class="media-heading">{{ answer.author.nickname }} <small>{{ answer.author.description }}</small></h4>
+                <h4 class="media-heading">{{ answer.author.nickname }}<small>, {{ answer.author.description }}</small></h4>
               </div>
             </div>
             <div class="question-title">
@@ -84,7 +84,7 @@
         </div>
       </div>
     {% else %}
-    <div class="site-box">
+    <div class="site-box right-block">
       <h4>加入知乎儿, 留下手印</h4>
       <p>
         <a target="_blank" href="{% url 'register' %}"><button class="btn btn-primary btn-lg btn-block">注册</button></a>
