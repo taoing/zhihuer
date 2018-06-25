@@ -43,7 +43,7 @@ def register(request):
             # 发送账户激活链接邮件
             send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, user=user, token=token)
             # 网页显示账户注册成功消息
-            messages.success(request, '账户已注册, 一封账户确认邮件已发往你的邮箱, 请查收')
+            messages.info(request, '账户已注册, 一封账户确认邮件已发往你的邮箱, 请查收')
             return redirect(reverse('user_login'))
         else:
             pass

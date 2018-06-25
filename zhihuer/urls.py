@@ -19,7 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
-    , collect_answer, follow_topic
+    , collect_answer, follow_topic, ask_question
 from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home, user_answer, user_question
 
 urlpatterns = [
@@ -49,6 +49,7 @@ urlpatterns = [
     path('question/detail/<int:question_id>/follow_question/', follow_question, name='follow_question'),
     path('answer/detail/<int:answer_id>/collect_answer/', collect_answer, name='collect_answer'),
     path('topic_detail/<int:topic_id>/follow_topic/', follow_topic, name='follow_topic'),
+    path('ask_question/', ask_question, name='ask_question'),
 ]
 
 # 第三方验证码url配置

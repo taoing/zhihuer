@@ -3,13 +3,23 @@
   <div class="row">
     <div class="col-sm-8">
     <div class="question-detail">
+    
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <p class="alert alert-info alert-dismissable">
+        <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
       <p>
         {% for topic in question.topics.all %}
         <a href="{% url 'topic_detail' topic.id %}"><button class="btn btn-default" type="button">{{ topic.name }}</button></a>
         {% endfor %}
       </p>
       <div class="question-title">
-        <a href="{% url 'question_detail' question.id %}"><h3>{{ question.title }}</h3></a>
+        <h3><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h3>
       </div>
       <p>{{ question.content }}</p>
       <div class="question-meta">

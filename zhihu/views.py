@@ -1,15 +1,17 @@
 from datetime import datetime
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.urls import reverse
 
 from .models import Question, Answer, Topic, UserFollowAnswer, AnswerComment, UserFollowQuestion, UserCollectAnswer
 from zhihuer import settings
 from helper.paginator_helper import paginator_helper
 from user.views import User
-from .forms import CommentForm
+from .forms import CommentForm, AskQuestionForm
 
 def index(request):
     '''首页'''
@@ -255,3 +257,26 @@ def follow_topic(request, topic_id):
             return JsonResponse({'status':'success', 'message':'已关注'})
     except Exception as e:
         return JsonResponse({'status':'fail', 'message':'发生错误'})
+
+@login_required
+def ask_question(request):
+    ask_quesiton_form = AskQuestionForm()
+
+    if request.method == 'POST':
+        ask_quesiton_form = AskQuestionForm(request.POST)
+        if ask_quesiton_form.is_valid():
+            question = Question()
+            question.author = request.user
+            question.title = ask_quesiton_form.cleaned_data.get('title')
+            question.content = ask_quesiton_form.cleaned_data.get('content')
+            question.is_anonymous = ask_quesiton_form.cleaned_data.get('anonymous')
+            question.save()
+            # 保存多对多关系前保存question对象
+            question.topics.set(ask_quesiton_form.cleaned_data.get('topics'))
+            messages.info(request, '问题已提交')
+            return redirect(reverse('question_detail', args=(question.id,)))
+        messages.info(request, '输入有误')
+
+    context = {}
+    context['ask_question_form'] = ask_quesiton_form
+    return render(request, 'zhihu/ask_question.html', context)

@@ -27,11 +27,12 @@ class Question(models.Model):
     '''问题模型'''
     title = models.CharField('问题标题', max_length=200)
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='问题作者')
-    content = models.TextField('问题内容')
+    content = models.TextField('问题内容', null=True, blank=True)
     topics = models.ManyToManyField(Topic, blank=True, verbose_name='话题')
     pub_time = models.DateTimeField('发布时间', auto_now_add=True)
     recommend = models.BooleanField('是否推荐', default=False)
     read_nums = models.IntegerField('浏览量', default=0)
+    is_anonymous = models.BooleanField('匿名问题', default=False)
 
     def __str__(self):
         return self.title

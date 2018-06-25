@@ -57,6 +57,11 @@ h3 {
     font-weight: 600;
     color: #1a1a1a;
 }
+h3 a {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
 
 .question-meta, .answer-meta {
     margin: 5px 0 20px 0;

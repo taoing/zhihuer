@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}提问-知乎儿{% endblock %}
+
+
+{% block content %}
+
+{% load myfilter %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2">
+      <div class="site-box">
+
+        {% if messages %}
+        <div class="messages">
+          {% for message in messages %}
+          <p class="alert alert-info alert-dismissable">
+            <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+    
+        <form action="" method="post">
+          {% csrf_token %}
+          {% for field in ask_question_form %}
+          <div class="form-group">
+            {{ field.errors }}
+            {{ field.label_tag }}
+            {{ field }}
+          </div>
+          {% endfor %}
+          <div class="text-right">
+            <button class="btn btn-primary" type="submit">提问</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
