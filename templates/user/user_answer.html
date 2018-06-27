@@ -5,7 +5,7 @@
 <h4>{% if user == request.user %}我的回答{% else %}他的回答{% endif %}</h4>
 <hr>
 
-{% for answer in user_answers %}
+{% for answer in user_answers_page.object_list %}
 <div class="trend-item">
   
   <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
@@ -16,7 +16,7 @@
     </div>
   </div>
   <p class="text-muted">{{ answer.get_follow_nums }} 人赞同了该回答</p>
-  <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200 }}</a></p>
+  <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
   <div class="answer-meta">
     <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button></a>
     <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
@@ -30,5 +30,6 @@
 <hr>
 {% endfor %}
 
+{% include 'zhihu/paginator.html' with page=user_answers_page %}
 
 {% endblock %}

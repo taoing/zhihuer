@@ -1,56 +1,40 @@
-{% load staticfiles %}
+{% extends 'base.html' %}
+
+{% block title %}注册账户-知乎儿{% endblock %}
+
+{% block content %}
+
 {% load myfilter %}
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>注册知乎儿</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
-
-  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
-  <link href="{% static 'css/zhihu.css' %}" rel="stylesheet">
-
-  <!--[if lt IE 9]>
-    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
-
-  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-</head>
-<body>
-  <div class="container">
-    <div class="form-register">
-      <h3>注册账户</h3>
-      <p>加入知乎儿, 新的开始</p>
-      <form action="{% url 'register' %}", method="post">
-        {% csrf_token %}
-        {% for field in register_form %}
-        <div class="form-group">
-          {{ field.errors }}
-          {{ field.label_tag }}
-          {{ field|widget_add_class:'form-control' }}
-        </div>
-        {% endfor %}
-        <input type="submit" name="" value="注册">
-      </form>
-      <hr>
-      <p>已有账号, 直接 <a href="{% url 'user_login' %}">登录</a></p>
-    </div>
+<div class="container">
+  <div class="form-register">
+    <h3>注册账户</h3>
+    <p>加入知乎儿, 新的开始</p>
+    <hr>
+    <form action="{% url 'register' %}", method="post">
+      {% csrf_token %}
+      {% for field in register_form %}
+      <div class="form-group">
+        {{ field.errors }}
+        {{ field.label_tag }}
+        {{ field|widget_add_class:'form-control' }}
+      </div>
+      {% endfor %}
+      <div class="text-right">
+        <button type="submit" class="btn btn-primary" name="">注册</button>
+      </div>
+    </form>
+    <hr>
+    <p>已有账号, 直接 <a href="{% url 'user_login' %}">登录</a></p>
   </div>
+</div>
 
-  <script>
-  $('.captcha').click(function () {
-  $.getJSON("/captcha/refresh/", function (result) {
-      $('.captcha').attr('src', result['image_url']);
-      $('#id_captcha_0').val(result['key'])
-  });
-  });
-  </script>
+<script>
+$('.captcha').click(function () {
+$.getJSON("/captcha/refresh/", function (result) {
+    $('.captcha').attr('src', result['image_url']);
+    $('#id_captcha_0').val(result['key'])
+});
+});
+</script>
 
-</body>
-</html>
+{% endblock %}

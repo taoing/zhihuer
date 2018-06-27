@@ -3,7 +3,7 @@
 {% block user_content %}
 
 {% load myfilter %}
-<h4>我的动态</h4>
+<h4>{% if user == request.user %}我的动态{% else %}他的动态{% endif %}</h4>
 <hr>
 {% for obj in user_trend_sorted_page.object_list %}
 
@@ -19,12 +19,12 @@
     </div>
   </div>
   <p class="text-muted">{{ obj.get_follow_nums }} 人赞同了该回答</p>
-  <p class="answer-content"><a href="{% url 'answer_detail' obj.id %}">{{ obj.content|truncatechars:200 }}</a></p>
+  <p class="answer-content"><a href="{% url 'answer_detail' obj.id %}">{{ obj.content|striptags|truncatechars:200 }}</a></p>
   <div class="answer-meta">
-    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.get_follow_nums }}</button></a>
-    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default">{{ obj.get_comment_nums }} 条评论</button></a>
-    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-primary btnvote-up btn-sm"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.get_follow_nums }}</button></a>
+    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btnvote-down btn-sm"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btn-sm">{{ obj.get_comment_nums }} 条评论</button></a>
+    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
   </div>
 </div>
 <hr>
@@ -47,13 +47,12 @@
     </div>
   </div>
   <p class="text-muted">{{ obj.answer.get_follow_nums }} 人赞同了该回答</p>
-  <p class="answer-content"><a href="{% url 'answer_detail' obj.answer_id %}">{{ obj.answer.content|truncatechars:200 }}</a></p>
+  <p class="answer-content"><a href="{% url 'answer_detail' obj.answer_id %}">{{ obj.answer.content|striptags|truncatechars:200 }}</a></p>
   <div class="answer-meta">
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.answer.get_follow_nums }}</button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default">{{ obj.answer.get_comment_nums }} 条评论</button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
-    <span>{{ obj.answer.pub_time }}</span>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-primary btnvote-up btn-sm"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.answer.get_follow_nums }}</button></a>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btnvote-down btn-sm"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm">{{ obj.answer.get_comment_nums }} 条评论</button></a>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
   </div>
 </div>
 <hr>
@@ -69,13 +68,12 @@
     </div>
   </div>
   <p class="text-muted">{{ obj.answer.get_follow_nums }} 人赞同了该回答</p>
-  <p class="answer-content"><a href="{% url 'answer_detail' obj.answer_id %}">{{ obj.answer.content|truncatechars:200 }}</a></p>
+  <p class="answer-content"><a href="{% url 'answer_detail' obj.answer_id %}">{{ obj.answer.content|striptags|truncatechars:200 }}</a></p>
   <div class="answer-meta">
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.answer.get_follow_nums }}</button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default">{{ obj.answer.get_comment_nums }} 条评论</button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
-    <span>{{ obj.answer.pub_time }}</span>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-primary btnvote-up btn-sm"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.answer.get_follow_nums }}</button></a>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btnvote-down btn-sm"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm">{{ obj.answer.get_comment_nums }} 条评论</button></a>
+    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
   </div>
 </div>
 <hr>

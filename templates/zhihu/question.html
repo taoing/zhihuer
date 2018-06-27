@@ -24,7 +24,7 @@
       <p>{{ question.content }}</p>
       <div class="question-meta">
         <button type="button" class="btn btn-primary follow-question">{% if has_follow_question %}已关注{% else %}关注问题{% endif %}</button>
-        <a href=""><button type="button" class="btn btn-default">写回答</button></a>
+        <a href="{% url 'answer_question' question.id %}"><button type="button" class="btn btn-default">写回答</button></a>
         <span>{{ question.pub_time }}</span>
       </div>
     </div>

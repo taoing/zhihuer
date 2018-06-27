@@ -5,6 +5,7 @@
 
 {% block content %}
 
+{% load staticfiles %}
 {% load myfilter %}
 <div class="container">
   <div class="row">
@@ -38,4 +39,14 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block custom_js %}
+<!-- 下拉菜单js -->
+  <script src="{% static 'js/bootstrap-select.min.js' %}"></script>
+{% endblock %}
+
+{% block custom_css %}
+<!-- 下拉菜单样式 -->
+  <link href="{% static 'css/bootstrap-select.min.css' %}" rel="stylesheet">
 {% endblock %}

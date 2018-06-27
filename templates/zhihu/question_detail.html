@@ -26,16 +26,25 @@
 
       {% for answer in page.object_list %}
         <div class="answer-item">
+          {% if answer.is_anonymous %}
           <div class="media">
-            <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
+            <div class="media-left"><img src="" alt="头像" class="media-object"></div>
             <div class="media-body">
-              <h4 class="media-heading">用户昵称</h4>
-              <p>一点示例文本, 一点示例文本</p>
+              <h4 class="media-heading text-muted">匿名回答</h4>
             </div>
           </div>
+          {% else %}
+          <div class="media">
+            <a href="{% url 'user_home' answer.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
+            <div class="media-body">
+              <h4 class="media-heading"><a href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</h4></a>
+              <p class="text-muted">{{ answer.author.description }}</p>
+            </div>
+          </div>
+          {% endif %}
           <p class="text-muted">{{ answer.follow_nums }} 人赞同了该回答</p>
           <p>
-            {{ answer.content }}
+            {{ answer.content|safe }}
           </p>
           <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
           <div class="answer-meta">

@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'user',
     # 第三方验证码
     'captcha',
+    # 富文本编辑器
+    'ckeditor',
+    'ckeditor_uploader',
 ]
 
 MIDDLEWARE = [
@@ -170,3 +173,12 @@ LOGIN_URL = '/login/'
 # 用户上传文件
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 富文本编辑器上传文件保存目录, 在media下
+CKEDITOR_UPLOAD_PATH = 'uploads/'
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%',
+    }
+}

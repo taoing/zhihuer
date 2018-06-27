@@ -6,12 +6,12 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.urls import reverse
+from django.conf import settings
 
 from .models import Question, Answer, Topic, UserFollowAnswer, AnswerComment, UserFollowQuestion, UserCollectAnswer
-from zhihuer import settings
 from helper.paginator_helper import paginator_helper
 from user.views import User
-from .forms import CommentForm, AskQuestionForm
+from .forms import CommentForm, AskQuestionForm, AnswerForm
 
 def index(request):
     '''首页'''
@@ -260,6 +260,7 @@ def follow_topic(request, topic_id):
 
 @login_required
 def ask_question(request):
+    '''提问'''
     ask_quesiton_form = AskQuestionForm()
 
     if request.method == 'POST':
@@ -273,10 +274,46 @@ def ask_question(request):
             question.save()
             # 保存多对多关系前保存question对象
             question.topics.set(ask_quesiton_form.cleaned_data.get('topics'))
-            messages.info(request, '问题已提交')
+            messages.info(request, '你的问题已提交')
             return redirect(reverse('question_detail', args=(question.id,)))
-        messages.info(request, '输入有误')
+        messages.info(request, '你的输入有误')
 
     context = {}
     context['ask_question_form'] = ask_quesiton_form
     return render(request, 'zhihu/ask_question.html', context)
+
+def question_list(request):
+    '''回答-问题列表'''
+    questions = Question.objects.all().order_by('-pub_time').annotate(answer_nums=Count('answer', distinct=True), follow_nums=Count('userfollowquestion', distinct=True))
+    hot_questions = Question.objects.all().annotate(answer_nums=Count('answer', distinct=True), follow_nums=Count('userfollowquestion', distinct=True)).order_by('-follow_nums')
+    
+    #分页
+    questions_page = paginator_helper(request, questions, per_page=settings.QUESTION_PER_PAGE)
+    hot_questions_page = paginator_helper(request, hot_questions, per_page = settings.QUESTION_PER_PAGE)
+
+    context = {}
+    context['questions_page'] = questions_page
+    context['hot_questions_page'] = hot_questions_page
+    return render(request, 'zhihu/question_list.html', context)
+
+@login_required
+def answer_question(request, question_id):
+    '''回答问题'''
+    answer_form = AnswerForm()
+    question = get_object_or_404(Question, id=question_id)
+    if request.method == 'POST':
+        answer_form = AnswerForm(request.POST)
+        if answer_form.is_valid():
+            answer = Answer()
+            answer.question = question
+            answer.author = request.user
+            answer.content = answer_form.cleaned_data.get('content')
+            answer.is_anonymous = answer_form.cleaned_data.get('anonymous')
+            answer.save()
+            messages.info(request, '你的回答已提交')
+            return redirect(reverse('question_detail', args=(question.id,)))
+
+    context = {}
+    context['question'] = question
+    context['answer_form'] = answer_form
+    return render(request, 'zhihu/answer_question.html', context)

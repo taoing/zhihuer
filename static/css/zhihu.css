@@ -34,7 +34,7 @@ body {
     }
 
 .media-heading {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 600;
 }
 h4 {
@@ -42,8 +42,16 @@ h4 {
     font-weight: 600;
 }
 
-.question-item, .answer-item {
-    padding: 20px;
+.media-heading a {
+    color: #444;
+}
+.question-item {
+    padding: 10px 0;
+    border-bottom: 1px dotted #ddd;
+}
+
+.answer-item {
+    padding: 10px;
 }
 
 .question-title {
@@ -155,4 +163,18 @@ h3.big-topic {
 }
 .trend-item {
     
+}
+
+.user-profile {
+    font-size: 15px;
+    font-weight: 600;
+    margin-right: 40px;
+}
+.username-big {
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.form-input {
+    margin-bottom: 20px;
 }

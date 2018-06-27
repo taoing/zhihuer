@@ -1,4 +1,5 @@
 from django.db import models
+from ckeditor_uploader.fields import RichTextUploadingField
 
 from user.models import User
 
@@ -61,10 +62,11 @@ class Answer(models.Model):
     '''回答模型'''
     question = models.ForeignKey(Question, on_delete=models.DO_NOTHING, verbose_name='回答问题')
     author = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='回答作者')
-    content = models.TextField('回答内容')
+    content = RichTextUploadingField('回答内容')
     pub_time = models.DateTimeField('发布时间', auto_now_add=True)
     voteup_nums = models.IntegerField('认同数', default=0)
     votedown_nums = models.IntegerField('不认同数', default=0)
+    is_anonymous = models.BooleanField('匿名回答', default=False)
 
     def get_follow_nums(self):
         '''获取回答点赞数'''

@@ -1,57 +1,41 @@
-{% load staticfiles %}
+{% extends 'base.html' %}
+
+{% block title %}登录-知乎儿{% endblock %}
+
+{% block content %}
+
 {% load myfilter %}
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>登录知乎儿</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
-
-  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-
-  <link href="{% static 'css/zhihu.css' %}" rel="stylesheet">
-
-  <!--[if lt IE 9]>
-    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
-
-  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-</head>
-<body>
-  <div class="container">
-    <div class="form-login">
-      {% if messages %}
-      <div class="messages">
-        {% for message in messages %}
-        <p class="alert alert-info alert-dismissable">
-          <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <h3>登录</h3>
-      <p>登录知乎儿, 发现不同</p>
-      <hr>
-      <form action="{% url 'user_login' %}", method="post">
-        {% csrf_token %}
-        {% for field in login_form %}
-        <div class="form-group">
-          {{ field.errors }}
-          {{ field.label_tag }}
-          {{ field|widget_add_class:'form-control' }}
-        </div>
-        {% endfor %}
-        <input type="hidden" name="next" value="{{ request.GET.next }}">
-        <input type="submit" name="" value="登录">
-      </form>
-      <hr>
-      <p>还没有账号, 何不 <a href="{% url 'register' %}">注册账户</a></p>
+<div class="container">
+  <div class="form-login">
+    {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+      <p class="alert alert-info alert-dismissable">
+        <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
+      {% endfor %}
     </div>
+    {% endif %}
+
+    <h3>登录</h3>
+    <p>登录知乎儿, 发现不同</p>
+    <hr>
+    <form action="{% url 'user_login' %}", method="post">
+      {% csrf_token %}
+      {% for field in login_form %}
+      <div class="form-group">
+        {{ field.errors }}
+        {{ field.label_tag }}
+        {{ field|widget_add_class:'form-control' }}
+      </div>
+      {% endfor %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+      <div class="text-right">
+        <button type="submit" class="btn btn-primary" name="">登录</button>
+      </div>
+    </form>
+    <hr>
+    <p>还没有账号, 何不 <a href="{% url 'register' %}">注册账户</a></p>
+    <p>忘记密码?, 点击这里 <a href="{% url 'reset_password' %}">找回密码</a></p>
   </div>
-</body>
-</html>
+</div>
+{% endblock %}

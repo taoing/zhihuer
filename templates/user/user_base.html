@@ -9,12 +9,14 @@
     <div class="col-sm-12">
       <div class="site-box">
         <div class="media">
-          <div class="media-left"><img src="" alt="头像" class="media-left"></div>
+          <div class="media-left"><img width="160" height="160" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-left"></div>
           <div class="media-body">
-            <h3 class="media-heading"><strong>{{ user.nickname }}</strong></h3>
-            <p><strong>{{ user.description }}</strong></p>
+            <h3 class="media-heading username-big">{{ user.nickname }}</h3>
+            <p>{{ user.description|default_if_none:'' }}</p>
+            <p class="text-muted">{% if user.gender == 'M' %}<i class="fa fa-mars fa-2x"></i>{% elif user.gender == 'F' %}<i class="fa fa-venus fa-2x"></i>{% endif %}</p>
+            {% if user.address %}<p><span class="user-profile">居住地</span><span>{{ user.address }}</span></p>{% endif %}
             {% if user == request.user %}
-            <div class="pull-right"><a href="">编辑个人资料</a></div>
+            <div class="text-right"><a href="{% url 'edit_profile' %}">编辑个人资料</a></div>
             {% endif %}
           </div>
         </div>
@@ -25,7 +27,7 @@
     <div class="col-sm-8">
       <div class="site-box">
         <div class="nav nav-pills header-bar">
-          <li class="{% url 'user_home' user.id %}"><a href="">动态</a></li>
+          <li class="active"><a href="{% url 'user_home' user.id %}">动态</a></li>
           <li><a href="{% url 'user_answer' user.id %}">回答</a></li>
           <li><a href="{% url 'user_question' user.id %}">提问</a></li>
           <li><a href="">想法</a></li>
@@ -60,5 +62,12 @@
   </div>
 </div>
 
+
+{% endblock %}
+
+{% block custom_css %}
+
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}">
 
 {% endblock %}

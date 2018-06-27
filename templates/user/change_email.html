@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}修改邮箱-知乎儿{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+      <div class="site-box">
+        <h3>修改邮箱</h3>
+        <hr>
+        <form action="{% url 'change_email_request' %}" method="post">
+          {% csrf_token %}
+          {% for field in form %}
+          {% if field.is_hidden %}
+            {{ field }}
+          {% else %}
+            <div class="form-group">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+            </div>
+            <!-- 错误提示消息 -->
+            <p class="text-danger text-right">{{ field.errors.as_text }}</p>
+            {% endif %}
+            {% endfor %}
+
+            <div class="text-right">
+              <button class="btn btn-primary" type="submit">确认修改</button>
+            </div>
+        </form>
+        <hr>
+        <p>点击 确认修改, 一封含有确认修改邮箱链接的邮件会发送到你的新邮箱.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

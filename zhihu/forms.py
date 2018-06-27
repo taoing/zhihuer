@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 from .models import Topic
 
@@ -16,3 +17,8 @@ class AskQuestionForm(forms.Form):
         widget=forms.SelectMultiple(attrs={'class':'selectpicker form-control', 'data-live-search':'true', 'title':'请选择话题'}))
     content = forms.CharField(label='问题描述(可选)', widget=forms.Textarea(attrs={'class':'form-control', 'rows':'3'}), required=False)
     anonymous = forms.BooleanField(label='匿名提问', required=False)
+
+class AnswerForm(forms.Form):
+    '''回答表单'''
+    content = forms.CharField(label='回答', widget=CKEditorUploadingWidget(), required=True)
+    anonymous = forms.BooleanField(label='匿名回答', required=False)

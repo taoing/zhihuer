@@ -48,7 +48,7 @@
                   </a>
                   <div class="media-body">
                     <h4 class="media-heading">{{ answer.question.author.nickname }}<small>, {{ answer.question.author.description }}</small></h4>
-                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200|safe }}</a></p>
+                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
                   </div>
                 </div>
                 <hr>
@@ -68,7 +68,7 @@
                   </a>
                   <div class="media-body">
                     <h4 class="media-heading">{{ answer.question.author.nickname }}<small>, {{ answer.question.author.description }}</small></h4>
-                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|truncatechars:200|safe }}</a></p>
+                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
                   </div>
                 </div>
                 <hr>
