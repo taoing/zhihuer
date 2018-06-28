@@ -96,6 +96,12 @@ p {
     font-weight: 400;
     float: right;
 }
+.right-general {
+    font-size: 14px;
+    color: #333;
+    float: right;
+    font-weight: 400;
+}
 
 h3.big-topic {
     font-size: 22px;
@@ -123,6 +129,11 @@ h3.big-topic {
     background: #ffffff;
 }
 
+.info-num {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
 .question-info {
     padding-top:40px;
     font-size: 16px;
@@ -156,11 +167,6 @@ h3.big-topic {
     border-bottom: 1px dotted #ddd;
 }
 
-.topic-follow, .look-more, .time-right {
-    font-size: 14px;
-    right: 25px;
-    position: absolute;
-}
 .trend-item {
     
 }

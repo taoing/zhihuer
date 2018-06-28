@@ -1,0 +1,25 @@
+{% extends 'user/user_base.html' %}
+
+{% block user_content %}
+
+<h4>{% if user == request.user %}关注我的人{% else %}关注{% if user.gender == 'M' %}他{% else %}她{% endif %}的人{% endif %}</h4>
+<hr>
+
+{% for from_user in from_users_page.object_list %}
+<div class="trend-item">
+    <div class="media">
+        <a href="{% url 'user_home' from_user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ from_user.image }}" alt="" class="media-object"></a>
+        <div class="media-body">
+            <h4 class="media-heading"><a href="{% url 'user_home' from_user.id %}">{{ from_user.nickname|default_if_none:'' }}</a></h4>
+            <p class="text-muted">{{ from_user.description|default_if_none:'' }}<span class="right-info">
+                <button type="button" class="btn btn-default">关注</button>
+            </span></p>
+        </div>
+    </div>
+</div>
+<hr>
+{% endfor %}
+
+{% include 'zhihu/paginator.html' with page=from_users_page %}
+
+{% endblock %}

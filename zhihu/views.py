@@ -145,16 +145,31 @@ def topic_detail(request, topic_id):
     topic_answers = Answer.objects.filter(question__in=topic.question_set.all()).annotate(follow_nums\
         =Count('userfollowanswer', distince=True)).annotate(comment_nums=Count('answercomment', distinct=True)).order_by('-pub_time')
 
-    # 话题下回答问题的最活跃回答者, 按用户的回答赞同数排序
-    # 用distinct去除重复的user_id, 但mysql数据库不支持, 使用set类型集合
+    # 话题下回答问题的最活跃回答者, 按用户的回答数排序
+    # 用distinct去除重复的user_id, 但mysql数据库不支持, 使用set类型集合去除重复的user_id
     # 该话题下, 有回答的用户ID列表
     user_ids = set()
     for answer in topic_answers:
         user_ids.add(answer.author_id)
-    # 最活跃用户取前5
-    most_active_users = User.objects.filter(id__in=user_ids)\
-        .annotate(follow_nums=Count('userfollowanswer',distinct=True), answer_nums=Count('answer', distinct=True)).order_by('-follow_nums')[:5]
 
+    # 所有用户在话题下的回答数列表
+    user_answer_nums_list = []
+    for user_id  in user_ids:
+        user_answer_nums = topic_answers.filter(author_id=user_id).count()
+        user_answer_nums_list.append({'user_id':user_id, 'user_answer_nums':user_answer_nums})
+    # 依据回答数排序
+    def get_nums(obj):
+        return obj['user_answer_nums']
+    user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+    # 最活跃用户取前3
+    most_active_users = []
+    for obj in user_answer_nums_list_sorted[:3]:
+        user = User.objects.get(id=obj['user_id'])
+        # 用户话题回答数
+        user.topic_answer_nums = obj['user_answer_nums']
+        # 用户话题下回答赞同数
+        user.topic_answer_follow_nums = UserFollowAnswer.objects.filter(answer__author=user, answer__in=topic_answers).count()
+        most_active_users.append(user)
 
     page = paginator_helper(request, topic_answers, per_page=settings.ANSWER_PER_PAGE)
 

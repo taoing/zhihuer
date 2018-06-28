@@ -1,0 +1,35 @@
+{% extends 'user/user_base.html' %}
+
+{% block user_content %}
+
+<h4>{% if user == request.user %}我收藏的回答{% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}收藏的回答{% endif %}</h4>
+<hr>
+
+{% for answer in user_collect_answers_page.object_list %}
+<div class="trend-item">
+  
+  <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
+  <div class="media">
+    <a href="{% url 'user_home' answer.question.author_id %}" class="media-left"><img width="24" src="{{ MEDIA_URL }}{{ answer.question.author.image }}" alt="头像" class="media-object"></a>
+    <div class="media-body">
+      <p class="media-heading">{{ answer.author.nickname }}<span class="text-muted">, {{ answer.author.description|default_if_none:'' }}</span></p>
+    </div>
+  </div>
+  <p class="text-muted">{{ answer.get_follow_nums }} 人赞同了该回答</p>
+  <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
+  <div class="answer-meta">
+    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-sm btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button></a>
+    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-sm btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-sm btn-default">{{ answer.get_comment_nums }} 条评论</button></a>
+    <!-- <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span> 收藏</button></a> -->
+    {% if user == request.user %}
+    <button type="button" class="btn btn-sm btn-default"><span class="delete-answer glyphicon glyphicon-trash"></span> 取消收藏</button>
+    {% endif %}
+  </div>
+</div>
+<hr>
+{% endfor %}
+
+{% include 'zhihu/paginator.html' with page=user_collect_answers_page %}
+
+{% endblock %}

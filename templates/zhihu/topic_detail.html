@@ -31,21 +31,21 @@
         <div class="answer-item">
           <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
           <div class="media">
-            <a href="" class="media-left">
-              <img src="" alt="头像" class="media-object">
+            <a target="_blank" href="{% url 'user_home' answer.author.id %}" class="media-left">
+              <img width="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object">
             </a>
             <div class="media-body">
-              <h4 class="media-heading">{{ answer.author.nickname }} <span class=text-muted><small>, {{ answer.author.description }}</small></span></h4>
+              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author.id %}">{{ answer.author.nickname }}</a> <span class=text-muted><small>, {{ answer.author.description }}</small></span></h4>
             </div>
           </div>
           <div class="answer-content">
             <a href="{% url 'answer_detail' answer.id %}"><p>{{ answer.content|striptags|truncatechars:200 }}</p></a>
           </div>
           <div class="answer-meta">
-            <a href=""><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
-            <a href=""><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
-            <a href=""><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+            <a href=""><button type="button" class="btn btn-primary btn-sm btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
+            <a href=""><button type="button" class="btn btn-default btn-sm btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.comment_nums }} 条评论</button></a>
+            <a href=""><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
             <span>{{ answer.pub_time }}</span>         
           </div>
         </div>
@@ -64,10 +64,10 @@
         <hr>
         {% for user in most_active_users %}
         <div class="media">
-          <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
+          <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-object"></a>
           <div class="media-body">
-            <h4 class="media-heading">{{ user.nickname }}</h4>
-            <p>共{{ user.answer_nums }}回答, {{ user.follow_nums }}赞同</p>
+            <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
+            <p>共{{ user.topic_answer_nums }}回答, {{ user.topic_answer_follow_nums }}赞同</p>
           </div>
         </div>
         <hr>

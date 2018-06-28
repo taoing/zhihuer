@@ -14,7 +14,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
 from .models import User, CheckCode
-from zhihu.models import Answer, Question
+from zhihu.models import Answer, Question, Topic
 from .forms import RegisterForm, LoginForm, ForgetPwdForm, UserProfileForm, ChangePasswordForm, ChangeEmailForm
 from helper.send_email import send_email
 from helper.paginator_helper import paginator_helper
@@ -153,6 +153,94 @@ def user_question(request, user_id):
     context['user_questions_page'] = user_questions_page
     return render(request, 'user/user_question.html', context)
 
+def user_collect_answer(request, user_id):
+    '''用户主页--收藏的回答'''
+    user = get_object_or_404(User, id=user_id)
+    user_collect_answers = user.usercollectanswer_set.all().order_by('-add_time')
+    # 取出answer对象
+    user_collect_answers = [obj.answer for obj in user_collect_answers]
+    user_collect_answers_page = paginator_helper(request, user_collect_answers, per_page=settings.ANSWER_PER_PAGE)
+    context = {}
+    context['user'] = user
+    context['user_collect_answers_page'] = user_collect_answers_page
+    return render(request, 'user/user_collect_answer.html', context)
+
+def user_follow_topic(request, user_id):
+    '''用户主页--关注话题'''
+    user = get_object_or_404(User, id=user_id)
+    # 用户关注的话题
+    user_topics = user.topic_set.all()
+    user_topics_list = []
+    if user_topics:
+        for topic in user_topics:
+            # 话题下所有问题
+            topic_questions = topic.question_set.all()
+            # 用户在该话题下的所有回答
+            user_answer_nums = Answer.objects.filter(question__in=topic_questions, author=user).count()
+            # 创建dict对象放入列表中
+            user_topics_list.append({'topic':topic, 'user_answer_nums':user_answer_nums})
+
+    user_topics_page = paginator_helper(request, user_topics_list, per_page=settings.TOPIC_PER_PAGE)
+    context = {}
+    context['user'] = user
+    context['user_topics_page'] = user_topics_page
+    return render(request, 'user/user_follow_topic.html', context)
+
+def user_follow_question(request, user_id):
+    '''用户主页--关注问题'''
+    user = get_object_or_404(User, id=user_id)
+    # 用户关注问题
+    user_follow_questions = user.userfollowquestion_set.all()
+    # 取出question对象
+    user_follow_questions = [obj.question for obj in user_follow_questions]
+    user_follow_questions_page = paginator_helper(request, user_follow_questions, per_page=settings.QUESTION_PER_PAGE)
+    context = {}
+    context['user'] = user
+    context['user_follow_questions_page'] = user_follow_questions_page
+    return render(request, 'user/user_follow_question.html', context)
+
+def user_follow_user(request, user_id):
+    '''用户主页--用户关注'''
+    user = get_object_or_404(User, id=user_id)
+    # 该用户关注的用户
+    to_users = user.to_user_set.all().order_by('-add_time')
+    # 取出关注的用户
+    to_users = [obj.to_user for obj in to_users]
+    to_users_page = paginator_helper(request, to_users, per_page = settings.USER_PER_PAGE)
+    context = {}
+    context['user'] = user
+    context['to_users_page'] = to_users_page
+    return render(request, 'user/user_follow_user.html', context)
+
+def user_followed_by_user(request, user_id):
+    '''用户主页--用户关注者'''
+    user = get_object_or_404(User, id=user_id)
+    # 关注该用户的用户
+    from_users = user.from_user_set.all().order_by('-add_time')
+    # 取出关注者
+    from_users = [obj.from_user for obj in from_users]
+    from_users_page = paginator_helper(request, from_users, per_page=settings.USER_PER_PAGE)
+    context = {}
+    context['user'] = user
+    context['from_users_page'] = from_users_page
+    return render(request, 'user/user_followed_user.html', context)
+
+def user_topic_answer(request, user_id, topic_id):
+    '''用户在话题下的回答'''
+    user = get_object_or_404(User, id=user_id)
+    try:
+        topic = user.topic_set.get(id=topic_id)
+    except Exception as e:
+        return redirect(reverse('index'))
+    topic_questions = topic.question_set.all()
+    topic_answers = Answer.objects.filter(question__in=topic_questions, author=user)
+    topic_answers_page = paginator_helper(request, topic_answers, per_page=settings.ANSWER_PER_PAGE)
+    context = {}
+    context['user'] = user
+    context['topic'] = topic
+    context['topic_answers_page'] = topic_answers_page
+    return render(request, 'user/user_topic_answer.html', context)
+
 def reset_password(request):
     '''忘记密码, 找回密码'''
     if not request.user.is_anonymous:
@@ -277,7 +365,7 @@ def change_email_request(request):
             password = form.cleaned_data.get('password')
             new_email = form.cleaned_data.get('new_email')
             if request.user.check_password(password):
-                token = request.user.generate_change_email_token()
+                token = request.user.generate_change_email_token(new_email)
                 send_email('知乎儿修改邮箱', 'user/email/change_email', new_email, token=token)
                 messages.info(request, '一封含有确认修改邮箱链接的邮件已发送到你的新邮箱, 请查收')
                 return redirect(reverse('index'))

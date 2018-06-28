@@ -13,10 +13,12 @@
           <div class="media-body">
             <h3 class="media-heading username-big">{{ user.nickname }}</h3>
             <p>{{ user.description|default_if_none:'' }}</p>
-            <p class="text-muted">{% if user.gender == 'M' %}<i class="fa fa-mars fa-2x"></i>{% elif user.gender == 'F' %}<i class="fa fa-venus fa-2x"></i>{% endif %}</p>
+            <p class="text-muted"> {% if user.gender == 'M' %}<i class="fa fa-mars fa-2x"></i>{% elif user.gender == 'F' %}<i class="fa fa-venus fa-2x"></i>{% endif %}</p>
             {% if user.address %}<p><span class="user-profile">居住地</span><span>{{ user.address }}</span></p>{% endif %}
             {% if user == request.user %}
-            <div class="text-right"><a href="{% url 'edit_profile' %}">编辑个人资料</a></div>
+            <div class="text-right"><a href="{% url 'edit_profile' %}"><button class="btn btn-default">编辑个人资料</button></a></div>
+            {% else %}
+            <div class="text-right"><a href=""><button class="btn btn-primary">关注 TA</button></a></div>
             {% endif %}
           </div>
         </div>
@@ -31,6 +33,17 @@
           <li><a href="{% url 'user_answer' user.id %}">回答</a></li>
           <li><a href="{% url 'user_question' user.id %}">提问</a></li>
           <li><a href="">想法</a></li>
+          <li class="dropdown">
+            <a href="" class="dropdown-toggle" data-toggle="dropdown">更多
+            <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="{% url 'user_collect_answer' user.id %}">收藏的回答</a></li>
+              <li><a href="{% url 'user_follow_topic' user.id %}">关注的话题</a></li>
+              <li><a href="{% url 'user_follow_question' user.id %}">关注的问题</a></li>
+              <li><a href="{% url 'user_follow_user' user.id %}">关注</a></li>
+              <li><a href="{% url 'user_followed_by_user' user.id %}">关注者</a></li>
+            </ul>
+          </li>
         </div>
         <hr>
         {% block user_content %}
@@ -47,15 +60,23 @@
         <p><span class="glyphicon glyphicon-star"></span> 获得 {{ user.get_answer_by_collected_nums }} 次收藏</p>
       </div>
       <div class="site-box">
-        <div class="nav nav-pills nav-stacked">
-          <li><a href=""><span class="badge pull-right">12</span>关注了</a></li>
-          <li><a href=""><span class="badge pull-right">15</span>关注者</a></li>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="text-center">关注了</p>
+            <p class="text-center"><a class="info-num" href="{% url 'user_follow_user' user.id %}">{{ user.get_follow_user_nums }}</a></p>
+          </div>
+          <div class="col-sm-6">
+            <p class="text-center">关注者</p>
+            <p class="text-center"><a class="info-num" href="{% url 'user_followed_by_user' user.id %}">{{ user.get_followed_by_user_nums }}</a></p>
+          </div>
         </div>
       </div>
+
       <div class="site-box">
         <div class="nav nav-pills nav-stacked">
-          <li><a href=""><span class="badge pull-right">37</span>关注的话题</a></li>
-          <li><a href=""><span class="badge pull-right">35</span>关注的问题</a></li>
+          <li><a href="{% url 'user_collect_answer' user.id %}"><span class="badge pull-right">{{ user.get_collect_answer_nums }}</span>收藏的回答</a></li>
+          <li><a href="{% url 'user_follow_topic' user.id %}"><span class="badge pull-right">{{ user.get_topic_nums }}</span>关注的话题</a></li>
+          <li><a href="{% url 'user_follow_question' user.id %}"><span class="badge pull-right">{{ user.get_follow_question_nums }}</span>关注的问题</a></li>
         </div>
       </div>
     </div>

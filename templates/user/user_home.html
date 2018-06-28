@@ -3,7 +3,7 @@
 {% block user_content %}
 
 {% load myfilter %}
-<h4>{% if user == request.user %}我的动态{% else %}他的动态{% endif %}</h4>
+<h4>{% if user == request.user %}我的动态{% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}的动态{% endif %}</h4>
 <hr>
 {% for obj in user_trend_sorted_page.object_list %}
 
@@ -11,7 +11,7 @@
 {% if obj|object_class_name == 'Answer' %}
 <div class="trend-item">
   <p class="text-muted">回答了问题<span class="right-info">{{ obj.pub_time|date:"Y年m月d日" }}</span></p>
-  <a href="{% url 'question_detail' obj.question_id %}"><h3>{{ obj.question.title }}</h3></a>
+  <h3><a href="{% url 'question_detail' obj.question_id %}">{{ obj.question.title }}</a></h3>
   <div class="media">
     <a href="{% url 'user_home' obj.question.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
     <div class="media-body">
@@ -24,7 +24,7 @@
     <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-primary btnvote-up btn-sm"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.get_follow_nums }}</button></a>
     <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btnvote-down btn-sm"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
     <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btn-sm">{{ obj.get_comment_nums }} 条评论</button></a>
-    <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+    <!-- <a href="{% url 'answer_detail' obj.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a> -->
   </div>
 </div>
 <hr>
@@ -32,14 +32,14 @@
 {% elif obj|object_class_name == 'Question' %}
 <div class="trend-item">
   <p class="text-muted">添加了问题<span class="right-info">{{ obj.pub_time|date:"Y年m月d日" }}</span></p>
-  <a href="{% url 'question_detail' obj.id %}"><h3>{{ obj.title }}</h3></a>
+  <h3><a href="{% url 'question_detail' obj.id %}">{{ obj.title }}</a></h3>
 </div>
 <hr>
 <!-- 赞同了回答 -->
 {% elif obj|object_class_name == 'UserFollowAnswer' %}
 <div class="trend-item">
   <p class="text-muted">赞同了回答<span class="right-info">{{ obj.add_time|date:"Y年m月d日" }}</span></p>
-  <a href="{% url 'question_detail' obj.answer.question_id %}"><h3>{{ obj.answer.question.title }}</h3></a>
+  <h3><a href="{% url 'question_detail' obj.answer.question_id %}">{{ obj.answer.question.title }}</a></h3>
   <div class="media">
     <a href="{% url 'user_home' obj.answer.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
     <div class="media-body">
@@ -52,7 +52,7 @@
     <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-primary btnvote-up btn-sm"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.answer.get_follow_nums }}</button></a>
     <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btnvote-down btn-sm"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
     <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm">{{ obj.answer.get_comment_nums }} 条评论</button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+    <!-- <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a> -->
   </div>
 </div>
 <hr>
@@ -60,7 +60,7 @@
 {% elif obj|object_class_name == 'UserCollectAnswer' %}
 <div class="trend-item">
   <p class="text-muted">在 {{ obj.answer.question.get_topic_name }} 中收藏了回答<span class="right-info">{{ obj.add_time|date:"Y年m月d日" }}</span></p>
-  <a href="{% url 'question_detail' obj.answer.question_id %}"><h3>{{ obj.answer.question.title }}</h3></a>
+  <h3><a href="{% url 'question_detail' obj.answer.question_id %}">{{ obj.answer.question.title }}</a></h3>
   <div class="media">
     <a href="{% url 'user_home' obj.answer.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
     <div class="media-body">
@@ -73,7 +73,7 @@
     <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-primary btnvote-up btn-sm"><span class="glyphicon glyphicon-triangle-top"></span> {{ obj.answer.get_follow_nums }}</button></a>
     <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btnvote-down btn-sm"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
     <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm">{{ obj.answer.get_comment_nums }} 条评论</button></a>
-    <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+    <!-- <a href="{% url 'answer_detail' obj.answer_id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a> -->
   </div>
 </div>
 <hr>
@@ -81,7 +81,7 @@
 {% elif obj|object_class_name == 'UserFollowQuestion' %}
 <div class="trend-item">
   <p class="text-muted">关注了问题<span class="right-info">{{ obj.add_time|date:"Y年m月d日" }}</span></p>
-  <a href="{% url 'question_detail' obj.question_id %}"><h3>{{ obj.question.title }}</h3></a>
+  <h3><a href="{% url 'question_detail' obj.question_id %}">{{ obj.question.title }}</a></h3>
 </div>
 <hr>
 {% endif %}

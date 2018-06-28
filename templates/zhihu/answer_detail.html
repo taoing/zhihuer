@@ -132,69 +132,73 @@
 {% block custom_js %}
 
 <script>
-  var old_path = window.location.pathname;
-  //点赞
-  function add_follow(url) {
-    $.ajax({
-      cache:false,
-      type:'GET',
-      url:url,
-      async:true,
-      success:function(data) {
-        if(data.status == 'fail') {
+  // js代码在DOM节点的前面先加载, 绑定document的ready事件就好了
+  $(function () {
+    var old_path = window.location.pathname;
+    //点赞
+    function add_follow(url) {
+      $.ajax({
+        cache:false,
+        type:'GET',
+        url:url,
+        async:true,
+        success:function(data) {
+          if(data.status == 'fail') {
+            alert(data.message);
+          }else if (data.status == 'success') {
+            window.location.reload();
+          }else if (data.status == 'nothing') { 
+          }else {
+            window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+          }
+        },
+      });
+    }
+    // 点赞
+    $('.btnvote-up').on('click', function() {
+      add_follow("{% url 'add_follow_answer' answer.id %}");
+    });
+    // 取消点赞
+    $('.btnvote-down').on('click', function() {
+      add_follow("{% url 'cancel_follow_answer' answer.id %}")
+    });
+
+    // 回答评论
+    $('#comment-submit').on('click', function() {
+      var old_href = window.location.href;
+      $.ajax({
+        cache:false,
+        type:'POST',
+        url:"{% url 'comment_answer' answer.id %}",
+        data:$('.comment-form').serialize(),
+        async:true,
+        success:function(data) {
+          if(data.status == 'fail') {
+            alert(data.message);
+          }else if(data.status == 'success') {
+            //alert('已评论');
+            window.location.href=old_href;
+          }else{
+            window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+          }
+        },
+      });
+    });
+
+    //收藏答案
+    $('.collect-answer').on('click', function() {
+      $.get("{% url 'collect_answer' answer.id %}", function(data) {
+        if(data.status == 'success') {
+          $('.collect-answer').html('<span class="glyphicon glyphicon-star"></span>'+data.message);
+        }else if(data.status == 'fail') {
           alert(data.message);
-        }else if (data.status == 'success') {
-          window.location.reload();
-        }else if (data.status == 'nothing') { 
         }else {
           window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
         }
-      },
-    });
-  }
-  // 点赞
-  $('.btnvote-up').on('click', function() {
-    add_follow("{% url 'add_follow_answer' answer.id %}");
-  });
-  // 取消点赞
-  $('.btnvote-down').on('click', function() {
-    add_follow("{% url 'cancel_follow_answer' answer.id %}")
-  });
-
-  // 回答评论
-  $('#comment-submit').on('click', function() {
-    var old_href = window.location.href;
-    $.ajax({
-      cache:false,
-      type:'POST',
-      url:"{% url 'comment_answer' answer.id %}",
-      data:$('.comment-form').serialize(),
-      async:true,
-      success:function(data) {
-        if(data.status == 'fail') {
-          alert(data.message);
-        }else if(data.status == 'success') {
-          //alert('已评论');
-          window.location.href=old_href;
-        }else{
-          window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
-        }
-      },
+      });
     });
   });
 
-  //收藏答案
-  $('.collect-answer').on('click', function() {
-    $.get("{% url 'collect_answer' answer.id %}", function(data) {
-      if(data.status == 'success') {
-        $('.collect-answer').text(data.message);
-      }else if(data.status == 'fail') {
-        alert(data.message);
-      }else {
-        window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
-      }
-    });
-  });
 </script>
 
 {% endblock %}

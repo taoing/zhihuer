@@ -2,10 +2,11 @@
 
 {% block user_content %}
 
-<h4>{% if user == request.user %}我的回答{% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}的回答{% endif %}</h4>
+<h4>{% if user == request.user %}我在{{ topic.name }}的回答{% else %}{{ user.nickname|default_if_none:'' }}在{{ topic.name }}的回答{% endif %}
+  <a class="right-general" href="{% url 'user_answer' user.id %}">返回所有回答</a></h4>
 <hr>
 
-{% for answer in user_answers_page.object_list %}
+{% for answer in topic_answers_page.object_list %}
 <div class="trend-item">
   
   <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
@@ -29,6 +30,6 @@
 <hr>
 {% endfor %}
 
-{% include 'zhihu/paginator.html' with page=user_answers_page %}
+{% include 'zhihu/paginator.html' with page=topic_answers_page %}
 
 {% endblock %}

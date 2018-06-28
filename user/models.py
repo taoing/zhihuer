@@ -14,8 +14,11 @@ class User(AbstractUser):
     address = models.CharField('居住地', max_length=100, null=True, blank=True)
     description = models.CharField('个人描述', max_length=400, null=True, blank=True)
     image = models.ImageField('用户头像', upload_to='image/%Y/%m', default='image/default_user.png', null=True, blank=True)
-    add_time = models.DateTimeField('加入时间', auto_now_add=True)
     confirmed = models.BooleanField('用户确认', default=False)
+    # add_time = models.DateTimeField('加入时间', auto_now_add=True)
+
+    #用户相互关注, 多对多关系字段
+    users = models.ManyToManyField('self', through='UserRelationship', symmetrical=False, verbose_name='关注')
 
     def __str__(self):
         return self.username
@@ -78,6 +81,14 @@ class User(AbstractUser):
         self.save()
         return True
 
+    def get_follow_user_nums(self):
+        '''获取用户关注的用户数量'''
+        return self.to_user_set.count()
+
+    def get_followed_by_user_nums(self):
+        '''获取关注该用户的用户数量'''
+        return self.from_user_set.count()
+
 
 class CheckCode(models.Model):
     '''用户验证码模型'''
@@ -88,3 +99,10 @@ class CheckCode(models.Model):
 
     def __str__(self):
         return self.check_code
+
+
+class UserRelationship(models.Model):
+    '''用户相关关注中间模型, 显式定义'''
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user_set',verbose_name='用户')
+    to_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user_set', verbose_name='关注')
+    add_time = models.DateTimeField('关注时间', auto_now_add=True)
