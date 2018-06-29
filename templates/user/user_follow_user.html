@@ -5,19 +5,55 @@
 <h4>{% if user == request.user %}我关注的人{% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}关注的人{% endif %}</h4>
 <hr>
 
-{% for to_user in to_users_page.object_list %}
-<div class="trend-item">
-    <div class="media">
-        <a href="{% url 'user_home' to_user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ to_user.image }}" alt="" class="media-object"></a>
-        <div class="media-body">
-            <h4 class="media-heading"><a href="{% url 'user_home' to_user.id %}">{{ to_user.nickname|default_if_none:'' }}</a></h4>
-            <p class="text-muted">{{ to_user.description|default_if_none:'' }}<span class="right-info">
-                <button type="button" class="btn btn-default">取消关注</button>
-            </span></p>
+{% if request.user.is_authenticated and request.user == user %}
+
+    {% for to_user in to_users_page.object_list %}
+    <div class="trend-item">
+        <div class="media">
+            <a target="_blank" href="{% url 'user_home' to_user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ to_user.image }}" alt="" class="media-object"></a>
+            <div class="media-body">
+                <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' to_user.id %}">{{ to_user.nickname|default_if_none:'' }}</a></h4>
+                <p class="text-muted">{{ to_user.description|default_if_none:'' }}<span class="right-info">
+                    <button type="button" class="btn btn-default" onclick="follow_user(this, {{ to_user.id }})">取消关注</button>
+                </span></p>
+            </div>
         </div>
     </div>
-</div>
-{% endfor %}
+    {% endfor %}
+
+{% elif request.user.is_authenticated %}
+
+    {% for to_user in to_users_page.object_list %}
+    <div class="trend-item">
+        <div class="media">
+            <a target="_blank" href="{% url 'user_home' to_user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ to_user.image }}" alt="" class="media-object"></a>
+            <div class="media-body">
+                <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' to_user.id %}">{{ to_user.nickname|default_if_none:'' }}</a></h4>
+                <p class="text-muted">{{ to_user.description|default_if_none:'' }}<span class="right-info">
+                    <button type="button" class="btn btn-default" onclick="follow_user(this, {{ to_user.id }})">{% if to_user.has_followed %}取消关注{% else %}关注 TA{% endif %}</button>
+                </span></p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+{% else %}
+
+{% for to_user in to_users_page.object_list %}
+    <div class="trend-item">
+        <div class="media">
+            <a target="_blank" href="{% url 'user_home' to_user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ to_user.image }}" alt="" class="media-object"></a>
+            <div class="media-body">
+                <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' to_user.id %}">{{ to_user.nickname|default_if_none:'' }}</a></h4>
+                <p class="text-muted">{{ to_user.description|default_if_none:'' }}<span class="right-info">
+                    <button type="button" class="btn btn-default" onclick="follow_user(this, {{ to_user.id }})">关注 TA</button>
+                </span></p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+{% endif %}
 
 {% include 'zhihu/paginator.html' with page=to_users_page %}
 

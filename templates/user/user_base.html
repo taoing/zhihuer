@@ -85,7 +85,7 @@
 
 <script type=text/javascript>
   function follow_user (dom, user_id) {
-    old_path = location.pathname;
+    var old_path = location.pathname;
     $.ajax({
       type:'GET',
       async:true,

@@ -15,17 +15,17 @@
         <div class="answer-item">
           {% if answer.is_anonymous %}
           <div class="media">
-            <div class="media-left"><img src="" alt="头像" class="media-object"></div>
+            <a class="media-left"><img width="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
             <div class="media-body">
               <h4 class="media-heading text-muted">匿名回答</h4>
             </div>
           </div>
           {% else %}
           <div class="media">
-            <a href="{% url 'user_home' answer.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
+            <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
             <div class="media-body">
-              <h4 class="media-heading"><a href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a></h4>
-              <p class="text-muted">{{ answer.author.description }}</p>
+              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a></h4>
+              <p class="text-muted">{{ answer.author.description|default_if_none:'' }}</p>
             </div>
           </div>
           {% endif %}
@@ -60,8 +60,8 @@
 
         {% for comment in page.object_list %}
           <div class="media">
-            <a href="" class="media-left"><img src="" alt="头像" class="media-object"></a>
-            <div class="media-body"><h4 class="media-heading">{{ comment.user.nickname }}<span class="right-info">{{ comment.add_time }}</span></h4></div>
+            <a target="_blank" href="{% url 'user_home' comment.user_id %}" class="media-left"><img width="24" src="{{ MEDIA_URL }}{{ comment.user.image }}" alt="头像" class="media-object"></a>
+            <div class="media-body"><h4 class="media-heading"><a target="_blank" href="{% url 'user_home' comment.user_id %}">{{ comment.user.nickname }}</a><span class="right-info">{{ comment.add_time }}</span></h4></div>
           </div>
           <p>{{ comment.comment }}</p>
           <hr>
@@ -89,10 +89,10 @@
     <div class="col-sm-4">
       <div class="site-box">
         <div class="media">
-          <a href="" class="media-left"><img src="" alt="头像" class="meida-object"></a>
+          <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
           <div class="media-body">
-            <h4 class="media-heading">{{ answer.author.nickname }}</h4>
-            <p>{{ answer.author.description }}</p>
+            <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a></h4>
+            <p class="text-muted">{{ answer.author.description|default_if_none:'' }}</p>
           </div>
         </div>
         <hr>

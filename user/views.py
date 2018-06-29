@@ -212,7 +212,21 @@ def user_follow_user(request, user_id):
     to_users = user.to_user_set.all().order_by('-add_time')
     # 取出关注的用户
     to_users = [obj.to_user for obj in to_users]
-    to_users_page = paginator_helper(request, to_users, per_page = settings.USER_PER_PAGE)
+
+    # 判断用户关注的用户是否被当前用户关注
+    to_users_list = []
+    if request.user.is_authenticated and request.user != user:
+        # 当前用户关注的用户
+        current_user_to_users = [obj.to_user for obj in request.user.to_user_set.all().order_by('-add_time')]
+        for to_user in to_users:
+            if to_user in current_user_to_users:
+                # 添加被当前用户关注属性
+                to_user.has_followed = True
+            to_users_list.append(to_user)
+        to_users_page = paginator_helper(request, to_users_list, per_page = settings.USER_PER_PAGE)
+    else:
+        to_users_page = paginator_helper(request, to_users, per_page = settings.USER_PER_PAGE)
+
     context = {}
     context['user'] = user
     context['to_users_page'] = to_users_page
@@ -225,7 +239,20 @@ def user_followed_by_user(request, user_id):
     from_users = user.from_user_set.all().order_by('-add_time')
     # 取出关注者
     from_users = [obj.from_user for obj in from_users]
-    from_users_page = paginator_helper(request, from_users, per_page=settings.USER_PER_PAGE)
+
+    # 判断用户的关注者是否也被当前用户关注
+    from_users_list = []
+    if request.user.is_authenticated:
+        # 当前用户关注的用户
+        current_user_to_users = [obj.to_user for obj in request.user.to_user_set.all().order_by('-add_time')]
+        for from_user in from_users:
+            if from_user in current_user_to_users:
+                from_user.has_followed = True
+            from_users_list.append(from_user)
+        from_users_page = paginator_helper(request, from_users_list, per_page=settings.USER_PER_PAGE)
+    else:
+        from_users_page = paginator_helper(request, from_users, per_page=settings.USER_PER_PAGE)
+
     context = {}
     context['user'] = user
     context['from_users_page'] = from_users_page
