@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}话题广场-知乎儿{% endblock %}
+
+{% block topic %}active{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-8">
+      <div class="site-box">
+        <div class="media">
+          <div class="media-left"><img src="" alt="话题" class="media-object"></div>
+          <div class="media-body">
+            <h3 class="big-topic">{{ topic.name }}</h3>
+            <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
+          </div>
+        </div>
+        <hr>
+        <button id="follow-topic" class="btn btn-primary">{% if has_follow_topic %}已关注{% else %}关注话题{% endif %}</button>
+      </div>
+
+      <div class="site-box">
+        <ul class="nav nav-pills header-bar">
+          <li><a href="{% url 'topic_detail' topic.id %}">讨论</a></li>
+          <li><a href="{% url 'topic_detail' topic.id %}?topic_type=wonderful">精华</a></li>
+          <li class="active"><a href="{% url 'topic_question' topic.id %}">等待回答</a></li>
+        </ul>
+        <hr>
+
+        {% for question in topic_questions_page.object_list %}
+        <div class="topic-question-item">
+          <h3><a target="_blank" href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h3>
+          <div><a target="_blank" href="{% url 'answer_question' question.id %}"><button class="btn btn-primary">写回答</button></a>
+            <span class="text-muted">{{ question.pub_time|date:'Y-m-d' }} &middot; {{ question.get_answer_nums }} 个回答 &middot; {{ question.get_follow_nums }} 个关注</span>
+          </div>
+        </div>
+        {% endfor %}
+
+      </div>
+      {% include 'zhihu/paginator.html' with page=topic_questions_page %}
+    </div>
+
+    <div class="col-sm-4">
+      <div class="site-box">
+        <p>关注者: <span class="rightdes-num">{{ topic.get_user_nums }}</span></p>
+        <p>问题数: <span class="rightdes-num">{{ topic.get_question_nums }}</span></p>
+      </div>
+      <div class="site-box">
+        <h4>活跃回答者<a href="" class="text-muted right-info">查看更多</a></h4>
+        <hr>
+        {% for user in most_active_users %}
+        <div class="media">
+          <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-object"></a>
+          <div class="media-body">
+            <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
+            <p>共{{ user.topic_answer_nums }}回答, {{ user.topic_answer_follow_nums }}赞同</p>
+          </div>
+        </div>
+        <hr>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

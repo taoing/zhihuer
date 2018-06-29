@@ -38,9 +38,9 @@
 
     <div class="collapse navbar-collapse" id="mynav">
       <ul class="nav navbar-nav">
-        <li class="active"><a href="{% url 'index' %}">首页</a></li>
-        <li class=""><a href="{% url 'explore' %}">发现</a></li>
-        <li><a href="{% url 'topic_list' %}">话题</a></li>
+        <li class="{% block home %}{% endblock %}"><a href="{% url 'index' %}">首页</a></li>
+        <li class="{% block explore %}{% endblock %}"><a target="_blank" href="{% url 'explore' %}">发现</a></li>
+        <li class="{% block topic %}{% endblock %}"><a target="_blank" href="{% url 'topic_list' %}">话题</a></li>
       </ul>
       <form class="navbar-form navbar-left">
         <div class="form-group">

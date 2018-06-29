@@ -56,14 +56,14 @@
         </div>
         <hr>
 
-        <div class="comment">
+        <div id="comment-list">
 
         {% for comment in page.object_list %}
           <div class="media">
             <a target="_blank" href="{% url 'user_home' comment.user_id %}" class="media-left"><img width="24" src="{{ MEDIA_URL }}{{ comment.user.image }}" alt="头像" class="media-object"></a>
             <div class="media-body"><h4 class="media-heading"><a target="_blank" href="{% url 'user_home' comment.user_id %}">{{ comment.user.nickname }}</a><span class="right-info">{{ comment.add_time }}</span></h4></div>
           </div>
-          <p>{{ comment.comment }}</p>
+          <p class="comment-content">{{ comment.comment }}</p>
           <hr>
           {% empty %}
           <p>暂时没有评论</p>
@@ -71,7 +71,7 @@
 
           {% include 'zhihu/paginator.html' %}
 
-          <form class='comment-form' id="comment-form" method='post'>
+          <form action="{% url 'comment_answer' answer.id %}" class='comment-form' id="comment-form" method='post'>
             {% csrf_token %}
             {% for field in comment_form %}
             <div class="form-group">
@@ -80,7 +80,8 @@
               {{ field.as_widget }}
             </div>
             {% endfor %}
-            <button id="comment-submit" class="btn btn-primary" type="submit">评论</button>
+            <p class="alert alert-success hidden" id="submit-info"></p>
+            <div class="text-right"><button id="comment-submit" class="btn btn-primary" type="submit">评论</button></div>
           </form>
         </div>
       </div>
@@ -105,7 +106,7 @@
         </div>
       </div>
       <div class="site-box">
-        <p class="strong">被收藏了{{ answer.get_collect_nums }}次</p>
+        <p><strong>被收藏了 {{ answer.get_collect_nums }} 次</strong></p>
       </div>
       <div class="site-box">
         <h4>相关问题</h4>
@@ -135,21 +136,27 @@
   // js代码在DOM节点的前面先加载, 绑定document的ready事件就好了
   $(function () {
     // 回答评论
-    $('#comment-submit').on('click', function() {
+    $('#comment-form').on('submit', function(event) {
+      event.preventDefault();
       var old_path = location.pathname;
       $.ajax({
         cache:false,
         type:'POST',
         url:"{% url 'comment_answer' answer.id %}",
-        data:$('.comment-form').serialize(),
+        data:$('#comment-form').serialize(),
         async:true,
         success:function(data) {
           if(data.status == 'success') {
-            location.href=old_path;
+            //location.href=old_path;
+            $('#id_comment').val('');
+            $('#submit-info').removeClass('hidden').text(data.message);
+            setTimeout(function () {
+              $('#submit-info').addClass('hidden')
+            }, 3000);
           }else if(data.status == 'fail') {
             alert(data.message);
           }else{
-            window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+            location.href = "{% url 'user_login' %}" + '?next=' + old_path;
           }
         },
       });

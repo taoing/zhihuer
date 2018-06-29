@@ -135,15 +135,16 @@ def topic_list(request):
 
 def topic_detail(request, topic_id):
     '''话题详情'''
-    topic = Topic.objects.get(pk=topic_id)
-
+    topic = get_object_or_404(Topic, id=topic_id)
+    context = {}
     has_follow_topic = False
     if request.user.is_authenticated:
         if topic in request.user.topic_set.all():
             has_follow_topic = True
-    # 话题下最新讨论(回答)
+
+    # 话题下回答
     topic_answers = Answer.objects.filter(question__in=topic.question_set.all()).annotate(follow_nums\
-        =Count('userfollowanswer', distince=True)).annotate(comment_nums=Count('answercomment', distinct=True)).order_by('-pub_time')
+        =Count('userfollowanswer', distinct=True)).annotate(comment_nums=Count('answercomment', distinct=True))
 
     # 话题下回答问题的最活跃回答者, 按用户的回答数排序
     # 用distinct去除重复的user_id, 但mysql数据库不支持, 使用set类型集合去除重复的user_id
@@ -171,14 +172,39 @@ def topic_detail(request, topic_id):
         user.topic_answer_follow_nums = UserFollowAnswer.objects.filter(answer__author=user, answer__in=topic_answers).count()
         most_active_users.append(user)
 
+    topic_type = request.GET.get('topic_type', '')
+    # 话题下回答排序, 默认按时间排序
+    if topic_type == 'wonderful':
+        # 获取话题下精彩回答, 按点赞数排序
+        topic_answers = topic_answers.order_by('-follow_nums')
+    else:
+        topic_answers = topic_answers.order_by('-pub_time')
+
     page = paginator_helper(request, topic_answers, per_page=settings.ANSWER_PER_PAGE)
 
-    context = {}
     context['topic'] = topic
     context['has_follow_topic'] = has_follow_topic
     context['most_active_users'] = most_active_users
+    context['topic_type'] = topic_type
     context['page'] = page
     return render(request, 'zhihu/topic_detail.html', context)
+
+def topic_question(request, topic_id):
+    '''话题下等待回答问题, 按时间排序'''
+    topic = get_object_or_404(Topic, id=topic_id)
+    context = {}
+    has_follow_topic = False
+    if request.user.is_authenticated:
+        if topic in request.user.topic_set.all():
+            has_follow_topic = True
+
+    topic_questions = topic.question_set.all().order_by('-pub_time')
+
+    topic_questions_page = paginator_helper(request, topic_questions, per_page = settings.QUESTION_PER_PAGE)
+
+    context['topic'] = topic
+    context['topic_questions_page'] = topic_questions_page
+    return render(request, 'zhihu/topic_question.html', context)
 
 @login_required
 def add_follow_answer(request):
@@ -186,6 +212,7 @@ def add_follow_answer(request):
     answer_id = int(request.GET.get('answer_id', ''))
     answer = get_object_or_404(Answer, id=answer_id)
     answer_follow_existed = UserFollowAnswer.objects.filter(user=request.user, answer=answer)
+    print(answer_follow_existed.count())
     if answer_follow_existed:
         answer_follow_existed.delete()
         return JsonResponse({'status':'success', 'reason':'cancel'})
@@ -216,7 +243,7 @@ def comment_answer(request, answer_id):
             answer = get_object_or_404(Answer, id=answer_id)
             answer_comment = AnswerComment(user=request.user, answer=answer, comment=comment)
             answer_comment.save()
-            return JsonResponse({'status':'success'})
+            return JsonResponse({'status':'success', 'message':'你的评论已提交'})
         else:
             return JsonResponse({'status':'fail', 'message':'评论不能为空'})
 

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
-    , collect_answer, follow_topic, ask_question, question_list, answer_question
+    , collect_answer, follow_topic, ask_question, question_list, answer_question, topic_question
 from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home, user_answer, user_question, reset_password, get_check_code\
     , edit_profile, update_image, change_password, change_email_request, change_email, user_collect_answer, user_follow_topic, user_follow_question, user_follow_user\
     , user_followed_by_user, user_topic_answer, follow_user, delete_answer
@@ -20,6 +20,7 @@ urlpatterns = [
     path('topic_list/', topic_list, name='topic_list'),
     path('topic_detail/<int:topic_id>/', topic_detail, name='topic_detail'),
     path('topic_detail/<int:topic_id>/follow_topic/', follow_topic, name='follow_topic'),
+    path('topic_detail/<int:topic_id>/question/', topic_question, name='topic_question'),
 
     # path('answer/detail/<int:answer_id>/add_follow_answer/', add_follow_answer, name='add_follow_answer'),
     path('answer/add_follow_answer/', add_follow_answer, name='add_follow_answer'),
