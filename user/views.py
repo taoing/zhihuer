@@ -13,7 +13,7 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
-from .models import User, CheckCode
+from .models import User, CheckCode, UserRelationship
 from zhihu.models import Answer, Question, Topic
 from .forms import RegisterForm, LoginForm, ForgetPwdForm, UserProfileForm, ChangePasswordForm, ChangeEmailForm
 from helper.send_email import send_email
@@ -114,6 +114,11 @@ def get_time(obj):
 def user_home(request, user_id):
     '''用户主页'''
     user = get_object_or_404(User, id=user_id)
+    # 当前用户是否已关注用户
+    has_follow_user = False
+    if request.user.is_authenticated:
+        if request.user.to_user_set.filter(to_user=user):
+            has_follow_user = True
 
     user_answers = user.answer_set.all()
     user_questions = user.question_set.all()
@@ -128,13 +133,14 @@ def user_home(request, user_id):
 
     context = {}
     context['user'] = user
+    context['has_follow_user'] = has_follow_user
     context['user_trend_sorted_page'] = user_trend_sorted_page
     return render(request, 'user/user_home.html', context)
 
 def user_answer(request, user_id):
     '''用户主页--回答'''
     user = get_object_or_404(User, id=user_id)
-    user_answers = user.answer_set.all()
+    user_answers = user.answer_set.all().order_by('-pub_time')
 
     user_answers_page = paginator_helper(request, user_answers, per_page=settings.ANSWER_PER_PAGE)
     context = {}
@@ -145,7 +151,7 @@ def user_answer(request, user_id):
 def user_question(request, user_id):
     '''用户主页--提问'''
     user = get_object_or_404(User, id=user_id)
-    user_questions = user.question_set.all()
+    user_questions = user.question_set.all().order_by('-pub_time')
 
     user_questions_page = paginator_helper(request, user_questions, per_page=settings.QUESTION_PER_PAGE)
     context = {}
@@ -190,7 +196,7 @@ def user_follow_question(request, user_id):
     '''用户主页--关注问题'''
     user = get_object_or_404(User, id=user_id)
     # 用户关注问题
-    user_follow_questions = user.userfollowquestion_set.all()
+    user_follow_questions = user.userfollowquestion_set.all().order_by('-add_time')
     # 取出question对象
     user_follow_questions = [obj.question for obj in user_follow_questions]
     user_follow_questions_page = paginator_helper(request, user_follow_questions, per_page=settings.QUESTION_PER_PAGE)
@@ -233,13 +239,34 @@ def user_topic_answer(request, user_id, topic_id):
     except Exception as e:
         return redirect(reverse('index'))
     topic_questions = topic.question_set.all()
-    topic_answers = Answer.objects.filter(question__in=topic_questions, author=user)
+    topic_answers = Answer.objects.filter(question__in=topic_questions, author=user).order_by('-pub_time')
     topic_answers_page = paginator_helper(request, topic_answers, per_page=settings.ANSWER_PER_PAGE)
     context = {}
     context['user'] = user
     context['topic'] = topic
     context['topic_answers_page'] = topic_answers_page
     return render(request, 'user/user_topic_answer.html', context)
+
+@login_required
+def follow_user(request):
+    '''关注用户, 取消关注'''
+    user_id = int(request.GET.get('user_id', ''))
+    user = get_object_or_404(User, id=user_id)
+    user_relationship_existed = request.user.to_user_set.filter(to_user=user)
+    if user_relationship_existed:
+        user_relationship_existed.delete()
+        return JsonResponse({'status':'success', 'message':'关注 TA'})
+    user_relationship = UserRelationship(from_user=request.user, to_user=user)
+    user_relationship.save()
+    return JsonResponse({'status':'success', 'message':'取消关注'})
+
+@login_required
+def delete_answer(request):
+    '''删除回答'''
+    answer_id = int(request.GET.get('answer_id', ''))
+    answer = get_object_or_404(request.user.answer_set.all(), id=answer_id)
+    answer.delete()
+    return JsonResponse({'status':'success'})
 
 def reset_password(request):
     '''忘记密码, 找回密码'''

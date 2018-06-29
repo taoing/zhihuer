@@ -7,7 +7,7 @@ from zhihu.views import index, question_detail, answer_detail, explore, topic_li
     , collect_answer, follow_topic, ask_question, question_list, answer_question
 from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home, user_answer, user_question, reset_password, get_check_code\
     , edit_profile, update_image, change_password, change_email_request, change_email, user_collect_answer, user_follow_topic, user_follow_question, user_follow_user\
-    , user_followed_by_user, user_topic_answer
+    , user_followed_by_user, user_topic_answer, follow_user, delete_answer
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -21,11 +21,15 @@ urlpatterns = [
     path('topic_detail/<int:topic_id>/', topic_detail, name='topic_detail'),
     path('topic_detail/<int:topic_id>/follow_topic/', follow_topic, name='follow_topic'),
 
-    path('answer/detail/<int:answer_id>/add_follow_answer/', add_follow_answer, name='add_follow_answer'),
-    path('answer/detail/<int:answer_id>/cancel_follow_answer/', cancel_follow_answer, name='cancel_follow_answer'),
+    # path('answer/detail/<int:answer_id>/add_follow_answer/', add_follow_answer, name='add_follow_answer'),
+    path('answer/add_follow_answer/', add_follow_answer, name='add_follow_answer'),
+    # path('answer/detail/<int:answer_id>/cancel_follow_answer/', cancel_follow_answer, name='cancel_follow_answer'),
+    path('answer/cancel_follow_answer/', cancel_follow_answer, name='cancel_follow_answer'),
     path('answer/detail/<int:answer_id>/comment_answer/', comment_answer, name='comment_answer'),
-    path('answer/detail/<int:answer_id>/collect_answer/', collect_answer, name='collect_answer'),
-    path('question/detail/<int:question_id>/follow_question/', follow_question, name='follow_question'),
+    # path('answer/detail/<int:answer_id>/collect_answer/', collect_answer, name='collect_answer'),
+    path('answer/collect_answer/', collect_answer, name='collect_answer'),
+    # path('question/detail/<int:question_id>/follow_question/', follow_question, name='follow_question'),
+    path('question/follow_question/', follow_question, name='follow_question'),
     
     path('ask_question/', ask_question, name='ask_question'),
     path('question_list/', question_list, name='question_list'),
@@ -53,6 +57,8 @@ urlpatterns = [
     path('user/<int:user_id>/follow_user/', user_follow_user, name='user_follow_user'),
     path('user/<int:user_id>/followed_by_user/', user_followed_by_user, name='user_followed_by_user'),
     path('user/<int:user_id>/topic_answer/<int:topic_id>/', user_topic_answer, name='user_topic_answer'),
+    path('user/follow/', follow_user, name='follow_user'),
+    path('user/delete_answer/', delete_answer, name='delete_answer'),
 ]
 
 # 第三方验证码url配置

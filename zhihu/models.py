@@ -1,8 +1,11 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from ckeditor_uploader.fields import RichTextUploadingField
 
 from user.models import User
 
+def get_sentinel_user():
+    return get_user_model().objects.get_or_create(username='deleted')[0]
 
 class Topic(models.Model):
     '''话题分类'''
@@ -27,7 +30,7 @@ class Topic(models.Model):
 class Question(models.Model):
     '''问题模型'''
     title = models.CharField('问题标题', max_length=200)
-    author = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='问题作者')
+    author = models.ForeignKey(User, on_delete=models.SET(get_sentinel_user), verbose_name='问题作者')
     content = models.TextField('问题内容', null=True, blank=True)
     topics = models.ManyToManyField(Topic, blank=True, verbose_name='话题')
     pub_time = models.DateTimeField('发布时间', auto_now_add=True)
@@ -57,11 +60,13 @@ class Question(models.Model):
         '''获取关注者数量'''
         return self.userfollowquestion_set.all().count()
 
+def get_sentinel_question():
+    return Question.objects.get_or_create(title='deleted question')[0]
 
 class Answer(models.Model):
     '''回答模型'''
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING, verbose_name='回答问题')
-    author = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='回答作者')
+    question = models.ForeignKey(Question, on_delete=models.SET(get_sentinel_question), verbose_name='回答问题')
+    author = models.ForeignKey(User, on_delete=models.SET(get_sentinel_user), verbose_name='回答作者')
     content = RichTextUploadingField('回答内容')
     pub_time = models.DateTimeField('发布时间', auto_now_add=True)
     voteup_nums = models.IntegerField('认同数', default=0)
@@ -86,8 +91,8 @@ class Answer(models.Model):
 
 class AnswerComment(models.Model):
     '''回答评论模型'''
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='用户')
-    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING, verbose_name='回答')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, verbose_name='回答')
     comment = models.CharField('评论', max_length=300)
     add_time = models.DateTimeField('添加时间', auto_now_add=True)
 
@@ -97,19 +102,19 @@ class AnswerComment(models.Model):
 
 class UserFollowQuestion(models.Model):
     '''用户关注问题模型'''
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='用户')
-    question = models.ForeignKey(Question, on_delete=models.DO_NOTHING, verbose_name='问题')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, verbose_name='问题')
     add_time = models.DateTimeField('添加时间', auto_now_add=True)
 
 
 class UserFollowAnswer(models.Model):
     '''用户点赞回答模型'''
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='用户')
-    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING, verbose_name='回答')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, verbose_name='回答')
     add_time = models.DateTimeField('添加时间', auto_now_add=True)
 
 class UserCollectAnswer(models.Model):
     '''用户收藏回答模型'''
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='用户')
-    answer = models.ForeignKey(Answer, on_delete=models.DO_NOTHING, verbose_name='回答')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='用户')
+    answer = models.ForeignKey(Answer, on_delete=models.CASCADE, verbose_name='回答')
     add_time = models.DateTimeField('添加时间', auto_now_add=True)

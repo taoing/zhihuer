@@ -8,27 +8,114 @@
 {% for answer in user_answers_page.object_list %}
 <div class="trend-item">
   
-  <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
+  <h3><a href="{% url 'question_detail' answer.question_id %}">{{ answer.question.title }}</a></h3>
   <div class="media">
-    <a href="{% url 'user_home' answer.question.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
+    <a href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24px" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
     <div class="media-body">
-      <p class="media-heading">{{ answer.author.nickname }}</p>
+      <h4 class="media-heading"><a href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</a></h4>
+      <p class="text-muted">{{ answer.author.description|default_if_none:'' }}</p>
     </div>
   </div>
   <p class="text-muted">{{ answer.get_follow_nums }} 人赞同了该回答</p>
   <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
   <div class="answer-meta">
-    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-primary btn-sm btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button></a>
-    <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+    <button type="button" class="btn btn-primary btn-sm btnvote-up" onclick="follow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button>
+    <button type="button" class="btn btn-default btn-sm btnvote-down" onclick="unfollow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-bottom"></span></button>
     <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.get_comment_nums }} 条评论</button></a>
     {% if user == request.user %}
-    <button type="button" class="btn btn-default btn-sm"><span class="delete-answer glyphicon glyphicon-trash"></span> 删除</button>
+    <button type="button" class="btn btn-default btn-sm" onclick="delete_answer(this, {{ answer.id }})"><span class="delete-answer glyphicon glyphicon-trash"></span> 删除</button>
     {% endif %}
   </div>
 </div>
-<hr>
 {% endfor %}
 
 {% include 'zhihu/paginator.html' with page=user_answers_page %}
+
+{% endblock %}
+
+{% block custom_js %}
+<script>
+
+  //删除回答
+  function delete_answer(dom, answer_id) {
+    old_path = location.pathname;
+    $.ajax({
+      type: 'GET',
+      async: true,
+      url: "{% url 'delete_answer' %}",
+      data: {'answer_id': answer_id},
+      cache: false,
+      success: function (data) {
+        if(data.status == 'success') {
+          $(dom).parent().parent().remove();
+        }else {
+          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        }
+      },
+      error: function (xhr, error_message, error) {
+        alert('请求出错');
+      },
+    });
+  }
+
+  //点赞
+  function follow_answer (dom, answer_id) {
+    var old_path = location.pathname;
+    $.ajax({
+      type: 'GET',
+      async: true,
+      url: "{% url 'add_follow_answer' %}",
+      data: {'answer_id':answer_id},
+      cache: false,
+      success: function (data) {
+        if(data.status == 'success') {
+          if(data.reason == 'add') {
+            var nums = parseInt($(dom).text()) + 1;
+            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+          }else if(data.reason == 'cancel') {
+            var nums = parseInt($(dom).text()) - 1;
+            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+          }
+        }else{
+          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        }
+      },
+      error: function (xhr, err_msg, error) {
+        alert('请求出错');
+      },
+    });
+  }
+
+  //取消点赞
+  function unfollow_answer (dom, answer_id) {
+    if (parseInt($(dom).prev().text()) == 0) {
+      return;
+    };
+    var old_path = location.pathname;
+    $.ajax({
+      type: 'GET',
+      async: true,
+      url: "{% url 'cancel_follow_answer' %}",
+      data: {'answer_id':answer_id},
+      cache: false,
+      success: function (data) {
+        if(data.status == 'success') {
+          if(data.reason == 'cancel') {
+            var nums = parseInt($(dom).prev().text()) - 1;
+            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+          }else {
+            return;
+          }
+        }else{
+          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        }
+      },
+      error: function (xhr, err_msg, error) {
+        alert('请求出错');
+      },
+    });
+  }
+
+</script>
 
 {% endblock %}

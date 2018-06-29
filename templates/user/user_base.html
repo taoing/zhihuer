@@ -18,7 +18,7 @@
             {% if user == request.user %}
             <div class="text-right"><a href="{% url 'edit_profile' %}"><button class="btn btn-default">编辑个人资料</button></a></div>
             {% else %}
-            <div class="text-right"><a href=""><button class="btn btn-primary">关注 TA</button></a></div>
+            <div class="text-right"><button class="btn btn-primary" onclick="follow_user(this, {{ user.id }})">{% if has_follow_user %}取消关注{% else %}关注 TA{% endif %}</button></div>
             {% endif %}
           </div>
         </div>
@@ -83,6 +83,29 @@
   </div>
 </div>
 
+<script type=text/javascript>
+  function follow_user (dom, user_id) {
+    old_path = location.pathname;
+    $.ajax({
+      type:'GET',
+      async:true,
+      url:"{% url 'follow_user' %}",
+      data:{'user_id':user_id},
+      cache:false,
+      success:function (data) {
+        if(data.status == 'success') {
+          $(dom).text(data.message);
+        }else {
+          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        }
+      },
+      error:function (xhr, error_message, error) {
+        alert('请求出错');
+      },
+    });
+  }
+
+</script>
 
 {% endblock %}
 

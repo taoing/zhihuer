@@ -181,37 +181,30 @@ def topic_detail(request, topic_id):
     return render(request, 'zhihu/topic_detail.html', context)
 
 @login_required
-def add_follow_answer(request, answer_id):
-    '''赞同答案'''
-    # if request.method == 'POST':
-    try:
-        answer = get_object_or_404(Answer, id=answer_id)
-        answer_follow_existed = UserFollowAnswer.objects.filter(user=request.user, answer=answer).first()
-        if answer_follow_existed:
-            answer_follow_existed.delete()
-            return JsonResponse({"status":"success"})
-        else:
-            answer_follow = UserFollowAnswer(user=request.user, answer=answer)
-            answer_follow.save()
-            return JsonResponse({"status":"success"})
-    except Exception as e:
-        return JsonResponse({"status":"fail", "message":"发生错误"})
+def add_follow_answer(request):
+    '''赞同回答'''
+    answer_id = int(request.GET.get('answer_id', ''))
+    answer = get_object_or_404(Answer, id=answer_id)
+    answer_follow_existed = UserFollowAnswer.objects.filter(user=request.user, answer=answer)
+    if answer_follow_existed:
+        answer_follow_existed.delete()
+        return JsonResponse({'status':'success', 'reason':'cancel'})
+    else:
+        answer_follow = UserFollowAnswer(user=request.user, answer=answer)
+        answer_follow.save()
+        return JsonResponse({'status':'success', 'reason':'add'})
 
 @login_required
-def cancel_follow_answer(request, answer_id):
+def cancel_follow_answer(request):
     '''取消赞同'''
-    # if request.method == 'POST':
-    try:
-        answer = get_object_or_404(Answer, id=answer_id)
-        answer_follow_existed = UserFollowAnswer.objects.filter(user=request.user, answer=answer).first()
-        if answer_follow_existed:
-            answer_follow_existed.delete()
-            return JsonResponse({'status':'success'})
-        else:
-            return JsonResponse({'status':'nothing'})
-    except Exception as e:
-        print(e)
-        return JsonResponse({'status':'fail', 'message':'发生错误'})
+    answer_id = int(request.GET.get('answer_id', ''))
+    answer = get_object_or_404(Answer, id=answer_id)
+    answer_follow_existed = UserFollowAnswer.objects.filter(user=request.user, answer=answer)
+    if answer_follow_existed:
+        answer_follow_existed.delete()
+        return JsonResponse({'status':'success', 'reason':'cancel'})
+    else:
+        return JsonResponse({'status':'success', 'reason':'nothing'})
 
 @login_required
 def comment_answer(request, answer_id):
@@ -228,36 +221,32 @@ def comment_answer(request, answer_id):
             return JsonResponse({'status':'fail', 'message':'评论不能为空'})
 
 @login_required
-def follow_question(request, question_id):
+def follow_question(request):
     '''关注问题'''
-    try:
-        question = get_object_or_404(Question, id=question_id)
-        follow_question_existed = UserFollowQuestion.objects.filter(user=request.user, question=question).first()
-        if follow_question_existed:
-            follow_question_existed.delete()
-            return JsonResponse({'status':'success', 'message':'关注问题'})
-        else:
-            follow_question = UserFollowQuestion(user=request.user, question=question)
-            follow_question.save()
-            return JsonResponse({'status':'success', 'message':'已关注'})
-    except Exception as e:
-        return JsonResponse({'status':'fail', 'message':'发生错误'})
+    question_id = int(request.GET.get('question_id', ''))
+    question = get_object_or_404(Question, id=question_id)
+    follow_question_existed = UserFollowQuestion.objects.filter(user=request.user, question=question)
+    if follow_question_existed:
+        follow_question_existed.delete()
+        return JsonResponse({'status':'success', 'message':'关注问题'})
+    else:
+        follow_question = UserFollowQuestion(user=request.user, question=question)
+        follow_question.save()
+        return JsonResponse({'status':'success', 'message':'已关注'})
 
 @login_required
-def collect_answer(request, answer_id):
+def collect_answer(request):
     '''收藏答案'''
-    try:
-        answer = get_object_or_404(Answer, id=answer_id)
-        collect_answer_existed = UserCollectAnswer.objects.filter(user=request.user, answer=answer).first()
-        if collect_answer_existed:
-            collect_answer_existed.delete()
-            return JsonResponse({'status':'success', 'message':'收藏'})
-        else:
-            collect_answer = UserCollectAnswer(user=request.user, answer=answer)
-            collect_answer.save()
-            return JsonResponse({'status':'success', 'message':'已收藏'})
-    except Exception as e:
-        return JsonResponse({'status':'fail', 'message':'发生错误'})
+    answer_id = int(request.GET.get('answer_id', ''))
+    answer = get_object_or_404(Answer, id=answer_id)
+    collect_answer_existed = UserCollectAnswer.objects.filter(user=request.user, answer=answer)
+    if collect_answer_existed:
+        collect_answer_existed.delete()
+        return JsonResponse({'status':'success', 'message':'收藏'})
+    else:
+        collect_answer = UserCollectAnswer(user=request.user, answer=answer)
+        collect_answer.save()
+        return JsonResponse({'status':'success', 'message':'已收藏'})
 
 @login_required
 def follow_topic(request, topic_id):

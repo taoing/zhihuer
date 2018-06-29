@@ -38,29 +38,29 @@
             </div>
             {% else %}
             <div class="media">
-              <a href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24px" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
+              <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24px" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
               <div class="media-body">
-                <h4 class="media-heading"><a href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</a><small>, {{ answer.author.description }}</small></h4>
+                <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</a><small>, {{ answer.author.description }}</small></h4>
               </div>
             </div>
             {% endif %}
             <div class="question-title">
-                <h3><a href="{% url 'question_detail' answer.question_id %}">{{ answer.question.title }}</a></h3>
+                <h3><a target="_blank" href="{% url 'question_detail' answer.question_id %}">{{ answer.question.title }}</a></h3>
             </div>
             <div class="answer-content">
-                <a href="{% url 'answer_detail' answer.id %}"><p>{{ answer.content|striptags|truncatechars:200 }}</p></a>
+                <a target="_blank" href="{% url 'answer_detail' answer.id %}"><p>{{ answer.content|striptags|truncatechars:200 }}</p></a>
             </div>
             <div class="answer-meta">
-              <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-primary btnvote-up btn-sm"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
-              <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-default btnvote-down btn-sm"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-              <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.comment_nums }} 条评论</button></a>
-              <a href="{% url 'answer_detail' answer.id %}"<button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>
+              <button type="button" class="btn btn-primary btnvote-up btn-sm" onclick="follow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button>
+              <button type="button" class="btn btn-default btnvote-down btn-sm" onclick="unfollow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-bottom"></span></button>
+              <a target="_blank" href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.comment_nums }} 条评论</button></a>
+              <!-- <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a> -->
               <span class="text-muted"><small>{{ answer.pub_time }}</small></span>        
             </div>
             
           </div>
       {% empty %}
-      <p>没有问答</p>
+      <p>暂时没有问答</p>
       {% endfor %}
 
       {% include 'zhihu/paginator.html' %}
@@ -76,19 +76,19 @@
       <p>没收到确认邮件, 点击 <a class="send-email" href="{% url 'resend_confirm_email' %}">重新发送</a></p>
       {% endif %}
       <div class="media">
-          <div class="media-left">
-              <img src="" alt="头像" class="media-object">
-          </div>
+          <a target="_blank" href="{% url 'user_home' request.user.id %}" class="media-left">
+              <img width="60" src="{{ MEDIA_URL }}{{ request.user.image }}" alt="头像" class="media-object">
+          </a>
           <div class="media-body">
-              <h4 class="media-heading">{{ request.user.nickname }}</h4>
-              <p>{{ request.user.description }}</p>
+              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' request.user.id %}">{{ request.user.nickname }}</a></h4>
+              <p>{{ request.user.description|default_if_none:'' }}</p>
           </div>
       </div>
       <hr>
       <div class="">
         <ul class="nav nav-stacked">
-        <li><a href=""><span class="badge pull-right">{{ request.user.get_collect_answer_nums }}</span><b>我的收藏</b></a></li>
-        <li><a href=""><span class="badge pull-right">{{ request.user.get_follow_question_nums }}</span><b>我关注的问题</b></a></li>
+        <li><a target="_blank" href="{% url 'user_collect_answer' request.user.id %}"><span class="badge pull-right">{{ request.user.get_collect_answer_nums }}</span><b>我的收藏</b></a></li>
+        <li><a target="_blank" href="{% url 'user_follow_question' request.user.id %}"><span class="badge pull-right">{{ request.user.get_follow_question_nums }}</span><b>我关注的问题</b></a></li>
         </ul>
         </div>
       </div>
@@ -131,5 +131,70 @@
   </div>
 </div>
 
+
+{% endblock %}
+
+{% block custom_js %}
+<script>
+
+//点赞
+  function follow_answer (dom, answer_id) {
+    var old_path = location.pathname;
+    $.ajax({
+      type: 'GET',
+      async: true,
+      url: "{% url 'add_follow_answer' %}",
+      data: {'answer_id':answer_id},
+      cache: false,
+      success: function (data) {
+        if(data.status == 'success') {
+          if(data.reason == 'add') {
+            var nums = parseInt($(dom).text()) + 1;
+            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+          }else if(data.reason == 'cancel') {
+            var nums = parseInt($(dom).text()) - 1;
+            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+          }
+        }else{
+          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        }
+      },
+      error: function (xhr, err_msg, error) {
+        alert('请求出错');
+      },
+    });
+  }
+
+  //取消点赞
+  function unfollow_answer (dom, answer_id) {
+    if (parseInt($(dom).prev().text()) == 0) {
+      return;
+    };
+    var old_path = location.pathname;
+    $.ajax({
+      type: 'GET',
+      async: true,
+      url: "{% url 'cancel_follow_answer' %}",
+      data: {'answer_id':answer_id},
+      cache: false,
+      success: function (data) {
+        if(data.status == 'success') {
+          if(data.reason == 'cancel') {
+            var nums = parseInt($(dom).prev().text()) - 1;
+            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+          }else {
+            return;
+          }
+        }else{
+          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        }
+      },
+      error: function (xhr, err_msg, error) {
+        alert('请求出错');
+      },
+    });
+  }
+
+</script>
 
 {% endblock %}

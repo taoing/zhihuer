@@ -12,7 +12,6 @@
   <p><a class="text-muted" href="{% url 'user_topic_answer' user.id topic.topic.id %}">{{ topic.user_answer_nums }} 个回答</a></p>
 
 </div>
-<hr>
 {% endfor %}
 
 {% include 'zhihu/paginator.html' with page=user_topics_page %}
