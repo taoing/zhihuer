@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}话题广场-知乎儿{% endblock %}
+{% block title %}话题详情-知乎儿{% endblock %}
 
 {% block topic %}active{% endblock %}
 
@@ -67,7 +67,7 @@
         <p>问题数: <span class="rightdes-num">{{ topic.get_question_nums }}</span></p>
       </div>
       <div class="site-box">
-        <h4>活跃回答者<a href="" class="text-muted right-info">查看更多</a></h4>
+        <h4>活跃回答者<a href="{% url 'topic_answerer' topic.id %}" class="text-muted right-info">查看更多</a></h4>
         <hr>
         {% for user in most_active_users %}
         <div class="media">

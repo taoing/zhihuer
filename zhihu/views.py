@@ -37,9 +37,18 @@ def question_detail(request, question_id):
         if UserFollowQuestion.objects.filter(user=request.user, question=question):
             has_follow_question = True
 
-    # 问题的回答, 点赞数排序
-    question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer')).annotate(\
-        comment_nums=Count('answercomment')).order_by('-follow_nums')
+    # 问题的回答
+    question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer', distinct=True)).annotate(\
+        comment_nums=Count('answercomment', distinct=True))
+
+    # 问题下回答排序
+    sort_type = request.GET.get('sort_type', '')
+    # 如果按时间排序
+    if sort_type == 'time':
+        question_answers = question_answers.order_by('-pub_time')
+    # 默认排序, 按点赞数数排序
+    else:
+        question_answers = question_answers.order_by('-follow_nums')
 
     # 分页
     page = paginator_helper(request, question_answers, per_page=settings.ANSWER_PER_PAGE)
@@ -52,6 +61,7 @@ def question_detail(request, question_id):
     context = {}
     context['question'] = question
     context['has_follow_question'] = has_follow_question
+    context['sort_type'] = sort_type
     context['page'] = page
     context['relate_questions'] = relate_questions
     return render(request, 'zhihu/question_detail.html', context)
@@ -158,9 +168,11 @@ def topic_detail(request, topic_id):
     for user_id  in user_ids:
         user_answer_nums = topic_answers.filter(author_id=user_id).count()
         user_answer_nums_list.append({'user_id':user_id, 'user_answer_nums':user_answer_nums})
-    # 依据回答数排序
+
+    # 依据回答数排序, 排序函数sorted的key参数
     def get_nums(obj):
         return obj['user_answer_nums']
+    
     user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
     # 最活跃用户取前3
     most_active_users = []
@@ -205,6 +217,40 @@ def topic_question(request, topic_id):
     context['topic'] = topic
     context['topic_questions_page'] = topic_questions_page
     return render(request, 'zhihu/topic_question.html', context)
+
+def topic_answerer(request, topic_id):
+    '''话题下活跃回答者'''
+    topic = get_object_or_404(Topic, id=topic_id)
+    has_follow_topic = False
+    if request.user.is_authenticated:
+        if topic in request.user.topic_set.all():
+            has_follow_topic = True
+
+    topic_answers = Answer.objects.filter(question__in=topic.question_set.all())
+    user_list = set()
+    for answer in topic_answers:
+        user_list.add(answer.author)
+    # 用户话题下回答列表
+    user_answer_nums_list = []
+    for user in user_list:
+        # 用户在话题下的回答
+        user_answers = topic_answers.filter(author=user)
+        # 用户在话题下的回答数
+        user.user_answer_nums = user_answers.count()
+        # 用户在话题下的回答赞同数
+        user.user_answer_follow_nums = UserFollowAnswer.objects.filter(answer__in=user_answers).count()
+        user_answer_nums_list.append(user)
+
+    def get_nums(obj):
+        return obj.user_answer_nums
+    user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+    page = paginator_helper(request, user_answer_nums_list_sorted, settings.USER_PER_PAGE)
+
+    context = {}
+    context['topic'] = topic
+    context['has_follow_topic'] = has_follow_topic
+    context['page'] = page
+    return render(request, 'zhihu/topic_answerer.html', context)
 
 @login_required
 def add_follow_answer(request):

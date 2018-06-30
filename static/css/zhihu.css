@@ -166,7 +166,7 @@ h3.big-topic {
     border-bottom: 1px dotted #ddd;
 }
 
-.trend-item {
+.trend-item, .user-item {
     padding: 5px 0;
     border-bottom: 1px dotted #ddd;
 }

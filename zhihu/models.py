@@ -12,6 +12,7 @@ class Topic(models.Model):
     name = models.CharField('话题', max_length=40)
     description = models.CharField('话题描述', max_length=200, null=True, blank=True)
     add_time = models.DateTimeField('添加时间', auto_now_add=True)
+    image = models.ImageField('话题图片', upload_to='image/%Y/%m/', default='image/default_topic.jpg', null=True, blank=True)
 
     users = models.ManyToManyField(User, blank=True, verbose_name='用户话题')
 

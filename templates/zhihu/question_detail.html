@@ -15,10 +15,10 @@
       <div class="clearfix">
         <strong>{{ page.paginator.count }} 个回答</strong>
         <span class="pull-right dropdown">
-          <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">默认排序<span class="caret"></span></button>
+          <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">{% if sort_type == 'time' %}时间排序{% else %}默认排序{% endif %}<span class="caret"></span></button>
           <ul class="dropdown-menu">
-            <li class="active"><a href="">默认排序</a></li>
-            <li><a href="">时间排序</a></li>
+            <li class="{% if sort_type != 'time' %}active{% endif %}"><a href="{% url 'question_detail' question.id %}">默认排序</a></li>
+            <li class="{% if sort_type == 'time' %}active{% endif %}"><a href="?sort_type=time">时间排序</a></li>
           </ul>
         </span>
         </div>
@@ -48,10 +48,10 @@
           </p>
           <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
           <div class="answer-meta">
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-primary btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default">{{ answer.comment_nums }} 条评论</button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-star"></span>收藏</button></a>     
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-primary btn-sm btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.comment_nums }} 条评论</button></a>
+            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>     
           </div>
         </div>
         {% empty %}
