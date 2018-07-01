@@ -10,7 +10,7 @@
     <div class="col-sm-8">
       <div class="site-box">
         <div class="media">
-          <div class="media-left"><img src="" alt="话题" class="media-object"></div>
+          <div class="media-left"><img width="100" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></div>
           <div class="media-body">
             <h3 class="big-topic">{{ topic.name }}</h3>
             <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
@@ -43,8 +43,16 @@
 
     <div class="col-sm-4">
       <div class="site-box">
-        <p>关注者: <span class="rightdes-num">{{ topic.get_user_nums }}</span></p>
-        <p>问题数: <span class="rightdes-num">{{ topic.get_question_nums }}</span></p>
+        <div class="row">
+          <div class="col-sm-6">
+            <p class="text-center text-muted">关注者</p>
+            <p class="text-center"><a href="{% url 'follow_topic_user' topic.id %}" class="info-num">{{ topic.get_user_nums }}</a></p>
+          </div>
+          <div class="col-sm-6">
+            <p class="text-center text-muted">问题数</p>
+            <p class="text-center"><a href="{% url 'topic_question' topic.id %}" class="info-num">{{ topic.get_question_nums }}</a></p>
+          </div>
+        </div>
       </div>
       <div class="site-box">
         <h4>活跃回答者<a href="{% url 'topic_answerer' topic.id %}" class="text-muted right-info">查看更多</a></h4>
@@ -54,7 +62,7 @@
           <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-object"></a>
           <div class="media-body">
             <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
-            <p>共{{ user.topic_answer_nums }}回答, {{ user.topic_answer_follow_nums }}赞同</p>
+            <p>共{{ user.user_answer_nums }}回答, {{ user.user_answer_follow_nums }}赞同</p>
           </div>
         </div>
         <hr>

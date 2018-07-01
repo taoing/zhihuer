@@ -17,12 +17,12 @@
           {% if forloop.counter == 1 %}
           <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h4>
           <div class="media">
-            <a href="" class="media-left">
-              <img src="" alt="头像" class="media-object">
+            <a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}" class="media-left">
+              <img width="24" src="{{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}" alt="头像" class="media-object">
             </a>
             <div class="media-body">
-              <h4 class="media-heading">{{ question.author.nickname }}<small>, {{ question.author.description }}</small></h4>
-              <p>{{ question.get_follow_est_answer|truncatechars:200|safe }}</p>
+              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}">{{ question.follow_est_answer.author.nickname }}</a><small>, {{ question.follow_est_answer.author.description|default_if_none:'' }}</small></h4>
+              <p class="answer-content"><a target="_blank" href="{% url 'answer_detail' question.follow_est_answer.id %}">{{ question.follow_est_answer.content|striptags|truncatechars:200|safe }}</a></p>
             </div>
           </div>
           <hr>
@@ -86,7 +86,7 @@
 
     <div class="col-sm-4">
       <div class="site-box">
-        <h4>热门话题<a href="" class="text-muted right-info">更多话题</a></h4>
+        <h4>热门话题<a href="{% url 'topic_list' %}" class="text-muted right-info">更多话题</a></h4>
         <hr>
         {% for topic in hot_topics %}
         <p><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></p>

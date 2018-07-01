@@ -51,7 +51,7 @@ class Question(models.Model):
 
     def get_follow_est_answer(self):
         '''获取点赞最多的回答'''
-        return self.answer_set.all().annotate(follow_nums=models.Count('userfollowanswer')).order_by('-follow_nums').first().content
+        return self.answer_set.all().annotate(follow_nums=models.Count('userfollowanswer')).order_by('-follow_nums').first()
 
     def get_topic_name(self):
         '''获取话题名'''

@@ -29,9 +29,11 @@
           {% for topic in page.object_list %}
           <div class="topic-item">
             <div class="meida">
-              <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img src="" alt="话题" class="media-object"></a>
+              <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
               <div class="media-body">
-                <h4 class="media-heading"><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a> <span class="text-muted right-info"><a href="{% url 'topic_detail' topic.id %}">关注</a></span></h4>
+                <h4 class="media-heading"><a  target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a> 
+                  <!-- <span class="text-muted right-info"><a href="{% url 'topic_detail' topic.id %}">关注</a></span> -->
+                </h4>
                 <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
               </div>
             </div>
@@ -50,9 +52,9 @@
         <hr>
         {% for topic in hot_topics %}
         <div class="media">
-          <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img src="" alt="话题" class="media-object"></a>
+          <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
           <div class="media-body">
-            <a href="{% url 'topic_detail' topic.id %}"><p>{{ topic.name }}</p></a>
+            <p><b><a target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></b></p>
             <p class="text-muted">{{ topic.user_nums }} 人关注</p>
           </div>
         </div>
