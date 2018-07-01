@@ -29,11 +29,11 @@
     <div class="col-sm-8">
       <div class="site-box">
         <div class="nav nav-pills header-bar">
-          <li class="active"><a href="{% url 'user_home' user.id %}">动态</a></li>
-          <li><a href="{% url 'user_answer' user.id %}">回答</a></li>
-          <li><a href="{% url 'user_question' user.id %}">提问</a></li>
-          <li><a href="">想法</a></li>
-          <li class="dropdown">
+          <li class="{% if request.path|slice:'-6:' == '/home/' %}active{% endif %}"><a href="{% url 'user_home' user.id %}">动态</a></li>
+          <li class="{% if request.path|slice:'-8:' == '/answer/' %}active{% endif %}"><a href="{% url 'user_answer' user.id %}">回答</a></li>
+          <li class="{% if request.path|slice:'-10:' == '/question/' %}active{% endif %}"><a href="{% url 'user_question' user.id %}">提问</a></li>
+          <!-- <li><a href="">想法</a></li> -->
+          <li class="dropdown {% if request.path|slice:'-6:' != '/home/' and request.path|slice:'-8:' != '/answer/' and request.path|slice:'-10:' != '/question/' %}active{% endif %}">
             <a href="" class="dropdown-toggle" data-toggle="dropdown">更多
             <span class="caret"></span></a>
             <ul class="dropdown-menu">

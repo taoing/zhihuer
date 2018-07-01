@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Count
@@ -135,10 +135,34 @@ def explore(request):
 
     return render(request, 'zhihu/explore.html', context)
 
+def explore_recommend(request):
+    '''发现页更多推荐'''
+    # 取最近3个月的问题, 按问题阅读量排序
+    recommend_questions = Question.objects.filter(pub_time__gt=datetime.now()-timedelta(days=90)).order_by('-read_nums')
+    # 每个问题获取点赞最多的回答
+    recommend_questions_list = []
+    for question in recommend_questions:
+        follow_est_answer = question.get_follow_est_answer()
+        # 问题至少有回答, 排除没有问答的问题
+        if follow_est_answer:
+            question.follow_est_answer = follow_est_answer
+            recommend_questions_list.append(question)
+
+    # 热门话题, 回答最多的话题
+    # annotate聚合函数, 获取每个话题下问题的回答数
+    hot_topics = Topic.objects.annotate(answer_nums=Count('question__answer')).order_by('-answer_nums')[:5]
+
+    recommend_questions_page = paginator_helper(request, recommend_questions_list, per_page=settings.QUESTION_PER_PAGE)
+
+    context = {}
+    context['recommend_questions_page'] = recommend_questions_page
+    context['hot_topics'] = hot_topics
+    return render(request, 'zhihu/explore_recommend.html', context)
+
 def topic_list(request):
     '''话题广场'''
     # 话题根据关注用户的数量排序
-    all_topics = Topic.objects.all().order_by('add_time')
+    all_topics = Topic.objects.all().order_by('-add_time')
     # 热门话题, 关注者最多的话题
     hot_topics = Topic.objects.all().annotate(user_nums=Count('users')).order_by('-user_nums')[:5]
     page = paginator_helper(request, all_topics, per_page = settings.TOPIC_PER_PAGE)

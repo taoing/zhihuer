@@ -10,7 +10,7 @@
   <div class="row">
     <div class="col-sm-8">
       <div class="site-box">
-        <p>编辑推荐<a href="" class="right-info">更多推荐</a></p>
+        <h4>编辑推荐<a href="{% url 'explore_recommend' %}" class="right-info">更多推荐</a></h4>
         <hr>
         <div class="recommend">
           {% for question in recommend_questions %}
@@ -86,11 +86,16 @@
 
     <div class="col-sm-4">
       <div class="site-box">
-        <h4>热门话题<a href="{% url 'topic_list' %}" class="text-muted right-info">更多话题</a></h4>
+        <h4>热门话题<a href="{% url 'topic_list' %}" class="right-info">更多话题</a></h4>
         <hr>
         {% for topic in hot_topics %}
-        <p><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></p>
-        <p class="text-muted">{{ topic.get_user_nums }} 人关注</p>
+        <div class="meida">
+          <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
+          <div class="media-body">
+            <h4 class="media-heading"><a  target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
+            <p class="text-muted">{{ topic.get_user_nums }} 人关注</p>
+          </div>
+        </div>        
         <hr>
         {% endfor %}
       </div>

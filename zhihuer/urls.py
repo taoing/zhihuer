@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
-    , collect_answer, follow_topic, ask_question, question_list, answer_question, topic_question, topic_answerer, follow_topic_user
+    , collect_answer, follow_topic, ask_question, question_list, answer_question, topic_question, topic_answerer, follow_topic_user, explore_recommend
 from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home, user_answer, user_question, reset_password, get_check_code\
     , edit_profile, update_image, change_password, change_email_request, change_email, user_collect_answer, user_follow_topic, user_follow_question, user_follow_user\
     , user_followed_by_user, user_topic_answer, follow_user, delete_answer
@@ -15,7 +15,8 @@ urlpatterns = [
 
     path('question/detail/<int:question_id>/', question_detail, name='question_detail'),
     path('answer/detail/<int:answer_id>/', answer_detail, name='answer_detail'),
-    path('explore/', explore, name='explore'), 
+    path('explore/', explore, name='explore'),
+    path('explore/recommend/', explore_recommend, name='explore_recommend'),
 
     path('topic_list/', topic_list, name='topic_list'),
     path('topic_detail/<int:topic_id>/', topic_detail, name='topic_detail'),
@@ -44,7 +45,7 @@ urlpatterns = [
     path('logout/', user_logout, name='user_logout'),
     path('confirm/<str:token>/', user_confirm, name='user_confirm'),
     path('resend_confirm_email/', resend_confirm_email, name='resend_confirm_email'),
-    path('user/<int:user_id>/', user_home, name='user_home'),
+    path('user/<int:user_id>/home/', user_home, name='user_home'),
     path('user/<int:user_id>/answer/', user_answer, name='user_answer'),
     path('user/<int:user_id>/question/', user_question, name='user_question'),
     path('reset_password/', reset_password, name='reset_password'),
