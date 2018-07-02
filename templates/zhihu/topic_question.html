@@ -10,7 +10,7 @@
     <div class="col-sm-8">
       <div class="site-box">
         <div class="media">
-          <div class="media-left"><img width="100" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></div>
+          <div class="media-left"><img width="100" height="100" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></div>
           <div class="media-body">
             <h3 class="big-topic">{{ topic.name }}</h3>
             <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
@@ -59,7 +59,7 @@
         <hr>
         {% for user in most_active_users %}
         <div class="media">
-          <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-object"></a>
+          <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-object"></a>
           <div class="media-body">
             <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
             <p>共{{ user.user_answer_nums }}回答, {{ user.user_answer_follow_nums }}赞同</p>

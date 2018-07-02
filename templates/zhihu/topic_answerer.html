@@ -11,7 +11,7 @@
     <div class="col-sm-8">
       <div class="site-box">
         <div class="media">
-          <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="" class="media-object"></a>
+          <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" height="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="" class="media-object"></a>
           <div class="media-body">
             <h4 class="media-heading"><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
             <ul class="breadcrumb">
@@ -24,7 +24,7 @@
         {% for user in page.object_list %}
         <div class="user-item">
           <div class="media">
-            <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="" class="media-object"></a>
+            <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="" class="media-object"></a>
             <div class="media-body">
               <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
               <p class="text-muted">{{ user.description|default_if_none:'' }}</p>

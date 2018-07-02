@@ -10,10 +10,10 @@ def send_email_async(msg):
     '''新线程发送邮件'''
     msg.send()
 
-def send_email(subject, template, to, **kwargs):
+def send_email(subject, template, to, request, **kwargs):
     '''发送邮件'''
-    text_content = render_to_string(template+'.txt', kwargs)
-    html_content = render_to_string(template+'.html', kwargs)
+    text_content = render_to_string(template+'.txt', kwargs, request=request)
+    html_content = render_to_string(template+'.html', kwargs, request=request)
     msg = EmailMultiAlternatives(subject, text_content, EMAIL_FROM, [to])
     msg.attach_alternative(html_content, 'text/html')
     # 发送邮件是耗时操作, 创建新线程执行实际的发送任务, 不会阻塞

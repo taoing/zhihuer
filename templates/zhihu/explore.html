@@ -18,7 +18,7 @@
           <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h4>
           <div class="media">
             <a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}" class="media-left">
-              <img width="24" src="{{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}" alt="头像" class="media-object">
+              <img width="24" height="24" src="{{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}" alt="头像" class="media-object">
             </a>
             <div class="media-body">
               <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}">{{ question.follow_est_answer.author.nickname }}</a><small>, {{ question.follow_est_answer.author.description|default_if_none:'' }}</small></h4>
@@ -42,15 +42,24 @@
             <div class="tab-pane fade in active" id="today">
               {% for answer in page_today.object_list %}
                 <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
+
+                {% if answer.is_anonymous %}
                 <div class="media">
-                  <a href="" class="media-left">
-                    <img src="" alt="头像" class="media-object">
-                  </a>
+                  <a class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
                   <div class="media-body">
-                    <h4 class="media-heading">{{ answer.question.author.nickname }}<small>, {{ answer.question.author.description }}</small></h4>
+                    <h4 class="media-heading text-muted">匿名回答</h4>
                     <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
                   </div>
                 </div>
+                {% else %}
+                <div class="media">
+                  <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
+                  <div class="media-body">
+                    <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a><small>, {{ answer.author.description|default_if_none:'' }}</small></h4>
+                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
+                  </div>
+                </div>
+                {% endif %}
                 <hr>
               {% empty %}
                 <p>暂时没有今日热门</p>
@@ -62,15 +71,24 @@
             <div class="tab-pane fade" id="month">
               {% for answer in page_month.object_list %}
                 <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
+                
+                {% if answer.is_anonymous %}
                 <div class="media">
-                  <a href="" class="media-left">
-                    <img src="" alt="头像" class="media-object">
-                  </a>
+                  <a class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
                   <div class="media-body">
-                    <h4 class="media-heading">{{ answer.question.author.nickname }}<small>, {{ answer.question.author.description }}</small></h4>
+                    <h4 class="media-heading text-muted">匿名回答</h4>
                     <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
                   </div>
                 </div>
+                {% else %}
+                <div class="media">
+                  <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
+                  <div class="media-body">
+                    <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a><small>, {{ answer.author.description|default_if_none:'' }}</small></h4>
+                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
+                  </div>
+                </div>
+                {% endif %}
                 <hr>
               {% empty %}
                 <p>暂时没有本月热门</p>

@@ -25,7 +25,7 @@ class RegisterForm(forms.Form):
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if User.objects.filter(username=username).first():
-            raise forms.ValidationError('用户已被使用, 请重新输入')
+            raise forms.ValidationError('用户名已被使用, 请重新输入')
         return username
 
     def clean_email(self):

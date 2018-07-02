@@ -55,8 +55,8 @@ def question_detail(request, question_id):
 
     # question归属话题, 取第一个话题
     question_topic = question.topics.all().first()
-    # 话题相关question, 取前5个
-    relate_questions = question_topic.question_set.all().order_by('-read_nums')[:5]
+    # 话题相关question, 取前5个, 并排除自身
+    relate_questions = question_topic.question_set.exclude(id=question_id).order_by('-read_nums')[:5]
 
     context = {}
     context['question'] = question
@@ -65,6 +65,21 @@ def question_detail(request, question_id):
     context['page'] = page
     context['relate_questions'] = relate_questions
     return render(request, 'zhihu/question_detail.html', context)
+
+def follow_question_user(request, question_id):
+    '''关注问题的用户'''
+    question = get_object_or_404(Question, id=question_id)
+    if question.get_follow_nums() == 0:
+        return redirect(reverse('question_detail', args=(question_id,)))
+
+    # 获取question关注记录, obj.user的方式获取记录中的user对象
+    follow_question_users = question.userfollowquestion_set.order_by('-add_time')
+
+    follow_question_users_page = paginator_helper(request, follow_question_users, per_page=settings.USER_PER_PAGE)
+    context = {}
+    context['question'] = question
+    context['follow_question_users_page'] = follow_question_users_page
+    return render(request, 'zhihu/follow_question_user.html', context)
 
 def answer_detail(request, answer_id):
     '''回答详情'''
@@ -83,8 +98,8 @@ def answer_detail(request, answer_id):
     # 归属问题话题的相关问题, 按阅读量排序
     # 回答归属question归属话题, 取第一个话题
     question_topic = question.topics.all().first()
-    # 话题相关question, 取前5个
-    relate_questions = question_topic.question_set.all().order_by('-read_nums')[:5]
+    # 话题相关question, 取前5个, 并排除自身
+    relate_questions = question_topic.question_set.exclude(id=answer.question_id).order_by('-read_nums')[:5]
     # 评论表单
     comment_form = CommentForm()
     # 评论分页
@@ -125,7 +140,7 @@ def explore(request):
     page_today = paginator_helper(request, recommend_answer_today, per_page=settings.ANSWER_PER_PAGE)
 
     # 热门话题, 问题最多的话题
-    hot_topics = Topic.objects.all().annotate(question_nums=Count('question')).order_by('-question_nums')[:5]
+    hot_topics = Topic.objects.annotate(question_nums=Count('question')).order_by('-question_nums')[:5]
 
     context = {}
     context['recommend_questions'] = recommend_questions_list

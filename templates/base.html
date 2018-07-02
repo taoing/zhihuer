@@ -71,10 +71,32 @@
 
 {% endblock %}
 
-<footer class="footer">
-  <p class="text-center text-muted">&copy;taoing的知乎儿</p>
-  <p class="text-right"><a href="#">回到顶部</a></p>
-</footer>
+<div class="footer">
+    <p class="text-center text-muted">&copy;taoing的知乎儿</p>
+    <p class="text-center text-muted">Django | <a target="_blank" href="https://github.com/taoing/zhihuer">源码</a></p>
+</div>
+
+<div id="back-to-top"><img width="40" height="40" src="{{ MEDIA_URL }}image/back_to_top.png" alt=""></div>
+
+<script>
+  // 回到顶部
+  $(function () {
+    $('#back-to-top').on('click', function () {
+      $('html').animate({
+          scrollTop: 0
+        }, 1000);
+    });
+
+    $(window).on('scroll', function () {
+      if($(window).scrollTop() > $(window).height()) {
+        $('#back-to-top').fadeIn();
+      }else {
+        $('#back-to-top').fadeOut();
+      }
+    });
+  });
+
+</script>
 
 </body>
 </html>

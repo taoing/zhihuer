@@ -31,10 +31,30 @@
     </div>
 
     <div class="col-sm-4">
-      <div class="question-info text-center">
-        <p>关注者: {{ question.get_follow_nums }}</p>
-        <p>被浏览: {{ question.read_nums }}</p>
+      <div class="row">
+        <div class="col-sm-8 col-sm-offset-2">
+          <div class="question-right">
+            <p class="text-center">关注者</p>
+            <p class="text-center"><a class="info-num" href="{% url 'follow_question_user' question.id %}">{{ question.get_follow_nums }}</a></p>
+          </div>
+          <div class="question-right">
+            <p class="text-center">被浏览</p>
+            <p class="text-center"><span class="info-num">{{ question.read_nums }}</span></p>
+          </div>
+        </div>
       </div>
+      <!-- <div class="question-right">
+        <div class="row">
+          <div class="col-sm-3 col-sm-offset-3">
+            <p class="text-center">关注者</p>
+            <p class="text-center"><a class="info-num" href="{% url 'follow_question_user' question.id %}">{{ question.get_follow_nums }}</a></p>
+          </div>
+          <div class="col-sm-5 col-sm-offset-1">
+            <p>被浏览</p>
+            <p><span class="info-num">{{ question.read_nums }}</span></p>
+          </div>
+        </div>
+      </div> -->
     </div>
   </div>
 </div>

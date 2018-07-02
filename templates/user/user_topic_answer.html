@@ -11,7 +11,7 @@
   
   <a href="{% url 'question_detail' answer.question_id %}"><h3>{{ answer.question.title }}</h3></a>
   <div class="media">
-    <a href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24px" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
+    <a href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
     <div class="media-body">
       <h4 class="media-heading"><a href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</a></h4>
       <p class="text-muted">{{ answer.author.description|default_if_none:'' }}</p>

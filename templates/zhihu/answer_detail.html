@@ -15,14 +15,14 @@
         <div class="answer-item">
           {% if answer.is_anonymous %}
           <div class="media">
-            <a class="media-left"><img width="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
+            <a class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
             <div class="media-body">
               <h4 class="media-heading text-muted">匿名回答</h4>
             </div>
           </div>
           {% else %}
           <div class="media">
-            <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
+            <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
             <div class="media-body">
               <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a></h4>
               <p class="text-muted">{{ answer.author.description|default_if_none:'' }}</p>
@@ -45,14 +45,14 @@
 
       <div class="site-box">
         <div class="clearfix">
-          <strong>{{ answer.get_comment_nums }} 个评论</strong>
-          <span class="pull-right dropdown">
+          <b>{{ answer.get_comment_nums }} 个评论</b>
+          <!-- <span class="pull-right dropdown">
             <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">默认排序<span class="caret"></span></button>
             <ul class="dropdown-menu">
               <li class="active"><a href="">默认排序</a></li>
               <li><a href="">时间排序</a></li>
             </ul>
-          </span>
+          </span> -->
         </div>
         <hr>
 
@@ -99,9 +99,8 @@
         <hr>
         <div class="author-meta">
           <ul class="nav nav-pills nav-stacked">
-            <li><a href=""><span class="badge pull-right">12</span>回答</a></li>
-            <li><a href=""><span class="badge pull-right">3</span>文章</a></li>
-            <li><a href=""><span class="badge pull-right">49</span>关注者</a></li>
+            <li><a target="_blank" href="{% url 'user_answer' answer.author_id %}"><span class="badge pull-right">{{ answer.author.get_answer_nums }}</span>回答</a></li>
+            <li><a target="_blank" href="{% url 'user_followed_by_user' answer.author_id %}"><span class="badge pull-right">{{ answer.author.get_followed_by_user_nums }}</span>关注者</a></li>
           </ul>
         </div>
       </div>
@@ -117,13 +116,13 @@
         <p>没有相关问题</p>
         {% endfor %}
       </div>
-      <div class="site-box">
+      <!-- <div class="site-box">
         <h4>相关推荐</h4>
         <hr>
         <p><a href="">推荐文章</a> <span class="text-muted">2 个回答</span></p>
         <p><a href="">推荐文章</a> <span class="text-muted">2 个回答</span></p>
         <p><a href="">推荐文章</a> <span class="text-muted">2 个回答</span></p>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>
@@ -152,7 +151,7 @@
             $('#submit-info').removeClass('hidden').text(data.message);
             setTimeout(function () {
               $('#submit-info').addClass('hidden')
-            }, 3000);
+            }, 2000);
           }else if(data.status == 'fail') {
             alert(data.message);
           }else{

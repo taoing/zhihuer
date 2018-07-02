@@ -21,11 +21,11 @@ class Topic(models.Model):
 
     def get_user_nums(self):
         '''获取关注者数量'''
-        return self.users.all().count()
+        return self.users.count()
 
     def get_question_nums(self):
         '''获取话题的问题数'''
-        return self.question_set.all().count()
+        return self.question_set.count()
 
 
 class Question(models.Model):
@@ -47,19 +47,19 @@ class Question(models.Model):
 
     def get_answer_nums(self):
         '''获取回答数量'''
-        return self.answer_set.all().count()
+        return self.answer_set.count()
 
     def get_follow_est_answer(self):
         '''获取点赞最多的回答'''
-        return self.answer_set.all().annotate(follow_nums=models.Count('userfollowanswer')).order_by('-follow_nums').first()
+        return self.answer_set.annotate(follow_nums=models.Count('userfollowanswer')).order_by('-follow_nums').first()
 
     def get_topic_name(self):
         '''获取话题名'''
-        return self.topics.all().first().name
+        return self.topics.first().name
 
     def get_follow_nums(self):
         '''获取关注者数量'''
-        return self.userfollowquestion_set.all().count()
+        return self.userfollowquestion_set.count()
 
 def get_sentinel_question():
     return Question.objects.get_or_create(title='deleted question')[0]
@@ -76,15 +76,15 @@ class Answer(models.Model):
 
     def get_follow_nums(self):
         '''获取回答点赞数'''
-        return self.userfollowanswer_set.all().count()
+        return self.userfollowanswer_set.count()
 
     def get_collect_nums(self):
         '''获取回答的被收藏数'''
-        return self.usercollectanswer_set.all().count()
+        return self.usercollectanswer_set.count()
 
     def get_comment_nums(self):
         '''获取评论数量'''
-        return self.answercomment_set.all().count()
+        return self.answercomment_set.count()
 
     def __str__(self):
         return self.content[:50]

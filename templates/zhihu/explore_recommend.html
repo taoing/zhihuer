@@ -17,14 +17,14 @@
           <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h4>
           {% if question.follow_est_answer.is_anonymous %}
           <div class="media">
-            <div class="media-left"><img width="24px" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></div>
+            <div class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></div>
             <div class="media-body">
               <h4 class="media-heading text-muted">匿名回答</h4>
             </div>
           </div>
           {% else %}
           <div class="media">
-            <a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}" class="media-left"><img width="24px" src="{{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}" alt="头像" class="media-object"></a>
+            <a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}" alt="头像" class="media-object"></a>
             <div class="media-body">
               <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}">{{ question.follow_est_answer.author.nickname }}</a><small>, {{ question.follow_est_answer.author.description }}</small></h4>
             </div>
@@ -53,7 +53,7 @@
         <hr>
         {% for topic in hot_topics %}
         <div class="meida">
-          <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
+          <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" height="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
           <div class="media-body">
             <h4 class="media-heading"><a  target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
             <p class="text-muted">{{ topic.get_user_nums }} 人关注</p>

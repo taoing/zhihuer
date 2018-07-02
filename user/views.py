@@ -46,7 +46,7 @@ def register(request):
             # 生成账户确认签名
             token = user.generate_confirm_token()
             # 发送账户激活链接邮件
-            send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, user=user, token=token)
+            send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, request, user=user, token=token)
             # 网页显示账户注册成功消息
             messages.info(request, '账户已注册, 一封账户确认邮件已发往你的邮箱, 请查收')
             return redirect(reverse('user_login'))
@@ -100,7 +100,7 @@ def resend_confirm_email(request):
     '''重新发送确认链接'''
     user = request.user
     token = user.generate_confirm_token()
-    send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, user=user, token=token)
+    send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, request, user=user, token=token)
     messages.info(request, '确认邮件已发送')
     return redirect(reverse('index'))
 
@@ -363,7 +363,7 @@ def get_check_code(request):
         user_check_code.check_code = check_code
         user_check_code.save()
         # 发送邮件
-        send_email('知乎儿验证码', 'user/email/reset_password', email, user_check_code=user_check_code)
+        send_email('知乎儿验证码', 'user/email/reset_password', email, request, user_check_code=user_check_code)
         return JsonResponse({'status':'success'})
     except Exception as e:
         pass
@@ -375,8 +375,8 @@ def edit_profile(request):
         form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.info(request, '你的资料已更新')
-            return render(request, 'user/edit_profile.html')
+            return JsonResponse({'status':'success'})
+        return JsonResponse({'status':'fail', 'message':'请求出错'})
     return render(request, 'user/edit_profile.html')
 
 @login_required
@@ -388,7 +388,7 @@ def update_image(request):
             request.user.image = image
             request.user.save()
             messages.info(request, '你的头像已修改')
-            return render(request, 'user/edit_profile.html')
+            return redirect(reverse('edit_profile'))
         else:
             return render(request, 'user/edit_profile.html')
 
@@ -420,7 +420,7 @@ def change_email_request(request):
             new_email = form.cleaned_data.get('new_email')
             if request.user.check_password(password):
                 token = request.user.generate_change_email_token(new_email)
-                send_email('知乎儿修改邮箱', 'user/email/change_email', new_email, token=token)
+                send_email('知乎儿修改邮箱', 'user/email/change_email', new_email, request, token=token)
                 messages.info(request, '一封含有确认修改邮箱链接的邮件已发送到你的新邮箱, 请查收')
                 return redirect(reverse('index'))
             else:

@@ -28,17 +28,17 @@
         <div class="answer-item">
           {% if answer.is_anonymous %}
           <div class="media">
-            <div class="media-left"><img src="" alt="头像" class="media-object"></div>
+            <a class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
             <div class="media-body">
               <h4 class="media-heading text-muted">匿名回答</h4>
             </div>
           </div>
           {% else %}
           <div class="media">
-            <a href="{% url 'user_home' answer.author_id %}" class="media-left"><img src="" alt="头像" class="media-object"></a>
+            <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
             <div class="media-body">
-              <h4 class="media-heading"><a href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</h4></a>
-              <p class="text-muted">{{ answer.author.description }}</p>
+              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a></h4>
+              <p class="text-muted">{{ answer.author.description|default_if_none:'' }}</p>
             </div>
           </div>
           {% endif %}

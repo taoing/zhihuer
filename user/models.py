@@ -23,13 +23,20 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    def get_answer_nums(self):
+        '''获取回答数量'''
+        return self.answer_set.count()
+
     def get_topic_nums(self):
-        return self.topic_set.all().count()
+        '''获取关注话题的数量'''
+        return self.topic_set.count()
 
     def get_collect_answer_nums(self):
-        return self.usercollectanswer_set.all().count()
+        '''获取收藏的回答数量'''
+        return self.usercollectanswer_set.count()
 
     def get_follow_question_nums(self):
+        '''获取关注的问题数量'''
         return self.userfollowquestion_set.all().count()
 
     def get_answer_by_followed_nums(self):

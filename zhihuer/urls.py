@@ -4,7 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
-    , collect_answer, follow_topic, ask_question, question_list, answer_question, topic_question, topic_answerer, follow_topic_user, explore_recommend
+    , collect_answer, follow_topic, ask_question, question_list, answer_question, topic_question, topic_answerer, follow_topic_user, explore_recommend, follow_question_user
 from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home, user_answer, user_question, reset_password, get_check_code\
     , edit_profile, update_image, change_password, change_email_request, change_email, user_collect_answer, user_follow_topic, user_follow_question, user_follow_user\
     , user_followed_by_user, user_topic_answer, follow_user, delete_answer
@@ -17,6 +17,7 @@ urlpatterns = [
     path('answer/detail/<int:answer_id>/', answer_detail, name='answer_detail'),
     path('explore/', explore, name='explore'),
     path('explore/recommend/', explore_recommend, name='explore_recommend'),
+    path('question/detail/<int:question_id>/follow_question_user/', follow_question_user, name='follow_question_user'),
 
     path('topic_list/', topic_list, name='topic_list'),
     path('topic_detail/<int:topic_id>/', topic_detail, name='topic_detail'),
@@ -50,7 +51,7 @@ urlpatterns = [
     path('user/<int:user_id>/question/', user_question, name='user_question'),
     path('reset_password/', reset_password, name='reset_password'),
     path('reset_password/get_check_code/', get_check_code, name='get_check_code'),
-    path('user/edit_profile/', edit_profile, name = 'edit_profile'),
+    path('user/edit_profile/', edit_profile, name='edit_profile'),
     path('user/edit_profile/update_image/', update_image, name = 'update_image'),
     path('user/edit_profile/change_password/', change_password, name='change_password'),
     path('user/edit_profile/change_email_request/', change_email_request, name='change_email_request'),

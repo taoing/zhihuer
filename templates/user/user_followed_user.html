@@ -10,7 +10,7 @@
     {% for from_user in from_users_page.object_list %}
     <div class="trend-item">
         <div class="media">
-            <a target="_blank" href="{% url 'user_home' from_user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ from_user.image }}" alt="" class="media-object"></a>
+            <a target="_blank" href="{% url 'user_home' from_user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ from_user.image }}" alt="" class="media-object"></a>
             <div class="media-body">
                 <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' from_user.id %}">{{ from_user.nickname|default_if_none:'' }}</a></h4>
                 <p class="text-muted">{{ from_user.description|default_if_none:'' }}<span class="right-info">
@@ -26,7 +26,7 @@
     {% for from_user in from_users_page.object_list %}
     <div class="trend-item">
         <div class="media">
-            <a target="_blank" href="{% url 'user_home' from_user.id %}" class="media-left"><img width="60" src="{{ MEDIA_URL }}{{ from_user.image }}" alt="" class="media-object"></a>
+            <a target="_blank" href="{% url 'user_home' from_user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ from_user.image }}" alt="" class="media-object"></a>
             <div class="media-body">
                 <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' from_user.id %}">{{ from_user.nickname|default_if_none:'' }}</a></h4>
                 <p class="text-muted">{{ from_user.description|default_if_none:'' }}<span class="right-info">
