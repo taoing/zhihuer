@@ -34,7 +34,11 @@
                 <h4 class="media-heading"><a  target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a> 
                   <!-- <span class="text-muted right-info"><a href="{% url 'topic_detail' topic.id %}">关注</a></span> -->
                 </h4>
-                <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
+                {% if topic.description %}
+                <p>{{ topic.description|striptags|truncatechars:30 }}</p>
+                {% else %}
+                <p>话题暂时没有描述</p>
+                {% endif %}
               </div>
             </div>
           </div>

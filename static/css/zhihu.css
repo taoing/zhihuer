@@ -100,6 +100,8 @@ h3 a {
 
 .answer-content a {
     color: #333;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 p {
@@ -181,7 +183,7 @@ h3.big-topic {
     border-bottom: 1px dotted #ddd;
 }
 
-.trend-item, .user-item {
+.trend-item, .user-item, .search-item {
     padding: 5px 0;
     border-bottom: 1px dotted #ddd;
 }

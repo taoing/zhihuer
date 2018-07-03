@@ -4,7 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from zhihu.views import index, question_detail, answer_detail, explore, topic_list, topic_detail, add_follow_answer, cancel_follow_answer, comment_answer, follow_question\
-    , collect_answer, follow_topic, ask_question, question_list, answer_question, topic_question, topic_answerer, follow_topic_user, explore_recommend, follow_question_user
+    , collect_answer, follow_topic, ask_question, question_list, answer_question, topic_question, topic_answerer, follow_topic_user, explore_recommend, follow_question_user\
+    , search
 from user.views import register, user_login, user_logout, user_confirm, resend_confirm_email, user_home, user_answer, user_question, reset_password, get_check_code\
     , edit_profile, update_image, change_password, change_email_request, change_email, user_collect_answer, user_follow_topic, user_follow_question, user_follow_user\
     , user_followed_by_user, user_topic_answer, follow_user, delete_answer
@@ -64,6 +65,9 @@ urlpatterns = [
     path('user/<int:user_id>/topic_answer/<int:topic_id>/', user_topic_answer, name='user_topic_answer'),
     path('user/follow/', follow_user, name='follow_user'),
     path('user/delete_answer/', delete_answer, name='delete_answer'),
+
+    #搜索
+    path('search/', search, name='search'),
 ]
 
 # 第三方验证码url配置
@@ -72,3 +76,9 @@ urlpatterns += [path('captcha/', include('captcha.urls'))]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 # 富文本编辑器
 urlpatterns += [re_path('^ckeditor/', include('ckeditor_uploader.urls'))]
+
+# 全局404错误
+handler404 = 'zhihu.views.custom_page_not_found'
+
+# 全局500错误
+handler500 = 'zhihu.views.server_error'

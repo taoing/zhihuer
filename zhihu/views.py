@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 
+import jieba #中文分词
+
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -10,7 +12,7 @@ from django.conf import settings
 
 from .models import Question, Answer, Topic, UserFollowAnswer, AnswerComment, UserFollowQuestion, UserCollectAnswer
 from helper.paginator_helper import paginator_helper
-from user.views import User
+from user.models import User
 from .forms import CommentForm, AskQuestionForm, AnswerForm
 
 def index(request):
@@ -485,3 +487,68 @@ def answer_question(request, question_id):
     context['question'] = question
     context['answer_form'] = answer_form
     return render(request, 'zhihu/answer_question.html', context)
+
+def search(request):
+    '''简单的搜索功能, 使用数据库模糊查询, 记录较多时性能应该不好吧'''
+    search_type = request.GET.get('search_type')
+    keywords = request.GET.get('keywords', '')
+    search_type_list = ['question', 'answer', 'topic', 'user']
+    print(search_type)
+    print(keywords)
+    print(len(keywords))
+
+    if not search_type:
+        return redirect(reverse('index'))
+    if search_type not in search_type_list:
+        return redirect(reverse('index'))
+    if not keywords:
+        return redirect(reverse('index'))
+    if len(keywords) > 20:
+        return redirect(reverse('index'))
+
+    # jieba分词(中文)
+    seg_list = jieba.cut(keywords, cut_all=False) #返回generator迭代器
+
+    if search_type == 'question':
+        # Q对象
+        q = Q()
+        for word in seg_list:
+            q = q|Q(title__icontains=word)
+        search_results = Question.objects.filter(q).order_by('id')[:100]
+
+    if search_type == 'answer':
+        q = Q()
+        for word in seg_list:
+            q = q|Q(content__icontains=word)
+        search_results = Answer.objects.filter(q).order_by('id')[:100]
+
+    if search_type == 'topic':
+        q = Q()
+        for word in seg_list:
+            q = q|Q(name__icontains=word)
+        search_results = Topic.objects.filter(q).order_by('id')[:100]
+
+    if search_type == 'user':
+        q = Q()
+        for word in seg_list:
+            q = q|Q(nickname__icontains=word)|Q(username__icontains=word)
+        search_results = User.objects.filter(q).order_by('id')[:100]
+
+    search_results_page = paginator_helper(request, search_results, per_page=settings.SEARCH_PER_PAGE)
+
+    context = {}
+    context['search_type'] = search_type
+    context['keywords'] = keywords
+    context['search_results_page'] = search_results_page
+    return render(request, 'zhihu/search_result.html', context)
+
+def custom_page_not_found(request, exception):
+    '''404错误'''
+    # 自定错误404错误视图, 需调用系统默认的page_not_found视图
+    from django.views.defaults import page_not_found
+    res = page_not_found(request, exception, template_name='404.html')
+    return res
+
+def server_error(request):
+    '''500错误'''
+    return render(request, '500.html', status=500)

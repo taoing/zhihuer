@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'q8oz7zb$zr^ptqwr2j(w6ivdvfu%dcrh8y8tje#*)h3hwci&px'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False #True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*'] #[]
 
 
 # Application definition
@@ -149,6 +149,7 @@ COMMENT_PER_PAGE = 5
 TOPIC_PER_PAGE = 4
 TREND_PER_PAGE = 5
 USER_PER_PAGE = 5
+SEARCH_PER_PAGE = 5
 
 # 边缘显示页数
 MARGIN_PAGES = 2

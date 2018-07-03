@@ -7,9 +7,14 @@
 
 {% for topic in user_topics_page.object_list %}
 <div class="trend-item">
-  
-  <h3><a href="{% url 'topic_detail' topic.topic.id %}">{{ topic.topic.name }}</a></h3>
-  <p><a class="text-muted" href="{% url 'user_topic_answer' user.id topic.topic.id %}">{{ topic.user_answer_nums }} 个回答</a></p>
+
+  <div class="media">
+    <a target="_blank" href="{% url 'topic_detail' topic.topic.id %}" class="media-left"><img width="50" height="50" src="{{ MEDIA_URL }}{{ topic.topic.image }}" alt="话题" class="media-object"></a>
+    <div class="media-body">
+      <h3 class="media-heading"><a target="_blank" href="{% url 'topic_detail' topic.topic.id %}">{{ topic.topic.name }}</a></h3>
+      <p><a class="text-muted" href="{% url 'user_topic_answer' user.id topic.topic.id %}">{{ topic.user_answer_nums }} 个回答</a></p>
+    </div>
+  </div>
 
 </div>
 {% endfor %}
