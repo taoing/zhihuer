@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'q8oz7zb$zr^ptqwr2j(w6ivdvfu%dcrh8y8tje#*)h3hwci&px'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False #True
@@ -134,6 +134,8 @@ USE_TZ = False #True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 # 静态文件目录
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
@@ -159,10 +161,10 @@ PAGE_RANGE = 4
 # 邮箱配置
 EMAIL_HOST = 'smtp.sina.com'
 EMAIL_PORT = 25
-EMAIL_HOST_USER = 'taomiantm@sina.com'
-EMAIL_HOST_PASSWORD = 'tm105047'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = False
-EMAIL_FROM = 'taomiantm@sina.com'
+EMAIL_FROM = EMAIL_HOST_USER
 
 # 自定认证后端
 AUTHENTICATION_BACKENDS = [
