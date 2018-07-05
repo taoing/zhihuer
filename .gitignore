@@ -1,5 +1,6 @@
 # C extensions
 *.so
+*.pyc
 
 # Packages
 *.egg

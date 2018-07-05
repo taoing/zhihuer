@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'q8oz7zb$zr^ptqwr2j(w6ivdvfu%dcrh8y8tje#*)h3hwci&px' #os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True #True
+DEBUG = False #True
 
 ALLOWED_HOSTS = ['*'] #[]
 
@@ -186,7 +186,3 @@ CKEDITOR_CONFIGS = {
         'width': '100%',
     }
 }
-
-# Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
