@@ -83,7 +83,6 @@ WSGI_APPLICATION = 'zhihuer.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
-'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -94,8 +93,9 @@ DATABASES = {
         'PORT': 3306,
     }
 }
-'''
 
+'''
+# pythonanywhere database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -105,6 +105,7 @@ DATABASES = {
         'HOST': 'taoing.mysql.pythonanywhere-services.com',
     }
 }
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -176,6 +177,16 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = False
 EMAIL_FROM = EMAIL_HOST_USER
 
+'''
+# gmail
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_FROM = EMAIL_HOST_USER
+'''
+
 # 自定认证后端
 AUTHENTICATION_BACKENDS = [
     'user.views.CustomModelBackend',
@@ -196,3 +207,6 @@ CKEDITOR_CONFIGS = {
         'width': '100%',
     }
 }
+
+# https
+SECURE_SSL_REDIRECT = True

@@ -43,3 +43,4 @@ venv
 # others
 .idea
 important.txt
+pythonanywhere deploy.md
