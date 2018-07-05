@@ -95,7 +95,7 @@ DATABASES = {
     }
 }
 '''
-
+# pythonanywhere database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -168,12 +168,21 @@ MARGIN_PAGES = 2
 # 中间显示页数
 PAGE_RANGE = 4
 
+'''
 # 邮箱配置
 EMAIL_HOST = 'smtp.sina.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = False
+EMAIL_FROM = EMAIL_HOST_USER
+'''
+# gmail
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 EMAIL_FROM = EMAIL_HOST_USER
 
 # 自定认证后端
@@ -196,3 +205,6 @@ CKEDITOR_CONFIGS = {
         'width': '100%',
     }
 }
+
+#   https
+SECURE_SSL_REDIRECT = True
