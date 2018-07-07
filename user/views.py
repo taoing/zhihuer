@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from itertools import chain
 from datetime import datetime, timedelta
 import random
+import time
 
 from django.contrib.auth import authenticate, login, logout
 from django.urls import reverse
@@ -13,11 +14,15 @@ from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+
 from .models import User, CheckCode, UserRelationship
 from zhihu.models import Answer, Question, Topic
 from .forms import RegisterForm, LoginForm, ForgetPwdForm, UserProfileForm, ChangePasswordForm, ChangeEmailForm
 from helper.send_email import send_email
 from helper.paginator_helper import paginator_helper
+from helper.expire_page_cache import expire_page_cache
 
 class CustomModelBackend(ModelBackend):
     '''自定认证后端类, 重写ModelBackend的authenticate方法, 可以使用username和email同时登录'''
@@ -96,13 +101,22 @@ def user_confirm(request, token):
         messages.info(request, '确认链接无效或过期')
         return redirect(reverse('index'))
 
+@login_required
 def resend_confirm_email(request):
     '''重新发送确认链接'''
     user = request.user
-    token = user.generate_confirm_token()
-    send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, request, user=user, token=token)
-    messages.info(request, '确认邮件已发送')
-    return redirect(reverse('index'))
+    send_time = request.session.get('send_time_'+user.username)
+    if send_time and (time.time()-send_time<60):
+        messages.info(request, '1分钟内已发送过邮件, 请先去邮箱查收喔')
+        return redirect(reverse('index'))
+
+    else:
+        request.session['send_time_'+user.username] = time.time()
+        token = user.generate_confirm_token()
+        send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, request, user=user, token=token)
+        messages.info(request, '确认邮件已发送')
+        return redirect(reverse('index'))
+    
 
 def get_time(obj):
     '''返回对象的创建时间, 在sorted中以对象的创建时间比较'''
@@ -111,6 +125,7 @@ def get_time(obj):
     else:
         return obj.add_time
 
+@cache_page(60, key_prefix='user_home')
 def user_home(request, user_id):
     '''用户主页'''
     user = get_object_or_404(User, id=user_id)
@@ -137,6 +152,7 @@ def user_home(request, user_id):
     context['user_trend_sorted_page'] = user_trend_sorted_page
     return render(request, 'user/user_home.html', context)
 
+@cache_page(60, key_prefix='user_answer')
 def user_answer(request, user_id):
     '''用户主页--回答'''
     user = get_object_or_404(User, id=user_id)
@@ -148,6 +164,7 @@ def user_answer(request, user_id):
     context['user_answers_page'] = user_answers_page
     return render(request, 'user/user_answer.html', context)
 
+@cache_page(60, key_prefix='user_question')
 def user_question(request, user_id):
     '''用户主页--提问'''
     user = get_object_or_404(User, id=user_id)
@@ -159,6 +176,7 @@ def user_question(request, user_id):
     context['user_questions_page'] = user_questions_page
     return render(request, 'user/user_question.html', context)
 
+@cache_page(60)
 def user_collect_answer(request, user_id):
     '''用户主页--收藏的回答'''
     user = get_object_or_404(User, id=user_id)
@@ -171,6 +189,7 @@ def user_collect_answer(request, user_id):
     context['user_collect_answers_page'] = user_collect_answers_page
     return render(request, 'user/user_collect_answer.html', context)
 
+@cache_page(60)
 def user_follow_topic(request, user_id):
     '''用户主页--关注话题'''
     user = get_object_or_404(User, id=user_id)
@@ -192,6 +211,7 @@ def user_follow_topic(request, user_id):
     context['user_topics_page'] = user_topics_page
     return render(request, 'user/user_follow_topic.html', context)
 
+@cache_page(60)
 def user_follow_question(request, user_id):
     '''用户主页--关注问题'''
     user = get_object_or_404(User, id=user_id)
@@ -205,6 +225,7 @@ def user_follow_question(request, user_id):
     context['user_follow_questions_page'] = user_follow_questions_page
     return render(request, 'user/user_follow_question.html', context)
 
+@cache_page(60)
 def user_follow_user(request, user_id):
     '''用户主页--用户关注'''
     user = get_object_or_404(User, id=user_id)
@@ -232,6 +253,7 @@ def user_follow_user(request, user_id):
     context['to_users_page'] = to_users_page
     return render(request, 'user/user_follow_user.html', context)
 
+@cache_page(60)
 def user_followed_by_user(request, user_id):
     '''用户主页--用户关注者'''
     user = get_object_or_404(User, id=user_id)
@@ -258,6 +280,7 @@ def user_followed_by_user(request, user_id):
     context['from_users_page'] = from_users_page
     return render(request, 'user/user_followed_user.html', context)
 
+@cache_page(60)
 def user_topic_answer(request, user_id, topic_id):
     '''用户在话题下的回答'''
     user = get_object_or_404(User, id=user_id)

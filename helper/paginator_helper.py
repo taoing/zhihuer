@@ -2,7 +2,7 @@
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-from zhihuer import settings
+from django.conf import settings
 
 def paginator_helper(request, object_list, per_page=10):
     '''分页辅助函数'''

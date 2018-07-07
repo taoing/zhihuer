@@ -25,7 +25,7 @@ SECRET_KEY = 'q8oz7zb$zr^ptqwr2j(w6ivdvfu%dcrh8y8tje#*)h3hwci&px' #os.environ.ge
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True #True
 
-ALLOWED_HOSTS = [] #[]
+ALLOWED_HOSTS = ['192.168.2.190', 'localhost', '127.0.0.1'] #[]
 
 
 # Application definition
@@ -212,6 +212,9 @@ CKEDITOR_CONFIGS = {
     }
 }
 
+# pythonanywhere nhttps
+# SECURE_SSL_REDIRECT = True
+
 # cache django-redis
 CACHES = {
     'default': {
@@ -227,4 +230,5 @@ CACHES = {
     }
 }
 
-CACHE_MIDDLEWARE_SECONDS = 60
+# CACHE_MIDDLEWARE_SECONDS = 60
+# CACHE_MIDDLEWARE_KEY_PREFIX = 'zhihuer'

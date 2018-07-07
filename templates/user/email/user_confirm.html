@@ -4,6 +4,6 @@
 
 <p>请点击以下链接确认账户:</p>
 
-<p>{{ request.get_host }}{% url 'user_confirm' token %}</p>
+<p>https://{{ request.META.HTTP_HOST }}{% url 'user_confirm' token %}</p>
 
 <p><small>该邮件来自知乎儿, 不用回复.</small></p>

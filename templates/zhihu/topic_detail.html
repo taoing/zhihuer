@@ -82,7 +82,7 @@
           <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-object"></a>
           <div class="media-body">
             <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
-            <p>共{{ user.topic_answer_nums }}回答, {{ user.topic_answer_follow_nums }}赞同</p>
+            <p>共{{ user.user_answer_nums }}回答, {{ user.user_answer_follow_nums }}赞同</p>
           </div>
         </div>
         <hr>

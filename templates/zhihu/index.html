@@ -5,6 +5,7 @@
 {% block home %}active{% endblock %}
 
 {% block content %}
+{% load cache %}
 
 <div class="container">
   {% if messages %}
@@ -27,7 +28,7 @@
         </ul>
       </div>
       </div>
-
+      {% cache 300 index_answer %}
       {% for answer in page.object_list %}
           <div class="answer-item site-box">
             <p class="text-muted">来自话题:{{ answer.question.get_topic_name }}</p>
@@ -64,6 +65,7 @@
       {% empty %}
       <p>暂时没有问答</p>
       {% endfor %}
+      {% endcache %}
 
       {% include 'zhihu/paginator.html' %}
 

@@ -10,10 +10,16 @@ from django.contrib import messages
 from django.urls import reverse
 from django.conf import settings
 
+#cache
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
+from django.utils.cache import get_cache_key
+
 from .models import Question, Answer, Topic, UserFollowAnswer, AnswerComment, UserFollowQuestion, UserCollectAnswer
 from helper.paginator_helper import paginator_helper
 from user.models import User
 from .forms import CommentForm, AskQuestionForm, AnswerForm
+
 
 def index(request):
     '''首页'''
@@ -40,8 +46,11 @@ def question_detail(request, question_id):
             has_follow_question = True
 
     # 问题的回答
-    question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer', distinct=True)).annotate(\
-        comment_nums=Count('answercomment', distinct=True))
+    question_answers = cache.get('question_answers'+str(question_id))
+    if not question_answers:
+        question_answers = Answer.objects.filter(question=question).annotate(follow_nums=Count('userfollowanswer', distinct=True)).annotate(\
+            comment_nums=Count('answercomment', distinct=True))
+        cache.set('question_answers'+str(question_id), question_answers, 5*60)
 
     # 问题下回答排序
     sort_type = request.GET.get('sort_type', '')
@@ -58,7 +67,10 @@ def question_detail(request, question_id):
     # question归属话题, 取第一个话题
     question_topic = question.topics.all().first()
     # 话题相关question, 取前5个, 并排除自身
-    relate_questions = question_topic.question_set.exclude(id=question_id).order_by('-read_nums')[:5]
+    relate_questions = cache.get('relate_questions'+str(question_id))
+    if not relate_questions:
+        relate_questions = question_topic.question_set.exclude(id=question_id).order_by('-read_nums')[:5]
+        cache.set('relate_questions'+str(question_id), relate_questions, 5*60)
 
     context = {}
     context['question'] = question
@@ -68,6 +80,7 @@ def question_detail(request, question_id):
     context['relate_questions'] = relate_questions
     return render(request, 'zhihu/question_detail.html', context)
 
+@cache_page(5*60, key_prefix='follow_question_user')
 def follow_question_user(request, question_id):
     '''关注问题的用户'''
     question = get_object_or_404(Question, id=question_id)
@@ -101,7 +114,10 @@ def answer_detail(request, answer_id):
     # 回答归属question归属话题, 取第一个话题
     question_topic = question.topics.all().first()
     # 话题相关question, 取前5个, 并排除自身
-    relate_questions = question_topic.question_set.exclude(id=answer.question_id).order_by('-read_nums')[:5]
+    relate_questions = cache.get('relate_questions'+str(answer_id))
+    if not relate_questions:
+        relate_questions = question_topic.question_set.exclude(id=answer.question_id).order_by('-read_nums')[:5]
+        cache.set('relate_questions'+str(answer_id), relate_questions, 5*60)
     # 评论表单
     comment_form = CommentForm()
     # 评论分页
@@ -117,6 +133,8 @@ def answer_detail(request, answer_id):
     context['page'] = page
     return render(request, 'zhihu/answer_detail.html', context)
 
+# use cache
+@cache_page(10*60, key_prefix='explore')
 def explore(request):
     '''发现页'''
     # 按浏览量取前5个
@@ -152,6 +170,7 @@ def explore(request):
 
     return render(request, 'zhihu/explore.html', context)
 
+@cache_page(10*60, key_prefix='explore_recommend')
 def explore_recommend(request):
     '''发现页更多推荐'''
     # 取最近3个月的问题, 按问题阅读量排序
@@ -176,12 +195,13 @@ def explore_recommend(request):
     context['hot_topics'] = hot_topics
     return render(request, 'zhihu/explore_recommend.html', context)
 
+@cache_page(10*60, key_prefix='topic_list')
 def topic_list(request):
     '''话题广场'''
     # 话题根据关注用户的数量排序
-    all_topics = Topic.objects.all().order_by('-add_time')
-    # 热门话题, 关注者最多的话题
-    hot_topics = Topic.objects.all().annotate(user_nums=Count('users')).order_by('-user_nums')[:5]
+    all_topics = Topic.objects.annotate(user_nums=Count('users')).order_by('-user_nums')
+    # 热门话题, 提问最多的话题
+    hot_topics = Topic.objects.annotate(question_nums=Count('question')).order_by('-question_nums')[:5]
     page = paginator_helper(request, all_topics, per_page = settings.TOPIC_PER_PAGE)
 
     context = {}
@@ -200,36 +220,70 @@ def topic_detail(request, topic_id):
             has_follow_topic = True
 
     # 话题下回答
-    topic_answers = Answer.objects.filter(question__in=topic.question_set.all()).annotate(follow_nums\
-        =Count('userfollowanswer', distinct=True)).annotate(comment_nums=Count('answercomment', distinct=True))
+    topic_answers = cache.get('topic_answers'+str(topic_id))
+    if not topic_answers:
+        topic_answers = Answer.objects.filter(question__in=topic.question_set.all()).annotate(follow_nums\
+            =Count('userfollowanswer', distinct=True)).annotate(comment_nums=Count('answercomment', distinct=True))
+        cache.set('topic_answers'+str(topic_id), topic_answers, 5*60)
 
+    '''
     # 话题下回答问题的最活跃回答者, 按用户的回答数排序
     # 用distinct去除重复的user_id, 但mysql数据库不支持, 使用set类型集合去除重复的user_id
     # 该话题下, 有回答的用户ID列表
-    user_ids = set()
-    for answer in topic_answers:
-        user_ids.add(answer.author_id)
+    user_ids = cache.get('user_ids'+'_topic_'+str(topic_id))
+    if not user_ids:
+        user_ids = set()
+        for answer in topic_answers:
+            user_ids.add(answer.author_id)
+        cache.set('user_ids'+'_topic_'+str(topic_id), user_ids, 5*60)
 
-    # 所有用户在话题下的回答数列表
-    user_answer_nums_list = []
-    for user_id  in user_ids:
-        user_answer_nums = topic_answers.filter(author_id=user_id).count()
-        user_answer_nums_list.append({'user_id':user_id, 'user_answer_nums':user_answer_nums})
+    most_active_users = cache.get('most_active_users'+str(topic_id))
+    if not most_active_users:
+        # 所有用户在话题下的回答数列表
+        user_answer_nums_list = []
+        for user_id  in user_ids:
+            user_answer_nums = topic_answers.filter(author_id=user_id).count()
+            user_answer_nums_list.append({'user_id':user_id, 'user_answer_nums':user_answer_nums})
 
-    # 依据回答数排序, 排序函数sorted的key参数
-    def get_nums(obj):
-        return obj['user_answer_nums']
-    
-    user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+        # 依据回答数排序, 排序函数sorted的key参数
+        def get_nums(obj):
+            return obj['user_answer_nums']
+        
+        user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+        # 最活跃用户取前3
+        most_active_users = []
+        for obj in user_answer_nums_list_sorted[:3]:
+            user = User.objects.get(id=obj['user_id'])
+            # 用户话题回答数
+            user.topic_answer_nums = obj['user_answer_nums']
+            # 用户话题下回答赞同数
+            user.topic_answer_follow_nums = UserFollowAnswer.objects.filter(answer__author=user, answer__in=topic_answers).count()
+            most_active_users.append(user)
+        cache.set('most_active_users'+str(topic_id), most_active_users, 10*60)
+    '''
+
+    user_answer_nums_list_sorted = cache.get('user_answer_nums_list_sorted'+str(topic_id))
+    if not user_answer_nums_list_sorted:
+        user_list = set()
+        for answer in topic_answers:
+            user_list.add(answer.author)
+        # 用户话题下回答列表
+        user_answer_nums_list = []
+        for user in user_list:
+            # 用户在话题下的回答
+            user_answers = topic_answers.filter(author=user)
+            # 用户在话题下的回答数
+            user.user_answer_nums = user_answers.count()
+            # 用户在话题下的回答赞同数
+            user.user_answer_follow_nums = UserFollowAnswer.objects.filter(answer__in=user_answers).count()
+            user_answer_nums_list.append(user)
+        # 活跃用户按回答数排序
+        def get_nums(obj):
+            return obj.user_answer_nums
+        user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+        cache.set('user_answer_nums_list_sorted'+str(topic_id), user_answer_nums_list_sorted, 10*60)
     # 最活跃用户取前3
-    most_active_users = []
-    for obj in user_answer_nums_list_sorted[:3]:
-        user = User.objects.get(id=obj['user_id'])
-        # 用户话题回答数
-        user.topic_answer_nums = obj['user_answer_nums']
-        # 用户话题下回答赞同数
-        user.topic_answer_follow_nums = UserFollowAnswer.objects.filter(answer__author=user, answer__in=topic_answers).count()
-        most_active_users.append(user)
+    most_active_users = user_answer_nums_list_sorted[:3]
 
     topic_type = request.GET.get('topic_type', '')
     # 话题下回答排序, 默认按时间排序
@@ -257,33 +311,41 @@ def topic_question(request, topic_id):
         if topic in request.user.topic_set.all():
             has_follow_topic = True
 
-    topic_questions = topic.question_set.all().order_by('-pub_time')
+    topic_questions = cache.get('topic_questions'+str(topic_id))
+    if not topic_questions:
+        topic_questions = topic.question_set.all().order_by('-pub_time')
+        cache.set('topic_questions'+str(topic_id), topic_questions, 10*60)
 
     # 话题下用户回答数排序
-    topic_answers = Answer.objects.filter(question__in=topic_questions)
-    user_list = set()
-    for answer in topic_answers:
-        user_list.add(answer.author)
-    # 用户话题下回答列表
-    user_answer_nums_list = []
-    for user in user_list:
-        # 用户在话题下的回答
-        user_answers = topic_answers.filter(author=user)
-        # 用户在话题下的回答数
-        user.user_answer_nums = user_answers.count()
-        # 用户在话题下的回答赞同数
-        user.user_answer_follow_nums = UserFollowAnswer.objects.filter(answer__in=user_answers).count()
-        user_answer_nums_list.append(user)
-
-    def get_nums(obj):
-        return obj.user_answer_nums
-    user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+    user_answer_nums_list_sorted = cache.get('user_answer_nums_list_sorted'+str(topic_id))
+    if not user_answer_nums_list_sorted:
+        topic_answers = Answer.objects.filter(question__in=topic_questions)
+        user_list = set()
+        for answer in topic_answers:
+            user_list.add(answer.author)
+        # 用户话题下回答列表
+        user_answer_nums_list = []
+        for user in user_list:
+            # 用户在话题下的回答
+            user_answers = topic_answers.filter(author=user)
+            # 用户在话题下的回答数
+            user.user_answer_nums = user_answers.count()
+            # 用户在话题下的回答赞同数
+            user.user_answer_follow_nums = UserFollowAnswer.objects.filter(answer__in=user_answers).count()
+            user_answer_nums_list.append(user)
+        # 活跃用户按回答数排序
+        def get_nums(obj):
+            return obj.user_answer_nums
+        user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+        cache.set('user_answer_nums_list_sorted'+str(topic_id), user_answer_nums_list_sorted, 10*60)
+    # 最活跃用户取前3
+    most_active_users = user_answer_nums_list_sorted[:3]
 
     topic_questions_page = paginator_helper(request, topic_questions, per_page = settings.QUESTION_PER_PAGE)
 
     context['topic'] = topic
     context['topic_questions_page'] = topic_questions_page
-    context['most_active_users'] = user_answer_nums_list_sorted[:3]
+    context['most_active_users'] = most_active_users
     return render(request, 'zhihu/topic_question.html', context)
 
 def topic_answerer(request, topic_id):
@@ -294,24 +356,30 @@ def topic_answerer(request, topic_id):
         if topic in request.user.topic_set.all():
             has_follow_topic = True
 
-    topic_answers = Answer.objects.filter(question__in=topic.question_set.all())
-    user_list = set()
-    for answer in topic_answers:
-        user_list.add(answer.author)
-    # 用户话题下回答列表
-    user_answer_nums_list = []
-    for user in user_list:
-        # 用户在话题下的回答
-        user_answers = topic_answers.filter(author=user)
-        # 用户在话题下的回答数
-        user.user_answer_nums = user_answers.count()
-        # 用户在话题下的回答赞同数
-        user.user_answer_follow_nums = UserFollowAnswer.objects.filter(answer__in=user_answers).count()
-        user_answer_nums_list.append(user)
+    # 话题下用户回答数排序
+    user_answer_nums_list_sorted = cache.get('user_answer_nums_list_sorted'+str(topic_id))
+    if not user_answer_nums_list_sorted:
+        topic_answers = Answer.objects.filter(question__in=topic.question_set.all())
+        user_list = set()
+        for answer in topic_answers:
+            user_list.add(answer.author)
+        # 用户话题下回答列表
+        user_answer_nums_list = []
+        for user in user_list:
+            # 用户在话题下的回答
+            user_answers = topic_answers.filter(author=user)
+            # 用户在话题下的回答数
+            user.user_answer_nums = user_answers.count()
+            # 用户在话题下的回答赞同数
+            user.user_answer_follow_nums = UserFollowAnswer.objects.filter(answer__in=user_answers).count()
+            user_answer_nums_list.append(user)
+        # 活跃用户按回答数排序
+        def get_nums(obj):
+            return obj.user_answer_nums
+        user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+        cache.set('user_answer_nums_list_sorted'+str(topic_id), user_answer_nums_list_sorted, 10*60)
 
-    def get_nums(obj):
-        return obj.user_answer_nums
-    user_answer_nums_list_sorted = sorted(user_answer_nums_list, key=get_nums, reverse=True)
+
     page = paginator_helper(request, user_answer_nums_list_sorted, settings.USER_PER_PAGE)
 
     context = {}
@@ -327,15 +395,19 @@ def follow_topic_user(request, topic_id):
     if request.user.is_authenticated:
         if topic in request.user.topic_set.all():
             has_follow_topic = True
-    # 关注话题的用户
-    topic_users = topic.users.all()
-    # 话题下的回答
-    topic_answers = Answer.objects.filter(question__in=topic.question_set.all())
 
-    topic_users_list = []
-    for user in topic_users:
-        user.answer_nums = topic_answers.filter(author=user).count()
-        topic_users_list.append(user)
+    topic_users_list = cache.get('topic_users_list'+str(topic_id))
+    if not topic_users_list:
+        # 关注话题的用户
+        topic_users = topic.users.all()
+        # 话题下的回答
+        topic_answers = Answer.objects.filter(question__in=topic.question_set.all())
+
+        topic_users_list = []
+        for user in topic_users:
+            user.answer_nums = topic_answers.filter(author=user).count()
+            topic_users_list.append(user)
+        cache.set('topic_users_list'+str(topic_id), topic_users_list, 10*60)
 
     topic_users_page = paginator_helper(request, topic_users_list, per_page=settings.USER_PER_PAGE)
 
@@ -452,6 +524,7 @@ def ask_question(request):
     context['ask_question_form'] = ask_quesiton_form
     return render(request, 'zhihu/ask_question.html', context)
 
+@cache_page(5*60, key_prefix='question_list')
 def question_list(request):
     '''回答-问题列表'''
     questions = Question.objects.all().order_by('-pub_time').annotate(answer_nums=Count('answer', distinct=True), follow_nums=Count('userfollowquestion', distinct=True))
@@ -488,6 +561,7 @@ def answer_question(request, question_id):
     context['answer_form'] = answer_form
     return render(request, 'zhihu/answer_question.html', context)
 
+@cache_page(5*60, key_prefix='search')
 def search(request):
     '''简单的搜索功能, 使用数据库模糊查询, 记录较多时性能应该不好吧'''
     search_type = request.GET.get('search_type')
