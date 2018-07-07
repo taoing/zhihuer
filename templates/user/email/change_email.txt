@@ -4,6 +4,6 @@
 
 请点击以下链接确认修改(有效期10分钟):
 
-https://{{ request.META.HTTP_HOST }}{% url 'change_email' token %}
+https://{{ host }}{% url 'change_email' token %}
 
 该邮件来自知乎儿, 不用回复.

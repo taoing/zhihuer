@@ -20,7 +20,7 @@ from django.core.cache import cache
 from .models import User, CheckCode, UserRelationship
 from zhihu.models import Answer, Question, Topic
 from .forms import RegisterForm, LoginForm, ForgetPwdForm, UserProfileForm, ChangePasswordForm, ChangeEmailForm
-from helper.send_email import send_email
+from .tasks import send_email
 from helper.paginator_helper import paginator_helper
 from helper.expire_page_cache import expire_page_cache
 
@@ -51,7 +51,7 @@ def register(request):
             # 生成账户确认签名
             token = user.generate_confirm_token()
             # 发送账户激活链接邮件
-            send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, request, user=user, token=token)
+            send_email.delay('知乎儿账户确认', 'user/email/user_confirm', user.email, host=request.get_host(), username=user.username, token=token)
             # 网页显示账户注册成功消息
             messages.info(request, '账户已注册, 一封账户确认邮件已发往你的邮箱, 请查收')
             return redirect(reverse('user_login'))
@@ -113,7 +113,7 @@ def resend_confirm_email(request):
     else:
         request.session['send_time_'+user.username] = time.time()
         token = user.generate_confirm_token()
-        send_email('知乎儿账户确认', 'user/email/user_confirm', user.email, request, user=user, token=token)
+        send_email.delay('知乎儿账户确认', 'user/email/user_confirm', user.email, host=request.get_host(), username=user.username, token=token)
         messages.info(request, '确认邮件已发送')
         return redirect(reverse('index'))
     
@@ -386,9 +386,10 @@ def get_check_code(request):
         user_check_code.check_code = check_code
         user_check_code.save()
         # 发送邮件
-        send_email('知乎儿验证码', 'user/email/reset_password', email, request, user_check_code=user_check_code)
+        send_email.delay('知乎儿验证码', 'user/email/reset_password', email, check_code=user_check_code.check_code)
         return JsonResponse({'status':'success'})
     except Exception as e:
+        print(e)
         pass
 
 @login_required
@@ -443,7 +444,7 @@ def change_email_request(request):
             new_email = form.cleaned_data.get('new_email')
             if request.user.check_password(password):
                 token = request.user.generate_change_email_token(new_email)
-                send_email('知乎儿修改邮箱', 'user/email/change_email', new_email, request, token=token)
+                send_email.delay('知乎儿修改邮箱', 'user/email/change_email', new_email, host=request.get_host(), token=token)
                 messages.info(request, '一封含有确认修改邮箱链接的邮件已发送到你的新邮箱, 请查收')
                 return redirect(reverse('index'))
             else:

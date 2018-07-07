@@ -232,3 +232,17 @@ CACHES = {
 
 # CACHE_MIDDLEWARE_SECONDS = 60
 # CACHE_MIDDLEWARE_KEY_PREFIX = 'zhihuer'
+
+# celery settings
+# celery中间人, 使用redis数据库
+BROKER_URL = 'redis://127.0.0.1:6379/2'
+# celery结果返回，跟踪结果
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/2'
+
+# celery内容消息的格式设置
+CELERY_ACCEPT_CONTENT = ['application/json',]
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# celery时区设置
+CELERY_TIMEZONE = TIME_ZONE
