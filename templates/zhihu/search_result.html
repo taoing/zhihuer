@@ -36,7 +36,6 @@
       {% empty %}
       <p>暂时没有搜索结果</p>
       {% endfor %}
-      </div>
 
       {% elif search_type == 'question' %}
       {% for question in search_results_page %}
@@ -86,6 +85,7 @@
 
       {% include 'zhihu/paginator.html' with page=search_results_page %}
 
+      </div>
     </div>
 
   </div>
