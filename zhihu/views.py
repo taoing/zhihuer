@@ -23,6 +23,11 @@ from .forms import CommentForm, AskQuestionForm, AnswerForm
 
 def index(request):
     '''首页'''
+    # 2018.7.17
+    # 采取分页了, 没有必要使用聚合, 数据多时, 这样聚合查询很慢
+    # 也没有必要查询一个完整的对象, 查询字段少可以优化查询速度
+    # 在模板中可以使用属性或方法获取点赞数或者评论数
+    # all_answers = Answer.objects.all().order_by('-pub_time')
     all_answers = Answer.objects.annotate(comment_nums=Count('answercomment', distinct=True))\
         .annotate(follow_nums=Count('userfollowanswer', distinct=True)).order_by('-pub_time')
 
@@ -582,6 +587,10 @@ def search(request):
 
     # jieba分词(中文)
     seg_list = jieba.cut(keywords, cut_all=False) #返回generator迭代器
+
+    # 2018.7.17
+    # 搜索功能直接对数据库搜索的话, 在数据库中,在要搜索的字段中上建立全文索引, 加快匹配速度
+    # 使用全文检索sql而不是模糊查询, 模糊查询太慢了, 全文检索还提供检索的匹配度
 
     if search_type == 'question':
         # Q对象
