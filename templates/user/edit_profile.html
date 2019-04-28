@@ -4,178 +4,216 @@
 
 {% block content %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-2">
-
-      <div class="site-box">
-        {% if messages %}
-        <div class="messages">
-          {% for message in messages %}
-          <p class="alert alert-info alert-dismissable">
-            <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        <h3>个人资料</h3>
-        <hr>
-        <form action="{% url 'edit_profile' %}" id="profile-form" method="post">
-          {% csrf_token %}
-          
-          <div class="row form-input">
-            <div class="form-group">
-              <label for="id_nickname" class="control-label col-sm-2">昵称</label>
-              <div class="col-sm-6">
-                <input type="text" name="nickname" required minlength="4" maxlength="40" class="form-control" id="id_nickname" value="{{ request.user.nickname }}" />
-              </div>
-            </div>
-          </div>
-            
-          <div class="row form-input">
-            <div class="form-group">
-              <label for="id_gender" class="col-sm-2">性别</label>
-              <div class="col-sm-6">
-                <label><input type="radio" name="gender" value="M" {% if request.user.gender == 'M' %}checked="checked"{% endif %} />男</label>
-                <label><input type="radio" name="gender" value="F" {% if request.user.gender == 'F' %}checked="checked"{% endif %} />女</label>
-              </div>
-            </div>
-          </div>
-           
-          <div class="row form-input">
-            <div class="form-group">
-              <label for="id_description" class="control-label col-sm-2">个人描述</label>
-              <div class="col-sm-6">
-                <textarea name="description" rows="3" class="form-control" id="id_description" cols="40" maxlength="400">{{ request.user.description|default_if_none:'' }}</textarea>
-              </div>
-            </div>
-          </div>          
-          
-          <div class="row form-input">
-            <div class="form-group">
-              <label for="id_address" class="control-label col-sm-2">居住地</label>
-              <div class="col-sm-6">
-                <input type="text" name="address" maxlength="100" class="form-control" id="id_address" value="{{ request.user.address|default_if_none:'' }}" />
-              </div>
-            </div>
-          </div>
-
-          <div class="row form-input">
-            <div class="text-right col-sm-8 form-input">
-              <button class="btn btn-primary" type="submit">确定修改</button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <div class="site-box">
-        <h3>修改头像</h3>
-        <hr>
-        <form action="{% url 'update_image' %}" id="user-image" class="form-inline form-input" enctype="multipart/form-data" method="post">
-          {% csrf_token %}
-          
-          <div class="form-group">
-            <label for="id_image">用户头像</label>
-            <input type="file" class="form-control" name="image" id="id_image" onchange="upload_image(this)"/>
-          </div>
-          <button class="btn btn-primary" type="submit">确定修改</button>
-        </form>
+    <div class="container">
         <div class="row">
-          <div class="col-sm-5 col-sm-offset-1">
-          <p>当前头像:</p>
-          <img id="now-img" width="200" height="200" src="{{ MEDIA_URL }}{{ request.user.image }}" alt="">
-          </div>
-          <div class="col-sm-5 col-sm-offset-1">
-          <p id="preview-text">新头像预览:</p>
-          <img id="preview-img" width="200" height="200" src="" alt="">
-          </div>
+            <div class="col-sm-8 col-sm-offset-2">
+
+                <div class="site-box">
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <p class="alert alert-info alert-dismissable">
+                                    <button class="close" type="button"
+                                            data-dismiss="alert">&times;
+                                    </button>
+                                    {{ message }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <h3>个人资料</h3>
+                    <hr>
+                    <form action="{% url 'edit_profile' %}" id="profile-form"
+                          method="post">
+                        {% csrf_token %}
+
+                        <div class="row form-input">
+                            <div class="form-group">
+                                <label for="id_nickname"
+                                       class="control-label col-sm-2">昵称</label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="nickname" required
+                                           minlength="4" maxlength="40"
+                                           class="form-control" id="id_nickname"
+                                           value="{{ request.user.nickname }}"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row form-input">
+                            <div class="form-group">
+                                <label for="id_gender"
+                                       class="col-sm-2">性别</label>
+                                <div class="col-sm-6">
+                                    <label><input type="radio" name="gender"
+                                                  value="M"
+                                            {% if  request.user.gender == 'M' %}checked="checked"{% endif %}
+                                        />男</label>
+                                    <label><input type="radio" name="gender"
+                                                  value="F"
+                                            {% if  request.user.gender == 'F' %}checked="checked"{% endif %}
+                                        />女</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row form-input">
+                            <div class="form-group">
+                                <label for="id_description"
+                                       class="control-label col-sm-2">个人描述</label>
+                                <div class="col-sm-6">
+                                <textarea name="description" rows="3"
+                                          class="form-control"
+                                          id="id_description" cols="40"
+                                          maxlength="400">{{ request.user.description|default_if_none:'' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row form-input">
+                            <div class="form-group">
+                                <label for="id_address"
+                                       class="control-label col-sm-2">居住地</label>
+                                <div class="col-sm-6">
+                                    <input type="text" name="address"
+                                           maxlength="100" class="form-control"
+                                           id="id_address"
+                                           value="{{ request.user.address|default_if_none:'' }}"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row form-input">
+                            <div class="text-right col-sm-8 form-input">
+                                <button class="btn btn-primary" type="submit">
+                                    确定修改
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="site-box">
+                    <h3>修改头像</h3>
+                    <hr>
+                    <form action="{% url 'update_image' %}" id="user-image"
+                          class="form-inline form-input"
+                          enctype="multipart/form-data" method="post">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label for="id_image">用户头像</label>
+                            <input type="file" class="form-control" name="image"
+                                   id="id_image" onchange="upload_image(this)"/>
+                        </div>
+                        <button class="btn btn-primary" type="submit">确定修改
+                        </button>
+                    </form>
+                    <div class="row">
+                        <div class="col-sm-5 col-sm-offset-1">
+                            <p>当前头像:</p>
+                            <img id="now-img" width="200" height="200"
+                                 src="{{ MEDIA_URL }}{{ request.user.image }}"
+                                 alt="">
+                        </div>
+                        <div class="col-sm-5 col-sm-offset-1">
+                            <p id="preview-text">新头像预览:</p>
+                            <img id="preview-img" width="200" height="200"
+                                 src=""
+                                 alt="">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="site-box">
+                    <h3>账户与密码</h3>
+                    <hr>
+                    <p>邮箱</p>
+                    <p class="text-muted">{{ request.user.email }}&nbsp;&nbsp;<span><a
+                            href="{% url 'change_email_request' %}">修改邮箱</a></span>
+                    </p>
+                    <hr>
+                    <p>密码</p>
+                    <p><a href="{% url 'change_password' %}">修改密码</a></p>
+                    <hr>
+                </div>
+
+            </div>
         </div>
-    
-      </div>
-
-      <div class="site-box">
-        <h3>账户与密码</h3>
-        <hr>
-        <p>邮箱</p>
-        <p class="text-muted">{{ request.user.email }}&nbsp;&nbsp;<span><a href="{% url 'change_email_request' %}">修改邮箱</a></span></p>
-        <hr>
-        <p>密码</p>
-        <p><a href="{% url 'change_password' %}">修改密码</a></p>
-        <hr>
-      </div>
-
     </div>
-  </div>
-</div>
 
 {% endblock %}
 
 {% block custom_js %}
-<script>
+    <script>
 
-  $(function () {
-    // 修改个人资料
-    var old_form_data = $('#profile-form').serializeArray();
-    $('#profile-form').on('submit', function(event) {
-      event.preventDefault();
-      var now_form_data = $('#profile-form').serializeArray();
-      var change = false;
-      for (i=1; i<old_form_data.length; i++) {
-        if (old_form_data[i].value != now_form_data[i].value) {
-          change = true;
-          break;
-        };       
-      };
-      if (!change) {
-        alert('你的个人资料没有任何修改, 无需提交');
-        return;
-      }
-      $.ajax({
-        cache:false,
-        type:'POST',
-        url:"{% url 'edit_profile' %}",
-        data:$('#profile-form').serialize(),
-        async:true,
-        success:function(data) {
-          if(data.status == 'success') {
-            alert('你的个人资料已修改');
-          }else if(data.status == 'fail') {
-            alert(data.message);
-          }
-        },
-      });
-    });
-  });
+        $(function () {
+            // 修改个人资料
+            var old_form_data = $('#profile-form').serializeArray();
+            $('#profile-form').on('submit', function (event) {
+                event.preventDefault();
+                var now_form_data = $('#profile-form').serializeArray();
+                var change = false;
+                for (i = 1; i < old_form_data.length; i++) {
+                    if (old_form_data[i].value != now_form_data[i].value) {
+                        change = true;
+                        break;
+                    }
+                    ;
+                }
+                ;
+                if (!change) {
+                    alert('你的个人资料没有任何修改, 无需提交');
+                    return;
+                }
+                $.ajax({
+                    cache: false,
+                    type: 'POST',
+                    url: "{% url 'edit_profile' %}",
+                    data: $('#profile-form').serialize(),
+                    async: true,
+                    success: function (data) {
+                        if (data.status == 'success') {
+                            alert('你的个人资料已修改');
+                        } else if (data.status == 'fail') {
+                            alert(data.message);
+                        }
+                    },
+                });
+            });
+        });
 
-  // 选择图片后预览
-  function upload_image(obj) {
-    var preview_img = $('#preview-img');
-    // 没有选中文件, 清除预览
-    if(obj.files.length === 0) {
-      preview_img.attr('src', '');
-      return;
-    }
-    var file = obj.files[0];
-    if (file.type != 'image/jpeg' && file.type != 'image/png' && file.type != 'image/gif') {
-      obj.value = '';
-      alert('不是有效的图片文件');
-      return false;
-    }
-    if (file.size > 1024*1024) {
-      obj.value = '';
-      alert('你的文件超过1M');
-      return false;
-    }
-    // FileReader读取文件
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var data = e.target.result;
-      preview_img.attr('src', data);
-    };
-    // 以DataURL的形式读取文件
-    reader.readAsDataURL(file);
-  }
- 
-</script>
+        // 选择图片后预览
+        function upload_image(obj) {
+            var preview_img = $('#preview-img');
+            // 没有选中文件, 清除预览
+            if (obj.files.length === 0) {
+                preview_img.attr('src', '');
+                return;
+            }
+            var file = obj.files[0];
+            if (file.type != 'image/jpeg' && file.type != 'image/png' && file.type != 'image/gif') {
+                obj.value = '';
+                alert('不是有效的图片文件');
+                return false;
+            }
+            if (file.size > 1024 * 1024) {
+                obj.value = '';
+                alert('你的文件超过1M');
+                return false;
+            }
+            // FileReader读取文件
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var data = e.target.result;
+                preview_img.attr('src', data);
+            };
+            // 以DataURL的形式读取文件
+            reader.readAsDataURL(file);
+        }
+
+    </script>
 
 {% endblock %}

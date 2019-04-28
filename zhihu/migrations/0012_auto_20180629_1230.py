@@ -2,11 +2,11 @@
 
 from django.conf import settings
 from django.db import migrations, models
+
 import zhihu.models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('zhihu', '0011_auto_20180629_1152'),
     ]
@@ -15,16 +15,22 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='answer',
             name='author',
-            field=models.ForeignKey(on_delete=models.SET(zhihu.models.get_sentinel_user), to=settings.AUTH_USER_MODEL, verbose_name='回答作者'),
+            field=models.ForeignKey(
+                on_delete=models.SET(zhihu.models.get_sentinel_user),
+                to=settings.AUTH_USER_MODEL, verbose_name='回答作者'),
         ),
         migrations.AlterField(
             model_name='answer',
             name='question',
-            field=models.ForeignKey(on_delete=models.SET(zhihu.models.get_sentinel_question), to='zhihu.Question', verbose_name='回答问题'),
+            field=models.ForeignKey(
+                on_delete=models.SET(zhihu.models.get_sentinel_question),
+                to='zhihu.Question', verbose_name='回答问题'),
         ),
         migrations.AlterField(
             model_name='question',
             name='author',
-            field=models.ForeignKey(on_delete=models.SET(zhihu.models.get_sentinel_user), to=settings.AUTH_USER_MODEL, verbose_name='问题作者'),
+            field=models.ForeignKey(
+                on_delete=models.SET(zhihu.models.get_sentinel_user),
+                to=settings.AUTH_USER_MODEL, verbose_name='问题作者'),
         ),
     ]

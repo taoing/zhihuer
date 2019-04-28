@@ -4,33 +4,52 @@
 
 {% block content %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8 col-sm-offset-2">
-      <div class="site-box">
-        <h3><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h3>
-        <ul class="breadcrumb">
-              <li><a href="{% url 'question_detail' question.id %}">返回问题</a></li>
-              <li class="active">{{ question.get_user_nums }} 人关注该话题</li>
-            </ul>
-        <hr>
-        {% for obj in follow_question_users_page.object_list %}
-        <div class="user-item">
-          <div class="media">
-            <a target="_blank" href="{% url 'user_home' obj.user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ obj.user.image }}" alt="" class="media-object"></a>
-            <div class="media-body">
-              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' obj.user.id %}">{{ obj.user.nickname }}</a></h4>
-              <p class="text-muted">{{ obj.user.description|default_if_none:'' }}</p>
-              <p class="text-muted">{% if obj.user.get_answer_nums %}{{ obj.user.get_answer_nums }} 回答{% endif %}{% if obj.user.get_followed_by_user_nums %}&nbsp;&nbsp;&nbsp;&nbsp;{{ obj.user.get_followed_by_user_nums }} 关注者{% endif %}</p>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8 col-sm-offset-2">
+                <div class="site-box">
+                    <h3><a href="{% url 'question_detail' question.id %}">
+                        {{ question.title }}</a></h3>
+                    <ul class="breadcrumb">
+                        <li>
+                            <a href="{% url 'question_detail' question.id %}">返回问题</a>
+                        </li>
+                        <li class="active">{{ question.get_user_nums }} 人关注该话题
+                        </li>
+                    </ul>
+                    <hr>
+                    {% for obj in follow_question_users_page.object_list %}
+                        <div class="user-item">
+                            <div class="media">
+                                <a target="_blank"
+                                   href="{% url 'user_home' obj.user.id %}"
+                                   class="media-left"><img width="60"
+                                                           height="60"
+                                                           src="
 
-        {% include 'zhihu/paginator.html' with page=follow_question_users_page %}
-      </div>
+                                                                   {{ MEDIA_URL }}{{ obj.user.image }}"
+                                                           alt=""
+                                                           class="media-object"></a>
+                                <div class="media-body">
+                                    <h4 class="media-heading"><a target="_blank"
+                                                                 href="{% url 'user_home' obj.user.id %}">
+                                        {{ obj.user.nickname }}</a></h4>
+                                    <p class="text-muted">
+                                        {{ obj.user.description|default_if_none:'' }}</p>
+                                    <p class="text-muted">
+                                        {% if obj.user.get_answer_nums %}{{ obj.user.get_answer_nums }}
+                                            回答{% endif %}
+                                        {% if obj.user.get_followed_by_user_nums %}&nbsp;&nbsp;&nbsp;&nbsp;{{obj.user.get_followed_by_user_nums }}
+                                        关注者{%endif %}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% include 'zhihu/paginator.html' with page=follow_question_users_page %}
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
 {% endblock %}

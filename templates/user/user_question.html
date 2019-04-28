@@ -2,19 +2,24 @@
 
 {% block user_content %}
 
-<h4>{% if user == request.user %}我的问题{% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}的问题{% endif %}</h4>
-<hr>
+    <h4>{% if user == request.user %}我的问题
+        {% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}的问题{% endif %}</h4>
+    <hr>
 
-{% for question in user_questions_page.object_list %}
-<div class="trend-item">
-  <h3><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h3>
-  <p class="text-muted">{{ question.pub_time|date:'Y-m-d' }} &middot; {{ question.get_answer_nums }} 个回答 &middot; {{ question.get_follow_nums }} 个关注</p>
-  <!-- {% if user == request.user %}
-  <button type="button" class="btn btn-default"><span class="delete-question glyphicon glyphicon-trash"></span> 删除</button>
-  {% endif %} -->
-</div>
-{% endfor %}
+    {% for question in user_questions_page.object_list %}
+        <div class="trend-item">
+            <h3><a href="{% url 'question_detail' question.id %}">
+                {{ question.title }}</a></h3>
+            <p class="text-muted">{{ question.pub_time|date:'Y-m-d' }} &middot;
+                {{ question.get_answer_nums }} 个回答
+                &middot; {{ question.get_follow_nums }}
+                个关注</p>
+            <!-- {% if user == request.user %}
+    <button type="button" class="btn btn-default"><span class="delete-question glyphicon glyphicon-trash"></span> 删除</button>
+    {% endif %} -->
+        </div>
+    {% endfor %}
 
-{% include 'zhihu/paginator.html' with page=user_questions_page %}
+    {% include 'zhihu/paginator.html' with page=user_questions_page %}
 
 {% endblock %}

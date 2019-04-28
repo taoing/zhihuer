@@ -6,120 +6,220 @@
 
 {% block content %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8">
-      <div class="site-box">
-        <h4>编辑推荐<a href="{% url 'explore_recommend' %}" class="right-info">更多推荐</a></h4>
-        <hr>
-        <div class="recommend">
-          {% for question in recommend_questions %}
-          {% if forloop.counter == 1 %}
-          <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h4>
-          <div class="media">
-            <a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}" class="media-left">
-              <img width="24" height="24" src="{{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}" alt="头像" class="media-object">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}">{{ question.follow_est_answer.author.nickname }}</a><small>, {{ question.follow_est_answer.author.description|default_if_none:'' }}</small></h4>
-              <p class="answer-content"><a target="_blank" href="{% url 'answer_detail' question.follow_est_answer.id %}">{{ question.follow_est_answer.content|striptags|truncatechars:200|safe }}</a></p>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="site-box">
+                    <h4>编辑推荐<a href="{% url 'explore_recommend' %}"
+                               class="right-info">更多推荐</a></h4>
+                    <hr>
+                    <div class="recommend">
+                        {% for question in recommend_questions %}
+                            {% if forloop.counter == 1 %}
+                                <h4>
+                                    <a href="{% url 'question_detail' question.id %}">
+                                        {{ question.title }}</a></h4>
+                                <div class="media">
+                                    <a target="_blank"
+                                       href="{% url 'user_home' question.follow_est_answer.author_id %}"
+                                       class="media-left">
+                                        <img width="24" height="24"
+                                             src="
+
+
+                                                     {{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}"
+                                             alt="头像" class="media-object">
+                                    </a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a
+                                                target="_blank"
+                                                href="{% url 'user_home' question.follow_est_answer.author_id %}">
+                                            {{ question.follow_est_answer.author.nickname }}</a>
+                                            <small>,
+                                                {{ question.follow_est_answer.author.description|default_if_none:'' }}
+                                            </small>
+                                        </h4>
+                                        <p class="answer-content"><a
+                                                target="_blank"
+                                                href="{% url 'answer_detail' question.follow_est_answer.id %}">
+                                            {{ question.follow_est_answer.content|striptags|truncatechars:200|safe }}</a></p>
+                                    </div>
+                                </div>
+                                <hr>
+                            {% else %}
+                                <h4>
+                                    <a href="{% url 'question_detail' question.id %}">
+                                        {{ question.title }}</a><span
+                                        class="text-muted right-info">{{ question.get_topic_name }}</span>
+                                </h4>
+                                <hr>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <ul class="nav nav-tabs">
+                            <li class=""><a href="#today"
+                                            data-toggle="tab">今日最热</a>
+                            </li>
+                            <li class="active"><a href="#month"
+                                                  data-toggle="tab">本月最热</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade in" id="today">
+                                {% for answer in page_today.object_list %}
+                                    <h4>
+                                        <a href="{% url 'question_detail' answer.question.id %}">
+                                            {{ answer.question.title }}</a>
+                                    </h4>
+
+                                    {% if answer.is_anonymous %}
+                                        <div class="media">
+                                            <a class="media-left"><img
+                                                    width="24"
+                                                    height="24"
+                                                    src="{{ MEDIA_URL }}image/default_user.png"
+                                                    alt="头像"
+                                                    class="media-object"></a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading text-muted">
+                                                    匿名回答</h4>
+                                                <p class="answer-content"><a
+                                                        href="{% url 'answer_detail' answer.id %}">
+                                                    {{ answer.content|striptags|truncatechars:200 }}</a></p>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="media">
+                                            <a target="_blank"
+                                               href="{% url 'user_home' answer.author_id %}"
+                                               class="media-left"><img
+                                                    width="24"
+                                                    height="24"
+                                                    src="
+
+
+                                                            {{ MEDIA_URL }}{{ answer.author.image }}"
+                                                    alt="头像"
+                                                    class="media-object"></a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading"><a
+                                                        target="_blank"
+                                                        href="{% url 'user_home' answer.author_id %}">
+                                                    {{ answer.author.username }}</a>
+                                                    <small>,
+                                                        {{ answer.author.description|default_if_none:'' }}
+                                                    </small>
+                                                </h4>
+                                                <p class="answer-content"><a
+                                                        href="{% url 'answer_detail' answer.id %}">
+                                                    {{ answer.content|striptags|truncatechars:200 }}</a></p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <hr>
+                                {% empty %}
+                                    <p>暂时没有今日热门</p>
+                                {% endfor %}
+
+                                {% include 'zhihu/paginator.html' with page=page_today %}
+
+                            </div>
+                            <div class="tab-pane fade in active" id="month">
+                                {% for answer in page_month.object_list %}
+                                    <h4>
+                                        <a href="{% url 'question_detail' answer.question.id %}">
+                                            {{ answer.question.title }}</a>
+                                    </h4>
+
+                                    {% if answer.is_anonymous %}
+                                        <div class="media">
+                                            <a class="media-left"><img
+                                                    width="24"
+                                                    height="24"
+                                                    src="{{ MEDIA_URL }}image/default_user.png"
+                                                    alt="头像"
+                                                    class="media-object"></a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading text-muted">
+                                                    匿名回答</h4>
+                                                <p class="answer-content"><a
+                                                        href="{% url 'answer_detail' answer.id %}">
+                                                    {{ answer.content|striptags|truncatechars:200 }}</a></p>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <div class="media">
+                                            <a target="_blank"
+                                               href="{% url 'user_home' answer.author_id %}"
+                                               class="media-left"><img
+                                                    width="24"
+                                                    height="24"
+                                                    src="
+
+
+                                                            {{ MEDIA_URL }}{{ answer.author.image }}"
+                                                    alt="头像"
+                                                    class="media-object"></a>
+                                            <div class="media-body">
+                                                <h4 class="media-heading"><a
+                                                        target="_blank"
+                                                        href="{% url 'user_home' answer.author_id %}">
+                                                    {{ answer.author.username }}</a>
+                                                    <small>,
+                                                        {{ answer.author.description|default_if_none:'' }}
+                                                    </small>
+                                                </h4>
+                                                <p class="answer-content"><a
+                                                        href="{% url 'answer_detail' answer.id %}">
+                                                    {{ answer.content|striptags|truncatechars:200 }}</a></p>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                    <hr>
+                                {% empty %}
+                                    <p>暂时没有本月热门</p>
+                                {% endfor %}
+
+                                {% include 'zhihu/paginator.html' with page=page_month %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <hr>
-          {% else %}
-          <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a><span class="text-muted right-info">{{ question.get_topic_name }}</span></h4>
-          <hr>
-          {% endif %}
-          {% endfor %}
+
+            <div class="col-sm-4">
+                <div class="site-box">
+                    <h4>热门话题<a href="{% url 'topic_list' %}"
+                               class="right-info">更多话题</a></h4>
+                    <hr>
+                    {% for topic in hot_topics %}
+                        <div class="meida">
+                            <a target="_blank"
+                               href="{% url 'topic_detail' topic.id %}"
+                               class="media-left"><img width="50"
+                                                       src="
+
+
+                                                               {{ MEDIA_URL }}{{ topic.image }}"
+                                                       alt="话题"
+                                                       class="media-object"></a>
+                            <div class="media-body">
+                                <h4 class="media-heading"><a target="_blank"
+                                                             href="{% url 'topic_detail' topic.id %}">
+                                    {{ topic.name }}</a></h4>
+                                <p class="text-muted">{{ topic.get_user_nums }}
+                                    人关注</p>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-
-        <div>
-          <ul class="nav nav-tabs">
-            <li class=""><a href="#today" data-toggle="tab">今日最热</a></li>
-            <li class="active"><a href="#month" data-toggle="tab">本月最热</a></li>
-          </ul>
-          <div class="tab-content">
-            <div class="tab-pane fade in" id="today">
-              {% for answer in page_today.object_list %}
-                <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
-
-                {% if answer.is_anonymous %}
-                <div class="media">
-                  <a class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
-                  <div class="media-body">
-                    <h4 class="media-heading text-muted">匿名回答</h4>
-                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
-                  </div>
-                </div>
-                {% else %}
-                <div class="media">
-                  <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
-                  <div class="media-body">
-                    <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a><small>, {{ answer.author.description|default_if_none:'' }}</small></h4>
-                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
-                  </div>
-                </div>
-                {% endif %}
-                <hr>
-              {% empty %}
-                <p>暂时没有今日热门</p>
-              {% endfor %}
-
-              {% include 'zhihu/paginator.html' with page=page_today %}
-
-            </div>
-            <div class="tab-pane fade in active" id="month">
-              {% for answer in page_month.object_list %}
-                <h4><a href="{% url 'question_detail' answer.question.id %}">{{ answer.question.title }}</a></h4>
-                
-                {% if answer.is_anonymous %}
-                <div class="media">
-                  <a class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
-                  <div class="media-body">
-                    <h4 class="media-heading text-muted">匿名回答</h4>
-                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
-                  </div>
-                </div>
-                {% else %}
-                <div class="media">
-                  <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
-                  <div class="media-body">
-                    <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a><small>, {{ answer.author.description|default_if_none:'' }}</small></h4>
-                    <p class="answer-content"><a href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></p>
-                  </div>
-                </div>
-                {% endif %}
-                <hr>
-              {% empty %}
-                <p>暂时没有本月热门</p>
-              {% endfor %}
-
-              {% include 'zhihu/paginator.html' with page=page_month %}
-
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-
-    <div class="col-sm-4">
-      <div class="site-box">
-        <h4>热门话题<a href="{% url 'topic_list' %}" class="right-info">更多话题</a></h4>
-        <hr>
-        {% for topic in hot_topics %}
-        <div class="meida">
-          <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
-          <div class="media-body">
-            <h4 class="media-heading"><a  target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
-            <p class="text-muted">{{ topic.get_user_nums }} 人关注</p>
-          </div>
-        </div>        
-        <hr>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</div>
 
 
 {% endblock %}

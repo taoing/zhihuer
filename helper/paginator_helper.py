@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from django.conf import settings
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-from django.conf import settings
 
 def paginator_helper(request, object_list, per_page=10):
     '''分页辅助函数'''
@@ -25,14 +25,15 @@ def paginator_helper(request, object_list, per_page=10):
         elif page.number < settings.PAGE_RANGE / 2:
             left = page.number
             right = settings.PAGE_RANGE - left
-        for page_number in range(1, paginator.num_pages+1):
+        for page_number in range(1, paginator.num_pages + 1):
             if page_number < settings.MARGIN_PAGES:
                 page_range_ex.append(page_number)
                 continue
             if page_number > paginator.num_pages - settings.MARGIN_PAGES:
                 page_range_ex.append(page_number)
                 continue
-            if (page_number >= page.number-left) and (page_number <= page.number+right):
+            if (page_number >= page.number - left) and (
+                    page_number <= page.number + right):
                 page_range_ex.append(page_number)
                 continue
             if page_range_ex[-1]:
@@ -42,4 +43,3 @@ def paginator_helper(request, object_list, per_page=10):
     else:
         page.page_range_ex = paginator.page_range
     return page
-    

@@ -6,75 +6,122 @@
 
 {% block content %}
 
-{% include 'zhihu/question.html' %}
+    {% include 'zhihu/question.html' %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8">
-      <div class="site-box">
-      <div class="clearfix">
-        <strong>{{ page.paginator.count }} 个回答</strong>
-        <span class="pull-right dropdown">
-          <button class="btn dropdown-toggle" data-toggle="dropdown" type="button">{% if sort_type == 'time' %}时间排序{% else %}默认排序{% endif %}<span class="caret"></span></button>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="site-box">
+                    <div class="clearfix">
+                        <strong>{{ page.paginator.count }} 个回答</strong>
+                        <span class="pull-right dropdown">
+          <button class="btn dropdown-toggle" data-toggle="dropdown"
+                  type="button">{% if sort_type == 'time' %}时间排序{% else %}
+              默认排序{% endif %}<span
+                  class="caret"></span></button>
           <ul class="dropdown-menu">
-            <li class="{% if sort_type != 'time' %}active{% endif %}"><a href="{% url 'question_detail' question.id %}">默认排序</a></li>
-            <li class="{% if sort_type == 'time' %}active{% endif %}"><a href="?sort_type=time">时间排序</a></li>
+            <li class="{% if sort_type != 'time' %}active{% endif %}"><a
+                    href="{% url 'question_detail' question.id %}">默认排序</a></li>
+            <li class="{% if sort_type == 'time' %}active{% endif %}"><a
+                    href="?sort_type=time">时间排序</a></li>
           </ul>
         </span>
-        </div>
-      <hr>
+                    </div>
+                    <hr>
 
-      {% for answer in page.object_list %}
-        <div class="answer-item">
-          {% if answer.is_anonymous %}
-          <div class="media">
-            <a class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></a>
-            <div class="media-body">
-              <h4 class="media-heading text-muted">匿名回答</h4>
+                    {% for answer in page.object_list %}
+                        <div class="answer-item">
+                            {% if answer.is_anonymous %}
+                                <div class="media">
+                                    <a class="media-left"><img width="24"
+                                                               height="24"
+                                                               src="{{ MEDIA_URL }}image/default_user.png"
+                                                               alt="头像"
+                                                               class="media-object"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading text-muted">
+                                            匿名回答</h4>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="media">
+                                    <a target="_blank"
+                                       href="{% url 'user_home' answer.author_id %}"
+                                       class="media-left"><img width="24"
+                                                               height="24"
+                                                               src="
+
+                                                                       {{ MEDIA_URL }}{{ answer.author.image }}"
+                                                               alt="头像"
+                                                               class="media-object"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a
+                                                target="_blank"
+                                                href="{% url 'user_home' answer.author_id %}">
+                                            {{ answer.author.username }}</a>
+                                        </h4>
+                                        <p class="text-muted">
+                                            {{ answer.author.description|default_if_none:'' }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <p class="text-muted">{{ answer.follow_nums }}
+                                人赞同了该回答</p>
+                            <p>
+                                {{ answer.content|safe }}
+                            </p>
+                            <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
+                            <div class="answer-meta">
+                                <a href="{% url 'answer_detail' answer.id %}">
+                                    <button type="button"
+                                            class="btn btn-primary btn-sm btnvote-up">
+                                        <span class="glyphicon glyphicon-triangle-top"></span>
+                                        {{ answer.follow_nums }}
+                                    </button>
+                                </a>
+                                <a href="{% url 'answer_detail' answer.id %}">
+                                    <button type="button"
+                                            class="btn btn-default btn-sm btnvote-down">
+                                        <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                    </button>
+                                </a>
+                                <a href="{% url 'answer_detail' answer.id %}">
+                                    <button type="button"
+                                            class="btn btn-default btn-sm">
+                                        {{ answer.comment_nums }} 条评论
+                                    </button>
+                                </a>
+                                <a href="{% url 'answer_detail' answer.id %}">
+                                    <button type="button"
+                                            class="btn btn-default btn-sm"><span
+                                            class="glyphicon glyphicon-star"></span>收藏
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>暂时没有回答</p>
+                    {% endfor %}
+                </div>
+
+                {% include 'zhihu/paginator.html' %}
+
             </div>
-          </div>
-          {% else %}
-          <div class="media">
-            <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
-            <div class="media-body">
-              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.username }}</a></h4>
-              <p class="text-muted">{{ answer.author.description|default_if_none:'' }}</p>
+
+            <div class="col-sm-4">
+                <div class="site-box">
+                    <h4>相关问题</h4>
+                    <hr>
+                    {% for question in relate_questions %}
+                        <p><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a> <span
+                                class="text-muted">{{ question.get_answer_nums }} 个回答</span>
+                        </p>
+                    {% empty %}
+                        <p>没有相关问题</p>
+                    {% endfor %}
+                </div>
             </div>
-          </div>
-          {% endif %}
-          <p class="text-muted">{{ answer.follow_nums }} 人赞同了该回答</p>
-          <p>
-            {{ answer.content|safe }}
-          </p>
-          <p class="text-muted">编辑于 {{ answer.pub_time }}</p>
-          <div class="answer-meta">
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-primary btn-sm btnvote-up"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm btnvote-down"><span class="glyphicon glyphicon-triangle-bottom"></span></button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.comment_nums }} 条评论</button></a>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a>     
-          </div>
         </div>
-        {% empty %}
-        <p>暂时没有回答</p>
-        {% endfor %}
-      </div>
-
-      {% include 'zhihu/paginator.html' %}
-
     </div>
-
-    <div class="col-sm-4">
-      <div class="site-box">
-        <h4>相关问题</h4>
-        <hr>
-        {% for question in relate_questions %}
-        <p><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a> <span class="text-muted">{{ question.get_answer_nums }} 个回答</span></p>
-        {% empty %}
-        <p>没有相关问题</p>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</div>
 
 {% endblock %}

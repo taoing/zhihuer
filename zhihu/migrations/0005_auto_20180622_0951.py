@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('zhihu', '0004_answercomment_add_time'),
@@ -15,11 +14,14 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='topic',
             name='description',
-            field=models.CharField(blank=True, max_length=200, null=True, verbose_name='话题描述'),
+            field=models.CharField(blank=True, max_length=200, null=True,
+                                   verbose_name='话题描述'),
         ),
         migrations.AddField(
             model_name='topic',
             name='users',
-            field=models.ManyToManyField(blank=True, to=settings.AUTH_USER_MODEL, verbose_name='用户话题'),
+            field=models.ManyToManyField(blank=True,
+                                         to=settings.AUTH_USER_MODEL,
+                                         verbose_name='用户话题'),
         ),
     ]

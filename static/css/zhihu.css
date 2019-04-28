@@ -5,7 +5,7 @@ html {
     height: 100%;
 }
 
-body { 
+body {
     background: #f5f7f9;
     padding-top: 70px;
     margin-bottom: 80px; /*空间预留给footer, 大于等于footer的高度*/
@@ -26,31 +26,34 @@ body {
     font-size: 16px;
     background: #ffffff;
     margin-bottom: 10px;
-    box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
 }
-    .header-box a {
-        color: #1a1a1a;
-    }
+
+.header-box a {
+    color: #1a1a1a;
+}
 
 .site-box {
     padding: 20px;
     background: #ffffff;
     margin: 20px 0;
     border-radius: 3px;
-    box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
 }
 
 .right-block {
     padding: 20px 60px;
 }
-    .right-block .btn {
-        margin-top: 20px;
-    }
+
+.right-block .btn {
+    margin-top: 20px;
+}
 
 .media-heading {
     font-size: 15px;
     font-weight: 600;
 }
+
 h4 {
     font-size: 15px;
     font-weight: 600;
@@ -59,10 +62,12 @@ h4 {
 .media-heading a {
     color: #444;
 }
+
 .question-item {
     padding: 10px 0;
     border-bottom: 1px dotted #ddd;
 }
+
 .topic-question-item {
     padding: 0 0 10px 0;
     border-bottom: 1px dotted #ddd;
@@ -83,6 +88,7 @@ h3 {
     font-weight: 600;
     color: #1a1a1a;
 }
+
 h3 a {
     font-size: 18px;
     font-weight: 600;
@@ -116,6 +122,7 @@ p {
     font-weight: 400;
     float: right;
 }
+
 .right-general {
     font-size: 14px;
     color: #333;
@@ -149,6 +156,7 @@ h3.big-topic {
     font-weight: 600;
     color: #333;
 }
+
 .question-right {
     margin-top: 30%;
     margin-bottom: 20px;
@@ -165,7 +173,7 @@ h3.big-topic {
 }
 
 .recommend {
-    
+
 }
 
 .form-register, .form-login {
@@ -193,6 +201,7 @@ h3.big-topic {
     font-weight: 600;
     margin-right: 40px;
 }
+
 .username-big {
     font-size: 26px;
     font-weight: 600;

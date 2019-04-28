@@ -5,34 +5,36 @@
 {% block custom_js %}
     <!-- 启用富文本编辑器样式 -->
     {% load staticfiles %}
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
-    <script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+    <script type = "text/javascript" src = "{% static "ckeditor / ckeditor / ckeditor.js" %}" ></script>
 {% endblock %}
 
 {% block content %}
 
-{% include 'zhihu/question.html' with question=question %}
+    {% include 'zhihu/question.html' with question=question %}
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-8">
-        <div class="site-box">
-            <form action="" method="post">
-                {% csrf_token %}
-                {% for field in answer_form %}
-                <div class="form-group">
-                    {{ field.errors }}
-                    {{ field.label_tag }}
-                    {{ field }}
-                </div>
-                {% endfor %}
-                <div class="text-right">
-                    <button type="submit" class="btn btn-primary">提交回答</button>
-                </div>
-            </form>
+    <div class= "container" >
+    < div class= "row" >
+    < div class= "col-sm-8" >
+    < div class= "site-box" >
+    < form action = "" method = "post" >
+    {% csrf_token %}
+    {% for field in answer_form %}
+        <div class="form-group">
+        {{ field.errors }}
+        {{ field.label_tag }}
+        {{ field }}
         </div>
-        </div>
-    </div>
-</div>
+    {% endfor %}
+    < div class= "text-right" >
+    < button type = "submit" class= "btn btn-primary" > 提交回答
+    < /button>
+    < /div>
+    < /form>
+    < /div>
+    < /div>
+    < /div>
+    < /div>
 
 {% endblock %}

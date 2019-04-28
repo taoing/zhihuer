@@ -1,85 +1,104 @@
 <div class="container-fluit">
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8">
-    <div class="question-detail">
-    
-    {% if messages %}
-    <div class="messages">
-      {% for message in messages %}
-      <p class="alert alert-info alert-dismissable">
-        <button class="close" type="button" data-dismiss="alert">&times;</button>{{ message }}</p>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-      <p>
-        {% for topic in question.topics.all %}
-        <a href="{% url 'topic_detail' topic.id %}"><button class="btn btn-default" type="button">{{ topic.name }}</button></a>
-        {% endfor %}
-      </p>
-      <div class="question-title">
-        <h3><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h3>
-      </div>
-      <p>{{ question.content }}</p>
-      <div class="question-meta">
-        <button type="button" class="btn btn-primary" onclick="follow_question(this, {{ question.id }})">{% if has_follow_question %}已关注{% else %}关注问题{% endif %}</button>
-        <a href="{% url 'answer_question' question.id %}"><button type="button" class="btn btn-default">写回答</button></a>
-        <span>{{ question.pub_time }}</span>
-      </div>
-    </div>
-    </div>
-
-    <div class="col-sm-4">
-      <div class="row">
-        <div class="col-sm-8 col-sm-offset-2">
-          <div class="question-right">
-            <p class="text-center">关注者</p>
-            <p class="text-center"><a class="info-num" href="{% url 'follow_question_user' question.id %}">{{ question.get_follow_nums }}</a></p>
-          </div>
-          <div class="question-right">
-            <p class="text-center">被浏览</p>
-            <p class="text-center"><span class="info-num">{{ question.read_nums }}</span></p>
-          </div>
-        </div>
-      </div>
-      <!-- <div class="question-right">
+    <div class="container">
         <div class="row">
-          <div class="col-sm-3 col-sm-offset-3">
-            <p class="text-center">关注者</p>
-            <p class="text-center"><a class="info-num" href="{% url 'follow_question_user' question.id %}">{{ question.get_follow_nums }}</a></p>
-          </div>
-          <div class="col-sm-5 col-sm-offset-1">
-            <p>被浏览</p>
-            <p><span class="info-num">{{ question.read_nums }}</span></p>
-          </div>
+            <div class="col-sm-8">
+                <div class="question-detail">
+
+                    {% if messages %}
+                        <div class="messages">
+                            {% for message in messages %}
+                                <p class="alert alert-info alert-dismissable">
+                                    <button class="close" type="button"
+                                            data-dismiss="alert">&times;
+                                    </button>
+                                    {{ message }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <p>
+                        {% for topic in question.topics.all %}
+                            <a href="{% url 'topic_detail' topic.id %}">
+                                <button class="btn btn-default"
+                                        type="button">{{ topic.name }}
+                                </button>
+                            </a>
+                        {% endfor %}
+                    </p>
+                    <div class="question-title">
+                        <h3><a href="
+{% url 'question_detail' question.id %}">{{ question.title }}</a></h3>
+                    </div>
+                    <p>{{ question.content }}</p>
+                    <div class="question-meta">
+                        <button type="button" class="btn btn-primary"
+                                onclick="follow_question(this, {{ question.id }})">
+                            {% if has_follow_question %}已关注{% else %}关注问题{%endif %}
+                        </button>
+                        <a href="{% url 'answer_question' question.id %}">
+                            <button type="button" class="btn btn-default">写回答
+                            </button>
+                        </a>
+                        <span>{{ question.pub_time }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2">
+                        <div class="question-right">
+                            <p class="text-center">关注者</p>
+                            <p class="text-center"><a class="info-num"
+                                                      href="{% url 'follow_question_user' question.id %}">
+                                {{question.get_follow_nums }}</a></p>
+                        </div>
+                        <div class="question-right">
+                            <p class="text-center">被浏览</p>
+                            <p class="text-center"><span
+                                    class="info-num">{{ question.read_nums }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="question-right">
+                  <div class="row">
+                    <div class="col-sm-3 col-sm-offset-3">
+                      <p class="text-center">关注者</p>
+                      <p class="text-center"><a class="info-num" href="{% url 'follow_question_user' question.id %}">{{ question.get_follow_nums }}</a></p>
+                    </div>
+                    <div class="col-sm-5 col-sm-offset-1">
+                      <p>被浏览</p>
+                      <p><span class="info-num">{{ question.read_nums }}</span></p>
+                    </div>
+                  </div>
+                </div> -->
+            </div>
         </div>
-      </div> -->
     </div>
-  </div>
-</div>
 </div>
 
 <script>
-  //关注问题
-  function follow_question (dom, question_id) {
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'follow_question' %}",
-      data: {'question_id':question_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-            $(dom).text(data.message);
-        }else {
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
-        }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
+    //关注问题
+    function follow_question(dom, question_id) {
+        var old_path = location.pathname;
+        $.ajax({
+            type: 'GET',
+            async: true,
+            url: "{% url 'follow_question' %}",
+            data: {'question_id': question_id},
+            cache: false,
+            success: function (data) {
+                if (data.status == 'success') {
+                    $(dom).text(data.message);
+                } else {
+                    location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                }
+            },
+            error: function (xhr, err_msg, error) {
+                alert('请求出错');
+            },
+        });
+    }
 </script>

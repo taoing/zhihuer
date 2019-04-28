@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('zhihu', '0009_answer_is_anonymous'),
     ]
@@ -14,6 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='answer',
             name='content',
-            field=ckeditor_uploader.fields.RichTextUploadingField(verbose_name='回答内容'),
+            field=ckeditor_uploader.fields.RichTextUploadingField(
+                verbose_name='回答内容'),
         ),
     ]

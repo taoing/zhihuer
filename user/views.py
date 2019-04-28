@@ -1,40 +1,40 @@
-from django.shortcuts import render, redirect, get_object_or_404
-
-from itertools import chain
-from datetime import datetime, timedelta
 import random
 import time
+from datetime import datetime, timedelta
+from itertools import chain
 
-from django.contrib.auth import authenticate, login, logout
-from django.urls import reverse
-from django.contrib import messages
-from django.contrib.auth.backends import ModelBackend #这是默认用户认证后端
-from django.db.models import Q
-from django.http import HttpResponse, JsonResponse
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.backends import ModelBackend  # 这是默认用户认证后端
 from django.contrib.auth.decorators import login_required
-
+from django.db.models import Q
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.views.decorators.cache import cache_page
-from django.core.cache import cache
 
-from .models import User, CheckCode, UserRelationship
-from zhihu.models import Answer, Question, Topic
-from .forms import RegisterForm, LoginForm, ForgetPwdForm, UserProfileForm, ChangePasswordForm, ChangeEmailForm
-from .tasks import send_email
 from helper.paginator_helper import paginator_helper
-from helper.expire_page_cache import expire_page_cache
+from zhihu.models import Answer, Question
+from .forms import RegisterForm, LoginForm, ForgetPwdForm, UserProfileForm, \
+    ChangePasswordForm, ChangeEmailForm
+from .models import User, CheckCode, UserRelationship
+from .tasks import send_email
+
 
 class CustomModelBackend(ModelBackend):
     '''自定认证后端类, 重写ModelBackend的authenticate方法, 可以使用username和email同时登录'''
+
     def authenticate(self, request, username=None, password=None, **kwargs):
         # 使用Q对象进行数据库or查询
         try:
-            user = User.objects.get(Q(username=username)|Q(email=username))
+            user = User.objects.get(Q(username=username) | Q(email=username))
             # 验证明文密码
             if user.check_password(password) and user.is_active:
                 return user
         except Exception as e:
             return None
+
 
 def register(request):
     register_form = RegisterForm()
@@ -51,7 +51,9 @@ def register(request):
             # 生成账户确认签名
             token = user.generate_confirm_token()
             # 发送账户激活链接邮件
-            send_email.delay('知乎儿账户确认', 'user/email/user_confirm', user.email, host=request.get_host(), username=user.username, token=token)
+            send_email.delay('知乎儿账户确认', 'user/email/user_confirm', user.email,
+                             host=request.get_host(), username=user.username,
+                             token=token)
             # 网页显示账户注册成功消息
             messages.info(request, '账户已注册, 一封账户确认邮件已发往你的邮箱, 请查收')
             return redirect(reverse('user_login'))
@@ -61,6 +63,7 @@ def register(request):
     context = {}
     context['register_form'] = register_form
     return render(request, 'user/register.html', context)
+
 
 def user_login(request):
     login_form = LoginForm()
@@ -85,10 +88,12 @@ def user_login(request):
     context['login_form'] = login_form
     return render(request, 'user/login.html', context)
 
+
 def user_logout(request):
     '''退出登录'''
     logout(request)
     return redirect(reverse('index'))
+
 
 def user_confirm(request, token):
     '''确认账户'''
@@ -101,22 +106,25 @@ def user_confirm(request, token):
         messages.info(request, '确认链接无效或过期')
         return redirect(reverse('index'))
 
+
 @login_required
 def resend_confirm_email(request):
     '''重新发送确认链接'''
     user = request.user
-    send_time = request.session.get('send_time_'+user.username)
-    if send_time and (time.time()-send_time<60):
+    send_time = request.session.get('send_time_' + user.username)
+    if send_time and (time.time() - send_time < 60):
         messages.info(request, '1分钟内已发送过邮件, 请先去邮箱查收喔')
         return redirect(reverse('index'))
 
     else:
-        request.session['send_time_'+user.username] = time.time()
+        request.session['send_time_' + user.username] = time.time()
         token = user.generate_confirm_token()
-        send_email.delay('知乎儿账户确认', 'user/email/user_confirm', user.email, host=request.get_host(), username=user.username, token=token)
+        send_email.delay('知乎儿账户确认', 'user/email/user_confirm', user.email,
+                         host=request.get_host(), username=user.username,
+                         token=token)
         messages.info(request, '确认邮件已发送')
         return redirect(reverse('index'))
-    
+
 
 def get_time(obj):
     '''返回对象的创建时间, 在sorted中以对象的创建时间比较'''
@@ -124,6 +132,7 @@ def get_time(obj):
         return obj.pub_time
     else:
         return obj.add_time
+
 
 @cache_page(60, key_prefix='user_home')
 def user_home(request, user_id):
@@ -141,10 +150,12 @@ def user_home(request, user_id):
     user_collect_answers = user.usercollectanswer_set.all()
     user_follow_questions = user.userfollowquestion_set.all()
     # 使用itertools.chain合并多个queryset, 反应用户的动态
-    user_trend = chain(user_answers, user_questions, user_follow_answers, user_collect_answers, user_follow_questions)
+    user_trend = chain(user_answers, user_questions, user_follow_answers,
+                       user_collect_answers, user_follow_questions)
     user_trend_sorted = sorted(user_trend, key=get_time, reverse=True)
     # 分页
-    user_trend_sorted_page = paginator_helper(request, user_trend_sorted, per_page=settings.TREND_PER_PAGE)
+    user_trend_sorted_page = paginator_helper(request, user_trend_sorted,
+                                              per_page=settings.TREND_PER_PAGE)
 
     context = {}
     context['user'] = user
@@ -152,17 +163,20 @@ def user_home(request, user_id):
     context['user_trend_sorted_page'] = user_trend_sorted_page
     return render(request, 'user/user_home.html', context)
 
+
 @cache_page(60, key_prefix='user_answer')
 def user_answer(request, user_id):
     '''用户主页--回答'''
     user = get_object_or_404(User, id=user_id)
     user_answers = user.answer_set.all().order_by('-pub_time')
 
-    user_answers_page = paginator_helper(request, user_answers, per_page=settings.ANSWER_PER_PAGE)
+    user_answers_page = paginator_helper(request, user_answers,
+                                         per_page=settings.ANSWER_PER_PAGE)
     context = {}
     context['user'] = user
     context['user_answers_page'] = user_answers_page
     return render(request, 'user/user_answer.html', context)
+
 
 @cache_page(60, key_prefix='user_question')
 def user_question(request, user_id):
@@ -170,24 +184,29 @@ def user_question(request, user_id):
     user = get_object_or_404(User, id=user_id)
     user_questions = user.question_set.all().order_by('-pub_time')
 
-    user_questions_page = paginator_helper(request, user_questions, per_page=settings.QUESTION_PER_PAGE)
+    user_questions_page = paginator_helper(request, user_questions,
+                                           per_page=settings.QUESTION_PER_PAGE)
     context = {}
     context['user'] = user
     context['user_questions_page'] = user_questions_page
     return render(request, 'user/user_question.html', context)
 
+
 @cache_page(60)
 def user_collect_answer(request, user_id):
     '''用户主页--收藏的回答'''
     user = get_object_or_404(User, id=user_id)
-    user_collect_answers = user.usercollectanswer_set.all().order_by('-add_time')
+    user_collect_answers = user.usercollectanswer_set.all().order_by(
+        '-add_time')
     # 取出answer对象
     user_collect_answers = [obj.answer for obj in user_collect_answers]
-    user_collect_answers_page = paginator_helper(request, user_collect_answers, per_page=settings.ANSWER_PER_PAGE)
+    user_collect_answers_page = paginator_helper(request, user_collect_answers,
+                                                 per_page=settings.ANSWER_PER_PAGE)
     context = {}
     context['user'] = user
     context['user_collect_answers_page'] = user_collect_answers_page
     return render(request, 'user/user_collect_answer.html', context)
+
 
 @cache_page(60)
 def user_follow_topic(request, user_id):
@@ -201,29 +220,37 @@ def user_follow_topic(request, user_id):
             # 话题下所有问题
             topic_questions = topic.question_set.all()
             # 用户在该话题下的所有回答
-            user_answer_nums = Answer.objects.filter(question__in=topic_questions, author=user).count()
+            user_answer_nums = Answer.objects.filter(
+                question__in=topic_questions, author=user).count()
             # 创建dict对象放入列表中
-            user_topics_list.append({'topic':topic, 'user_answer_nums':user_answer_nums})
+            user_topics_list.append(
+                {'topic': topic, 'user_answer_nums': user_answer_nums})
 
-    user_topics_page = paginator_helper(request, user_topics_list, per_page=settings.TOPIC_PER_PAGE)
+    user_topics_page = paginator_helper(request, user_topics_list,
+                                        per_page=settings.TOPIC_PER_PAGE)
     context = {}
     context['user'] = user
     context['user_topics_page'] = user_topics_page
     return render(request, 'user/user_follow_topic.html', context)
+
 
 @cache_page(60)
 def user_follow_question(request, user_id):
     '''用户主页--关注问题'''
     user = get_object_or_404(User, id=user_id)
     # 用户关注问题
-    user_follow_questions = user.userfollowquestion_set.all().order_by('-add_time')
+    user_follow_questions = user.userfollowquestion_set.all().order_by(
+        '-add_time')
     # 取出question对象
     user_follow_questions = [obj.question for obj in user_follow_questions]
-    user_follow_questions_page = paginator_helper(request, user_follow_questions, per_page=settings.QUESTION_PER_PAGE)
+    user_follow_questions_page = paginator_helper(request,
+                                                  user_follow_questions,
+                                                  per_page=settings.QUESTION_PER_PAGE)
     context = {}
     context['user'] = user
     context['user_follow_questions_page'] = user_follow_questions_page
     return render(request, 'user/user_follow_question.html', context)
+
 
 @cache_page(60)
 def user_follow_user(request, user_id):
@@ -238,20 +265,25 @@ def user_follow_user(request, user_id):
     to_users_list = []
     if request.user.is_authenticated and request.user != user:
         # 当前用户关注的用户
-        current_user_to_users = [obj.to_user for obj in request.user.to_user_set.all().order_by('-add_time')]
+        current_user_to_users = [obj.to_user for obj in
+                                 request.user.to_user_set.all().order_by(
+                                     '-add_time')]
         for to_user in to_users:
             if to_user in current_user_to_users:
                 # 添加被当前用户关注属性
                 to_user.has_followed = True
             to_users_list.append(to_user)
-        to_users_page = paginator_helper(request, to_users_list, per_page = settings.USER_PER_PAGE)
+        to_users_page = paginator_helper(request, to_users_list,
+                                         per_page=settings.USER_PER_PAGE)
     else:
-        to_users_page = paginator_helper(request, to_users, per_page = settings.USER_PER_PAGE)
+        to_users_page = paginator_helper(request, to_users,
+                                         per_page=settings.USER_PER_PAGE)
 
     context = {}
     context['user'] = user
     context['to_users_page'] = to_users_page
     return render(request, 'user/user_follow_user.html', context)
+
 
 @cache_page(60)
 def user_followed_by_user(request, user_id):
@@ -266,19 +298,24 @@ def user_followed_by_user(request, user_id):
     from_users_list = []
     if request.user.is_authenticated:
         # 当前用户关注的用户
-        current_user_to_users = [obj.to_user for obj in request.user.to_user_set.all().order_by('-add_time')]
+        current_user_to_users = [obj.to_user for obj in
+                                 request.user.to_user_set.all().order_by(
+                                     '-add_time')]
         for from_user in from_users:
             if from_user in current_user_to_users:
                 from_user.has_followed = True
             from_users_list.append(from_user)
-        from_users_page = paginator_helper(request, from_users_list, per_page=settings.USER_PER_PAGE)
+        from_users_page = paginator_helper(request, from_users_list,
+                                           per_page=settings.USER_PER_PAGE)
     else:
-        from_users_page = paginator_helper(request, from_users, per_page=settings.USER_PER_PAGE)
+        from_users_page = paginator_helper(request, from_users,
+                                           per_page=settings.USER_PER_PAGE)
 
     context = {}
     context['user'] = user
     context['from_users_page'] = from_users_page
     return render(request, 'user/user_followed_user.html', context)
+
 
 @cache_page(60)
 def user_topic_answer(request, user_id, topic_id):
@@ -289,13 +326,16 @@ def user_topic_answer(request, user_id, topic_id):
     except Exception as e:
         return redirect(reverse('index'))
     topic_questions = topic.question_set.all()
-    topic_answers = Answer.objects.filter(question__in=topic_questions, author=user).order_by('-pub_time')
-    topic_answers_page = paginator_helper(request, topic_answers, per_page=settings.ANSWER_PER_PAGE)
+    topic_answers = Answer.objects.filter(question__in=topic_questions,
+                                          author=user).order_by('-pub_time')
+    topic_answers_page = paginator_helper(request, topic_answers,
+                                          per_page=settings.ANSWER_PER_PAGE)
     context = {}
     context['user'] = user
     context['topic'] = topic
     context['topic_answers_page'] = topic_answers_page
     return render(request, 'user/user_topic_answer.html', context)
+
 
 @login_required
 def follow_user(request):
@@ -305,10 +345,11 @@ def follow_user(request):
     user_relationship_existed = request.user.to_user_set.filter(to_user=user)
     if user_relationship_existed:
         user_relationship_existed.delete()
-        return JsonResponse({'status':'success', 'message':'关注 TA'})
+        return JsonResponse({'status': 'success', 'message': '关注 TA'})
     user_relationship = UserRelationship(from_user=request.user, to_user=user)
     user_relationship.save()
-    return JsonResponse({'status':'success', 'message':'取消关注'})
+    return JsonResponse({'status': 'success', 'message': '取消关注'})
+
 
 @login_required
 def delete_answer(request):
@@ -316,7 +357,8 @@ def delete_answer(request):
     answer_id = int(request.GET.get('answer_id', ''))
     answer = get_object_or_404(request.user.answer_set.all(), id=answer_id)
     answer.delete()
-    return JsonResponse({'status':'success'})
+    return JsonResponse({'status': 'success'})
+
 
 def reset_password(request):
     '''忘记密码, 找回密码'''
@@ -345,6 +387,7 @@ def reset_password(request):
     context['form'] = form
     return render(request, 'user/reset_password.html', context)
 
+
 def get_check_code(request):
     '''发送验证码'''
     if not request.user.is_anonymous:
@@ -352,9 +395,9 @@ def get_check_code(request):
 
     email = request.GET.get('email', '')
     # 随机生成验证码
-    alist = ['0','1','2','3','4','5','6','7','8','9']
+    alist = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     # 根据ascii码将数字转换为大写字母
-    for i in range(65,91):
+    for i in range(65, 91):
         alist.append(chr(i))
 
     # 打乱alist的顺序
@@ -376,7 +419,8 @@ def get_check_code(request):
         user_check_code = CheckCode.objects.filter(user=user)
         if user_check_code.count() > 0:
             user_check_code = user_check_code.first()
-            if datetime.now() < user_check_code.add_time + timedelta(seconds=60):
+            if datetime.now() < user_check_code.add_time + timedelta(
+                    seconds=60):
                 data['status'] = 'fail'
                 data['message'] = '1分钟内已发送过验证码, 请检查邮箱'
                 return JsonResponse(data)
@@ -386,11 +430,13 @@ def get_check_code(request):
         user_check_code.check_code = check_code
         user_check_code.save()
         # 发送邮件
-        send_email.delay('知乎儿验证码', 'user/email/reset_password', email, check_code=user_check_code.check_code)
-        return JsonResponse({'status':'success'})
+        send_email.delay('知乎儿验证码', 'user/email/reset_password', email,
+                         check_code=user_check_code.check_code)
+        return JsonResponse({'status': 'success'})
     except Exception as e:
         print(e)
         pass
+
 
 @login_required
 def edit_profile(request):
@@ -399,9 +445,10 @@ def edit_profile(request):
         form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
-            return JsonResponse({'status':'success'})
-        return JsonResponse({'status':'fail', 'message':'请求出错'})
+            return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'fail', 'message': '请求出错'})
     return render(request, 'user/edit_profile.html')
+
 
 @login_required
 def update_image(request):
@@ -415,6 +462,7 @@ def update_image(request):
             return redirect(reverse('edit_profile'))
         else:
             return render(request, 'user/edit_profile.html')
+
 
 @login_required
 def change_password(request):
@@ -434,6 +482,7 @@ def change_password(request):
     context['form'] = form
     return render(request, 'user/change_password.html', context)
 
+
 @login_required
 def change_email_request(request):
     '''请求修改邮箱, 发送修改邮箱链接'''
@@ -444,7 +493,9 @@ def change_email_request(request):
             new_email = form.cleaned_data.get('new_email')
             if request.user.check_password(password):
                 token = request.user.generate_change_email_token(new_email)
-                send_email.delay('知乎儿修改邮箱', 'user/email/change_email', new_email, host=request.get_host(), token=token)
+                send_email.delay('知乎儿修改邮箱', 'user/email/change_email',
+                                 new_email, host=request.get_host(),
+                                 token=token)
                 messages.info(request, '一封含有确认修改邮箱链接的邮件已发送到你的新邮箱, 请查收')
                 return redirect(reverse('index'))
             else:
@@ -454,6 +505,7 @@ def change_email_request(request):
     context = {}
     context['form'] = form
     return render(request, 'user/change_email.html', context)
+
 
 def change_email(request, token):
     '''确认修改邮箱'''

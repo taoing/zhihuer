@@ -5,155 +5,233 @@
 {% block keywords %}{{ keywords }}{% endblock %}
 
 {% block content %}
-<div class="container">
+    <div class="container">
 
-  <div class="row">
-    <div class="col-sm-8">
-      
-      <div class="site-box">
-        {% if search_type == 'question' %}<h4><b>"{{ keywords }}" 的提问搜索结果</b></h4>{% endif %}
-        {% if search_type == 'answer' %}<h4><b>"{{ keywords }}" 的回答搜索结果</b></h4>{% endif %}
-        {% if search_type == 'topic' %}<h4><b>"{{ keywords }}" 的话题搜索结果</b></h4>{% endif %}
-        {% if search_type == 'user' %}<h4><b>"{{ keywords }}" 的用户搜索结果</b></h4>{% endif %}
-        <hr>
-      {% if search_type == 'answer' %}
-      {% for answer in search_results_page.object_list %}
-        <div class="search-item">
-          <div class="question-title">
-            <h3><a target="_blank" href="{% url 'question_detail' answer.question_id %}">{{ answer.question.title }}</a></h3>
-          </div>
-          {% if answer.is_anonymous %}
-            <h4 class="media-heading text-muted">匿名回答 : <span class="answer-content"><a target="_blank" href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></span></h4>
-          {% else %}
-            <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</a> : <span class="answer-content"><a target="_blank" href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></span></h4>
-          {% endif %}
-          <div class="answer-meta">
-            <button type="button" class="btn btn-primary btnvote-up btn-sm" onclick="follow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.get_follow_nums }}</button>
-            <button type="button" class="btn btn-default btnvote-down btn-sm" onclick="unfollow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-bottom"></span></button>
-            <a target="_blank" href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.get_comment_nums }} 条评论</button></a>
-          </div>
-        </div>
-      {% empty %}
-      <p>暂时没有搜索结果</p>
-      {% endfor %}
+        <div class="row">
+            <div class="col-sm-8">
 
-      {% elif search_type == 'question' %}
-      {% for question in search_results_page %}
-      <div class="search-item">
-        <h3><a target="_blank" href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h3>
-        <p class="text-muted">{{ question.get_answer_nums }} 个回答 &middot; {{ question.get_follow_nums }} 个关注</p>
-      </div>
-      {% empty %}
-      <p>暂时没有搜索结果</p>
-      {% endfor %}
+                <div class="site-box">
+                    {% if search_type == 'question' %}<h4><b>"{{ keywords }}"
+                        的提问搜索结果</b></h4>{% endif %}
+                    {% if search_type == 'answer' %}<h4><b>"{{ keywords }}"
+                        的回答搜索结果</b></h4>{% endif %}
+                    {% if search_type == 'topic' %}<h4><b>"{{ keywords }}"
+                        的话题搜索结果</b></h4>{% endif %}
+                    {% if search_type == 'user' %}<h4><b>"{{ keywords }}"
+                        的用户搜索结果</b></h4>{% endif %}
+                    <hr>
+                    {% if search_type == 'answer' %}
+                        {% for answer in search_results_page.object_list %}
+                            <div class="search-item">
+                                <div class="question-title">
+                                    <h3><a target="_blank"
+                                           href="{% url 'question_detail' answer.question_id %}">
+                                        {{ answer.question.title }}</a>
+                                    </h3>
+                                </div>
+                                {% if answer.is_anonymous %}
+                                    <h4 class="media-heading text-muted">匿名回答 :
+                                        <span
+                                                class="answer-content"><a
+                                                target="_blank"
+                                                href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></span>
+                                    </h4>
+                                {% else %}
+                                    <h4 class="media-heading"><a target="_blank"
+                                                                 href="{% url 'user_home' answer.author_id %}">
+                                        {{ answer.author.nickname }}</a> :
+                                        <span
+                                                class="answer-content"><a
+                                                target="_blank"
+                                                href="{% url 'answer_detail' answer.id %}">{{ answer.content|striptags|truncatechars:200 }}</a></span>
+                                    </h4>
+                                {% endif %}
+                                <div class="answer-meta">
+                                    <button type="button"
+                                            class="btn btn-primary btnvote-up btn-sm"
+                                            onclick="follow_answer(this, {{ answer.id }})">
+                                        <span class="glyphicon glyphicon-triangle-top"></span>
+                                        {{ answer.get_follow_nums }}
+                                    </button>
+                                    <button type="button"
+                                            class="btn btn-default btnvote-down btn-sm"
+                                            onclick="unfollow_answer(this, {{ answer.id }})">
+                                        <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                    </button>
+                                    <a target="_blank"
+                                       href="{% url 'answer_detail' answer.id %}">
+                                        <button type="button"
+                                                class="btn btn-default btn-sm">
+                                            {{ answer.get_comment_nums }}
+                                            条评论
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p>暂时没有搜索结果</p>
+                        {% endfor %}
 
-      {% elif search_type == 'topic' %}
-      {% for topic in search_results_page %}
-      <div class="search-item">
-        <div class="media">
-          <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" height="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
-          <div class="media-body">
-            <h4 class="media-heading"><a target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
-            {% if topic.description %}
-              <p>{{ topic.description|striptags|truncatechars:30 }}</p>
-            {% endif %}
-            <p class="text-muted"><a target="_blank" href="{% url 'follow_topic_user' topic.id %}">{{ topic.get_user_nums }} 关注</a> &middot; <a target="_blank" href="{% url 'topic_question' topic.id %}">{{ topic.get_question_nums }} 问题</a></p>
-          </div>
-        </div>
-      </div>
-      {% empty %}
-      <p>暂时没有搜索结果</p>
-      {% endfor %}
+                    {% elif search_type == 'question' %}
+                        {% for question in search_results_page %}
+                            <div class="search-item">
+                                <h3><a target="_blank"
+                                       href="{% url 'question_detail' question.id %}">
+                                    {{ question.title }}</a></h3>
+                                <p class="text-muted">{{ question.get_answer_nums }}
+                                    个回答
+                                    &middot; {{ question.get_follow_nums }}
+                                    个关注</p>
+                            </div>
+                        {% empty %}
+                            <p>暂时没有搜索结果</p>
+                        {% endfor %}
 
-      {% elif search_type == 'user' %}
-      {% for user in search_results_page %}
-      <div class="search-item">
-        <div class="media">
-            <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="" class="media-object"></a>
-            <div class="media-body">
-              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
-              <p>{{ user.description|default_if_none:'' }}</p>
-              <p class="text-muted"><a target="_blank" href="{% url 'user_answer' user.id %}">{{ user.get_answer_nums }} 回答</a> &middot; <a target="_blank" href="{% url 'user_followed_by_user' user.id %}">{{ user.get_followed_by_user_nums }} 关注者</a></p>
+                    {% elif search_type == 'topic' %}
+                        {% for topic in search_results_page %}
+                            <div class="search-item">
+                                <div class="media">
+                                    <a target="_blank"
+                                       href="{% url 'topic_detail' topic.id %}"
+                                       class="media-left"><img width="50"
+                                                               height="50"
+                                                               src="
+
+                                                                       {{ MEDIA_URL }}{{ topic.image }}"
+                                                               alt="话题"
+                                                               class="media-object"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a
+                                                target="_blank"
+                                                href="{% url 'topic_detail' topic.id %}">
+                                            {{ topic.name }}</a></h4>
+                                        {% if topic.description %}
+                                            <p>
+                                                {{ topic.description|striptags|truncatechars:30 }}</p>
+                                        {% endif %}
+                                        <p class="text-muted"><a target="_blank"
+                                                                 href="{% url 'follow_topic_user' topic.id %}">
+                                            {{ topic.get_user_nums }}
+                                            关注</a> &middot; <a
+                                                target="_blank"
+                                                href="{% url 'topic_question' topic.id %}">
+                                            {{ topic.get_question_nums }}
+                                            问题</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p>暂时没有搜索结果</p>
+                        {% endfor %}
+
+                    {% elif search_type == 'user' %}
+                        {% for user in search_results_page %}
+                            <div class="search-item">
+                                <div class="media">
+                                    <a target="_blank"
+                                       href="{% url 'user_home' user.id %}"
+                                       class="media-left"><img width="60"
+                                                               height="60"
+                                                               src="
+
+                                                                       {{ MEDIA_URL }}{{ user.image }}"
+                                                               alt=""
+                                                               class="media-object"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a
+                                                target="_blank"
+                                                href="{% url 'user_home' user.id %}">
+                                            {{ user.nickname }}</a></h4>
+                                        <p>{{ user.description|default_if_none:'' }}</p>
+                                        <p class="text-muted"><a target="_blank"
+                                                                 href="{% url 'user_answer' user.id %}">
+                                            {{ user.get_answer_nums }}
+                                            回答</a> &middot; <a
+                                                target="_blank"
+                                                href="{% url 'user_followed_by_user' user.id %}">
+                                            {{ user.get_followed_by_user_nums }}
+                                            关注者</a></p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p>暂时没有搜索结果</p>
+                        {% endfor %}
+
+                    {% endif %}
+
+                    {% include 'zhihu/paginator.html' with page=search_results_page %}
+
+                </div>
             </div>
+
         </div>
-      </div>
-      {% empty %}
-      <p>暂时没有搜索结果</p>
-      {% endfor %}
-
-      {% endif %}
-
-      {% include 'zhihu/paginator.html' with page=search_results_page %}
-
-      </div>
     </div>
-
-  </div>
-</div>
 
 {% endblock %}
 
 {% block custom_js %}
-<script>
+    <script>
 
-//点赞
-  function follow_answer (dom, answer_id) {
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'add_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'add') {
-            var nums = parseInt($(dom).text()) + 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).text()) - 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //点赞
+        function follow_answer(dom, answer_id) {
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'add_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'add') {
+                            var nums = parseInt($(dom).text()) + 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).text()) - 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-  //取消点赞
-  function unfollow_answer (dom, answer_id) {
-    if (parseInt($(dom).prev().text()) == 0) {
-      return;
-    };
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'cancel_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).prev().text()) - 1;
-            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else {
-            return;
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //取消点赞
+        function unfollow_answer(dom, answer_id) {
+            if (parseInt($(dom).prev().text()) == 0) {
+                return;
+            }
+            ;
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'cancel_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).prev().text()) - 1;
+                            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else {
+                            return;
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-</script>
+    </script>
 
 {% endblock %}

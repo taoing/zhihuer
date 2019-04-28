@@ -2,23 +2,34 @@
 
 {% block user_content %}
 
-<h4>{% if user == request.user %}我关注的话题{% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}关注的话题{% endif %}</h4>
-<hr>
+    <h4>{% if user == request.user %}我关注的话题
+        {% else %}{% if user.gender == 'M' %}他{% else %}她{% endif %}关注的话题{% endif %}</h4>
+    <hr>
 
-{% for topic in user_topics_page.object_list %}
-<div class="trend-item">
+    {% for topic in user_topics_page.object_list %}
+        <div class="trend-item">
 
-  <div class="media">
-    <a target="_blank" href="{% url 'topic_detail' topic.topic.id %}" class="media-left"><img width="50" height="50" src="{{ MEDIA_URL }}{{ topic.topic.image }}" alt="话题" class="media-object"></a>
-    <div class="media-body">
-      <h3 class="media-heading"><a target="_blank" href="{% url 'topic_detail' topic.topic.id %}">{{ topic.topic.name }}</a></h3>
-      <p><a class="text-muted" href="{% url 'user_topic_answer' user.id topic.topic.id %}">{{ topic.user_answer_nums }} 个回答</a></p>
-    </div>
-  </div>
+            <div class="media">
+                <a target="_blank"
+                   href="{% url 'topic_detail' topic.topic.id %}"
+                   class="media-left"><img width="50" height="50"
+                                           src="
 
-</div>
-{% endfor %}
+                                                   {{ MEDIA_URL }}{{ topic.topic.image }}"
+                                           alt="话题" class="media-object"></a>
+                <div class="media-body">
+                    <h3 class="media-heading"><a target="_blank"
+                                                 href="{% url 'topic_detail' topic.topic.id %}">
+                        {{ topic.topic.name }}</a></h3>
+                    <p><a class="text-muted"
+                          href="{% url 'user_topic_answer' user.id topic.topic.id %}">
+                        {{ topic.user_answer_nums }} 个回答</a></p>
+                </div>
+            </div>
 
-{% include 'zhihu/paginator.html' with page=user_topics_page %}
+        </div>
+    {% endfor %}
+
+    {% include 'zhihu/paginator.html' with page=user_topics_page %}
 
 {% endblock %}

@@ -2,11 +2,12 @@
 
 from datetime import datetime, timedelta
 
+from captcha.fields import CaptchaField
 from django import forms
 from django.contrib.auth import authenticate
-from captcha.fields import CaptchaField
 
 from .models import User, CheckCode
+
 
 class RegisterForm(forms.Form):
     username = forms.CharField(label="用户名", required=True, max_length=20)
@@ -41,10 +42,16 @@ class LoginForm(forms.Form):
 
 
 class ForgetPwdForm(forms.Form):
-    email = forms.EmailField(label='注册邮箱', widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'请输入你注册时的邮箱'}))
-    password = forms.CharField(label='新密码', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'新密码'}), min_length=6, max_length=36)
-    password_2 = forms.CharField(label='重复新密码', widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'重复新密码'}), min_length=6, max_length=36)
-    check_code = forms.CharField(label='验证码', widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'输入验证码'}))
+    email = forms.EmailField(label='注册邮箱', widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder': '请输入你注册时的邮箱'}))
+    password = forms.CharField(label='新密码', widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': '新密码'}), min_length=6,
+                               max_length=36)
+    password_2 = forms.CharField(label='重复新密码', widget=forms.PasswordInput(
+        attrs={'class': 'form-control', 'placeholder': '重复新密码'}), min_length=6,
+                                 max_length=36)
+    check_code = forms.CharField(label='验证码', widget=forms.TextInput(
+        attrs={'class': 'form-control', 'placeholder': '输入验证码'}))
 
     def clean_email(self):
         '''验证邮箱字段'''
@@ -73,7 +80,8 @@ class ForgetPwdForm(forms.Form):
         else:
             raise forms.ValidationError('没有发送过验证码')
         # 验证码有效时间10分钟
-        if datetime.now() > user_check_code.add_time + timedelta(seconds=10*60):
+        if datetime.now() > user_check_code.add_time + timedelta(
+                seconds=10 * 60):
             raise forms.ValidationError('验证码失效')
 
         return check_code
@@ -81,6 +89,7 @@ class ForgetPwdForm(forms.Form):
 
 class UserProfileForm(forms.ModelForm):
     '''用户资料修改表单'''
+
     class Meta:
         model = User
         fields = ['nickname', 'gender', 'description', 'address']
@@ -100,6 +109,7 @@ class UserProfileForm(forms.ModelForm):
 
 class ChangePasswordForm(forms.Form):
     '''修改密码表单'''
+
     def __init__(self, *args, **kwargs):
         if 'request' in kwargs:
             self.request = kwargs.pop('request')
@@ -109,24 +119,28 @@ class ChangePasswordForm(forms.Form):
         label='旧密码',
         min_length=6,
         max_length=36,
-        widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'请输入你的旧密码'})
-        )
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': '请输入你的旧密码'})
+    )
     password = forms.CharField(
         label='新密码',
         min_length=6,
         max_length=36,
-        widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'请输入你的新密码'})
-        )
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': '请输入你的新密码'})
+    )
     password_2 = forms.CharField(
         label='新密码',
         min_length=6,
         max_length=36,
-        widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'重复输入你的新密码'})
-        )
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': '重复输入你的新密码'})
+    )
 
     def clean_old_password(self):
         old_password = self.cleaned_data.get('old_password')
-        user = authenticate(username = self.request.user.username, password=old_password)
+        user = authenticate(username=self.request.user.username,
+                            password=old_password)
         if not user:
             raise forms.ValidationError('密码错误')
         return old_password
@@ -141,6 +155,7 @@ class ChangePasswordForm(forms.Form):
 
 class ChangeEmailForm(forms.Form):
     '''修改邮箱表单'''
+
     def __init__(self, *args, **kwargs):
         if 'request' in kwargs:
             self.request = kwargs.pop('request')
@@ -150,16 +165,19 @@ class ChangeEmailForm(forms.Form):
         label='输入密码',
         min_length=6,
         max_length=36,
-        widget=forms.PasswordInput(attrs={'class':'form-control', 'placeholder':'请输入你的密码'})
-        )
+        widget=forms.PasswordInput(
+            attrs={'class': 'form-control', 'placeholder': '请输入你的密码'})
+    )
     new_email = forms.EmailField(
         label='新邮箱',
-        widget=forms.EmailInput(attrs={'class':'form-control', 'placeholder':'请输入你的新邮箱'})
-        )
+        widget=forms.EmailInput(
+            attrs={'class': 'form-control', 'placeholder': '请输入你的新邮箱'})
+    )
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        user = authenticate(username=self.request.user.username, password=password)
+        user = authenticate(username=self.request.user.username,
+                            password=password)
         if not user:
             raise forms.ValidationError('密码错误')
         return password

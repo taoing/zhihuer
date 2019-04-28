@@ -3,77 +3,91 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}知乎儿{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}知乎儿{% endblock %}</title>
 
-  <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          rel="stylesheet">
 
-  <link href="{% static 'css/zhihu.css' %}" rel="stylesheet">
-  {% block custom_css %}{% endblock %}
+    <link href="{% static 'css/zhihu.css' %}" rel="stylesheet">
+    {% block custom_css %}{% endblock %}
 
-  <!--[if lt IE 9]>
-    <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 
-  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  {% block custom_js %}{% endblock %}
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    {% block custom_js %}{% endblock %}
 
 </head>
 <body>
 
 <nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#mynav">
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      </button>
-      <a href="{% url 'index' %}" class="navbar-brand">知乎儿</a>
-    </div>
-
-    <div class="collapse navbar-collapse" id="mynav">
-      <ul class="nav navbar-nav">
-        <li class="{% block home %}{% endblock %}"><a href="{% url 'index' %}">首页</a></li>
-        <li class="{% block explore %}{% endblock %}"><a target="_blank" href="{% url 'explore' %}">发现</a></li>
-        <li class="{% block topic %}{% endblock %}"><a target="_blank" href="{% url 'topic_list' %}">话题</a></li>
-      </ul>
-      <form action="/search/" target="_blank" class="navbar-form navbar-left" method="get">
-        <div class="form-group">
-          <select name="search_type" class="form-control">
-            <option value="question" selected="selected">提问</option>
-            <option value="answer">回答</option>
-            <option value="topic">话题</option>
-            <option value="user">用户</option>
-          </select>
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse" data-target="#mynav">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="{% url 'index' %}" class="navbar-brand">知乎儿</a>
         </div>
 
-        <div class="form-group">
-          <input type="text" name="keywords" required maxlength="20" class="form-control" placeholder="搜索你感兴趣的内容" value="{% block keywords %}{% endblock %}">
+        <div class="collapse navbar-collapse" id="mynav">
+            <ul class="nav navbar-nav">
+                <li class="{% block home %}{% endblock %}"><a
+                        href="{% url 'index' %}">首页</a></li>
+                <li class="{% block explore %}{% endblock %}"><a target="_blank"
+                                                                 href="{% url 'explore' %}">发现</a>
+                </li>
+                <li class="{% block topic %}{% endblock %}"><a target="_blank"
+                                                               href="{% url 'topic_list' %}">话题</a>
+                </li>
+            </ul>
+            <form action="/search/" target="_blank"
+                  class="navbar-form navbar-left" method="get">
+                <div class="form-group">
+                    <select name="search_type" class="form-control">
+                        <option value="question" selected="selected">提问</option>
+                        <option value="answer">回答</option>
+                        <option value="topic">话题</option>
+                        <option value="user">用户</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" name="keywords" required maxlength="20"
+                           class="form-control" placeholder="搜索你感兴趣的内容"
+                           value="{% block keywords %}{% endblock %}">
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
+            </form>
+            <ul class="nav navbar-nav navbar-right">
+                {% if request.user.is_authenticated %}
+                    <li class="dropdown">
+                        <a href="" class="dropdown-toggle"
+                           data-toggle="dropdown"
+                           role="button">{{ request.user.username }}
+                            <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="{% url 'user_home' request.user.id %}">我的主页</a>
+                            </li>
+                            <li><a href="{% url 'user_logout' %}">退出登录</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'user_login' %}">登录</a></li>
+                    <li><a href="{% url 'register' %}">注册</a></li>
+                {% endif %}
+            </ul>
         </div>
-        <button type="submit" class="btn btn-default">搜索</button>
-      </form>
-      <ul class="nav navbar-nav navbar-right">
-        {% if request.user.is_authenticated %}
-        <li class="dropdown">
-          <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button">{{ request.user.username }}
-          <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="{% url 'user_home' request.user.id %}">我的主页</a></li>
-            <li><a href="{% url 'user_logout' %}">退出登录</a></li>
-          </ul>
-        </li>
-        {% else %}
-        <li><a href="{% url 'user_login' %}">登录</a></li>
-        <li><a href="{% url 'register' %}">注册</a></li>
-        {% endif %}
-      </ul>
     </div>
-  </div>
 </nav>
 
 {% block content %}
@@ -82,28 +96,32 @@
 
 <div class="footer">
     <p class="text-center text-muted">&copy;taoing的知乎儿</p>
-    <p class="text-center text-muted">Django | <a target="_blank" href="https://github.com/taoing/zhihuer">GitHub</a></p>
+    <p class="text-center text-muted">Django | <a target="_blank"
+                                                  href="https://github.com/taoing/zhihuer">GitHub</a>
+    </p>
 </div>
 
-<div id="back-to-top"><img width="40" height="40" src="{{ MEDIA_URL }}image/back_to_top.png" alt=""></div>
+<div id="back-to-top"><img width="40" height="40"
+                           src="{{ MEDIA_URL }}image/back_to_top.png" alt="">
+</div>
 
 <script>
-  // 回到顶部
-  $(function () {
-    $('#back-to-top').on('click', function () {
-      $('html').animate({
-          scrollTop: 0
-        }, 1000);
-    });
+    // 回到顶部
+    $(function () {
+        $('#back-to-top').on('click', function () {
+            $('html').animate({
+                scrollTop: 0
+            }, 1000);
+        });
 
-    $(window).on('scroll', function () {
-      if($(window).scrollTop() > $(window).height()) {
-        $('#back-to-top').fadeIn();
-      }else {
-        $('#back-to-top').fadeOut();
-      }
+        $(window).on('scroll', function () {
+            if ($(window).scrollTop() > $(window).height()) {
+                $('#back-to-top').fadeIn();
+            } else {
+                $('#back-to-top').fadeOut();
+            }
+        });
     });
-  });
 
 </script>
 

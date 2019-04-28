@@ -6,131 +6,159 @@
 
 {% block content %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8">
-      <div class="site-box">
-        <div class="media">
-          <a href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" height="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="" class="media-object"></a>
-          <div class="media-body">
-            <h4 class="media-heading"><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
-            <ul class="breadcrumb">
-              <li><a href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></li>
-              <li class="active">{{ topic.get_user_nums }} 人关注该话题</li>
-            </ul>
-          </div>
-        </div>
-        <hr>
-        {% for user in topic_users_page.object_list %}
-        <div class="user-item">
-          <div class="media">
-            <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="" class="media-object"></a>
-            <div class="media-body">
-              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
-              <p class="text-muted">{{ user.description|default_if_none:'' }}</p>
-              <p class="text-muted">{% if user.answer_nums %}回答了 {{ user.answer_nums }} 个回答{% else %}还没回答问题{% endif %}</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="site-box">
+                    <div class="media">
+                        <a href="{% url 'topic_detail' topic.id %}"
+                           class="media-left"><img width="50" height="50"
+                                                   src="
+
+                                                           {{ MEDIA_URL }}{{ topic.image }}"
+                                                   alt="" class="media-object"></a>
+                        <div class="media-body">
+                            <h4 class="media-heading"><a
+                                    href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
+                            <ul class="breadcrumb">
+                                <li><a href="{% url 'topic_detail' topic.id %}">
+                                    {{ topic.name }}</a></li>
+                                <li class="active">{{ topic.get_user_nums }}
+                                    人关注该话题
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <hr>
+                    {% for user in topic_users_page.object_list %}
+                        <div class="user-item">
+                            <div class="media">
+                                <a target="_blank"
+                                   href="{% url 'user_home' user.id %}"
+                                   class="media-left"><img width="60"
+                                                           height="60"
+                                                           src="
+
+                                                                   {{ MEDIA_URL }}{{ user.image }}"
+                                                           alt=""
+                                                           class="media-object"></a>
+                                <div class="media-body">
+                                    <h4 class="media-heading"><a target="_blank"
+                                                                 href="{% url 'user_home' user.id %}">
+                                        {{ user.nickname }}</a></h4>
+                                    <p class="text-muted">
+                                        {{ user.description|default_if_none:'' }}</p>
+                                    <p class="text-muted">{% if user.answer_nums %}回答了
+                                        {{ user.answer_nums }} 个回答{% else %}还没回答问题{%endif %}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    {% include 'zhihu/paginator.html' with page=topic_users_page %}
+                </div>
             </div>
-          </div>
+
+            <div class="col-sm-4">
+                <div class="site-box">
+                    <p>
+                        <button class="btn btn-primary" id="follow-topic">
+                            {% if has_follow_topic %}已关注{% else %}关注话题{% endif %}
+                        </button>
+                        <span class="text-muted"><a
+                                href="{% url 'follow_topic_user' topic.id %}">{{ topic.get_user_nums }}</a> 人关注了该话题</span>
+                    </p>
+                </div>
+                <hr>
+                <div class="site-box">
+                    <p><b>话题描述</b></p>
+                    <p>{{ topic.description|default_if_none:'该话题暂时没有描述' }}</p>
+                </div>
+            </div>
         </div>
-        {% endfor %}
-
-        {% include 'zhihu/paginator.html' with page=topic_users_page %}
-      </div>
     </div>
-
-    <div class="col-sm-4">
-      <div class="site-box">
-        <p><button class="btn btn-primary" id="follow-topic">{% if has_follow_topic %}已关注{% else %}关注话题{% endif %}</button> <span class="text-muted"><a href="{% url 'follow_topic_user' topic.id %}">{{ topic.get_user_nums }}</a> 人关注了该话题</span></p>
-      </div>
-      <hr>
-      <div class="site-box">
-        <p><b>话题描述</b></p>
-        <p>{{ topic.description|default_if_none:'该话题暂时没有描述' }}</p>
-      </div>
-    </div>
-  </div>
-</div>
 
 {% endblock %}
 
 {% block custom_js %}
 
-<script>
+    <script>
 
-  $(function () {
-    //关注话题
-    $('#follow-topic').on('click', function() {
-      var old_path = window.location.pathname;
-      $.get("{% url 'follow_topic' topic.id %}", function(data) {
-        if(data.status == 'success') {
-          $('#follow-topic').text(data.message);
-        }else if(data.status == 'fail') {
-          alert(data.message);
-        }else {
-          window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
-        }  
-      });
-    });
-  });
+        $(function () {
+            //关注话题
+            $('#follow-topic').on('click', function () {
+                var old_path = window.location.pathname;
+                $.get("{% url 'follow_topic' topic.id %}", function (data) {
+                    if (data.status == 'success') {
+                        $('#follow-topic').text(data.message);
+                    } else if (data.status == 'fail') {
+                        alert(data.message);
+                    } else {
+                        window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                });
+            });
+        });
 
-  //点赞
-  function follow_answer (dom, answer_id) {
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'add_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'add') {
-            var nums = parseInt($(dom).text()) + 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).text()) - 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //点赞
+        function follow_answer(dom, answer_id) {
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'add_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'add') {
+                            var nums = parseInt($(dom).text()) + 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).text()) - 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-  //取消点赞
-  function unfollow_answer (dom, answer_id) {
-    if (parseInt($(dom).prev().text()) == 0) {
-      return;
-    };
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'cancel_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).prev().text()) - 1;
-            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else {
-            return;
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //取消点赞
+        function unfollow_answer(dom, answer_id) {
+            if (parseInt($(dom).prev().text()) == 0) {
+                return;
+            }
+            ;
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'cancel_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).prev().text()) - 1;
+                            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else {
+                            return;
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-</script>
+    </script>
 
 {% endblock %}

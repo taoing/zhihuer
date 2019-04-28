@@ -5,173 +5,243 @@
 {% block topic %}active{% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8">
-      <div class="site-box">
-        <div class="media">
-          <div class="media-left"><img width="100" height="100" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></div>
-          <div class="media-body">
-            <h3 class="big-topic">{{ topic.name }}</h3>
-            <p>{{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
-          </div>
-        </div>
-        <hr>
-        <button id="follow-topic" class="btn btn-primary">{% if has_follow_topic %}已关注{% else %}关注话题{% endif %}</button>
-      </div>
-
-      <div class="site-box">
-        <ul class="nav nav-pills header-bar">
-          <li class="{% if topic_type != 'wonderful' %}active{% endif %}"><a href="{% url 'topic_detail' topic.id %}">讨论</a></li>
-          <li class="{% if topic_type == 'wonderful' %}active{% endif %}"><a href="{% url 'topic_detail' topic.id %}?topic_type=wonderful">精华</a></li>
-          <li><a href="{% url 'topic_question' topic.id %}">等待回答</a></li>
-        </ul>
-        <hr>
-        {% for answer in page.object_list %}
-        <div class="answer-item">
-          <h3><a href="{% url 'question_detail' answer.question_id %}">{{ answer.question.title }}</a></h3>
-          {% if answer.is_anonymous %}
-            <div class="media">
-              <div class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></div>
-              <div class="media-body">
-                <h4 class="media-heading text-muted">匿名回答</h4>
-              </div>
-            </div>
-            {% else %}
-            <div class="media">
-              <a target="_blank" href="{% url 'user_home' answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ answer.author.image }}" alt="头像" class="media-object"></a>
-              <div class="media-body">
-                <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' answer.author_id %}">{{ answer.author.nickname }}</a><small>, {{ answer.author.description }}</small></h4>
-              </div>
-            </div>
-            {% endif %}
-          <div class="answer-content">
-            <a href="{% url 'answer_detail' answer.id %}"><p>{{ answer.content|striptags|truncatechars:200 }}</p></a>
-          </div>
-          <div class="answer-meta">
-            <button type="button" class="btn btn-primary btn-sm btnvote-up" onclick="follow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-top"></span> {{ answer.follow_nums }}</button>
-            <button type="button" class="btn btn-default btn-sm btnvote-down" onclick="unfollow_answer(this, {{ answer.id }})"><span class="glyphicon glyphicon-triangle-bottom"></span></button>
-            <a href="{% url 'answer_detail' answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ answer.comment_nums }} 条评论</button></a>
-            <!-- <a href=""><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"> </span>收藏</button></a> -->
-            <span>{{ answer.pub_time }}</span>         
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-      {% include 'zhihu/paginator.html' %}
-    </div>
-
-    <div class="col-sm-4">
-      <div class="site-box">
+    <div class="container">
         <div class="row">
-          <div class="col-sm-6">
-            <p class="text-center text-muted">关注者</p>
-            <p class="text-center"><a href="{% url 'follow_topic_user' topic.id %}" class="info-num">{{ topic.get_user_nums }}</a></p>
-          </div>
-          <div class="col-sm-6">
-            <p class="text-center text-muted">问题数</p>
-            <p class="text-center"><a href="{% url 'topic_question' topic.id %}" class="info-num">{{ topic.get_question_nums }}</a></p>
-          </div>
+            <div class="col-sm-8">
+                <div class="site-box">
+                    <div class="media">
+                        <div class="media-left"><img width="100" height="100"
+                                                     src="{{ MEDIA_URL }}{{ topic.image }}"
+                                                     alt="话题"
+                                                     class="media-object">
+                        </div>
+                        <div class="media-body">
+                            <h3 class="big-topic">{{ topic.name }}</h3>
+                            <p>
+                                {{ topic.description|default_if_none:"话题暂时没有描述" }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <button id="follow-topic" class="btn btn-primary">
+                        {% if has_follow_topic %}已关注{% else %}关注话题{% endif %}
+                    </button>
+                </div>
+
+                <div class="site-box">
+                    <ul class="nav nav-pills header-bar">
+                        <li class="{% if topic_type != 'wonderful' %}active{% endif %}">
+                            <a href="{% url 'topic_detail' topic.id %}">讨论</a>
+                        </li>
+                        <li class="{% if topic_type == 'wonderful' %}active{% endif %}">
+                            <a href="{% url 'topic_detail' topic.id %}?topic_type=wonderful">精华</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'topic_question' topic.id %}">等待回答</a>
+                        </li>
+                    </ul>
+                    <hr>
+                    {% for answer in page.object_list %}
+                        <div class="answer-item">
+                            <h3>
+                                <a href="{% url 'question_detail' answer.question_id %}">
+                                    {{ answer.question.title }}</a></h3>
+                            {% if answer.is_anonymous %}
+                                <div class="media">
+                                    <div class="media-left"><img width="24"
+                                                                 height="24"
+                                                                 src="{{ MEDIA_URL }}image/default_user.png"
+                                                                 alt="头像"
+                                                                 class="media-object">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading text-muted">
+                                            匿名回答</h4>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="media">
+                                    <a target="_blank"
+                                       href="{% url 'user_home' answer.author_id %}"
+                                       class="media-left"><img width="24"
+                                                               height="24"
+                                                               src="
+
+                                                                       {{ MEDIA_URL }}{{ answer.author.image }}"
+                                                               alt="头像"
+                                                               class="media-object"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a
+                                                target="_blank"
+                                                href="{% url 'user_home' answer.author_id %}">
+                                            {{ answer.author.nickname }}</a>
+                                            <small>
+                                                , {{ answer.author.description }}</small>
+                                        </h4>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <div class="answer-content">
+                                <a href="{% url 'answer_detail' answer.id %}">
+                                    <p>
+                                        {{ answer.content|striptags|truncatechars:200 }}</p>
+                                </a>
+                            </div>
+                            <div class="answer-meta">
+                                <button type="button"
+                                        class="btn btn-primary btn-sm btnvote-up"
+                                        onclick="follow_answer(this, {{ answer.id }})">
+                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                    {{ answer.follow_nums }}
+                                </button>
+                                <button type="button"
+                                        class="btn btn-default btn-sm btnvote-down"
+                                        onclick="unfollow_answer(this, {{ answer.id }})">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </button>
+                                <a href="{% url 'answer_detail' answer.id %}">
+                                    <button type="button"
+                                            class="btn btn-default btn-sm">
+                                        {{ answer.comment_nums }} 条评论
+                                    </button>
+                                </a>
+                                <!-- <a href=""><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"> </span>收藏</button></a> -->
+                                <span>{{ answer.pub_time }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% include 'zhihu/paginator.html' %}
+            </div>
+
+            <div class="col-sm-4">
+                <div class="site-box">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <p class="text-center text-muted">关注者</p>
+                            <p class="text-center"><a
+                                    href="{% url 'follow_topic_user' topic.id %}"
+                                    class="info-num">{{ topic.get_user_nums }}</a>
+                            </p>
+                        </div>
+                        <div class="col-sm-6">
+                            <p class="text-center text-muted">问题数</p>
+                            <p class="text-center"><a
+                                    href="{% url 'topic_question' topic.id %}"
+                                    class="info-num">
+                                {{ topic.get_question_nums }}</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="site-box">
+                    <h4>活跃回答者<a href="{% url 'topic_answerer' topic.id %}"
+                                class="text-muted right-info">查看更多</a></h4>
+                    <hr>
+                    {% for user in most_active_users %}
+                        <div class="media">
+                            <a target="_blank"
+                               href="{% url 'user_home' user.id %}"
+                               class="media-left"><img width="60" height="60"
+                                                       src="
+
+                                                               {{ MEDIA_URL }}{{ user.image }}"
+                                                       alt="头像"
+                                                       class="media-object"></a>
+                            <div class="media-body">
+                                <h4 class="media-heading"><a target="_blank"
+                                                             href="{% url 'user_home' user.id %}">
+                                    {{ user.nickname }}</a></h4>
+                                <p>共{{ user.user_answer_nums }}回答,
+                                    {{ user.user_answer_follow_nums }}赞同</p>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="site-box">
-        <h4>活跃回答者<a href="{% url 'topic_answerer' topic.id %}" class="text-muted right-info">查看更多</a></h4>
-        <hr>
-        {% for user in most_active_users %}
-        <div class="media">
-          <a target="_blank" href="{% url 'user_home' user.id %}" class="media-left"><img width="60" height="60" src="{{ MEDIA_URL }}{{ user.image }}" alt="头像" class="media-object"></a>
-          <div class="media-body">
-            <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' user.id %}">{{ user.nickname }}</a></h4>
-            <p>共{{ user.user_answer_nums }}回答, {{ user.user_answer_follow_nums }}赞同</p>
-          </div>
-        </div>
-        <hr>
-        {% endfor %}
-      </div>
     </div>
-  </div>
-</div>
 
 {% endblock %}
 
 {% block custom_js %}
 
-<script>
+    <script>
 
-  $(function () {
-    //关注话题
-    $('#follow-topic').on('click', function() {
-      var old_path = window.location.pathname;
-      $.get("{% url 'follow_topic' topic.id %}", function(data) {
-        if(data.status == 'success') {
-          $('#follow-topic').text(data.message);
-        }else if(data.status == 'fail') {
-          alert(data.message);
-        }else {
-          window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
-        }  
-      });
-    });
-  });
+        $(function () {
+            //关注话题
+            $('#follow-topic').on('click', function () {
+                var old_path = window.location.pathname;
+                $.get("{% url 'follow_topic' topic.id %}", function (data) {
+                    if (data.status == 'success') {
+                        $('#follow-topic').text(data.message);
+                    } else if (data.status == 'fail') {
+                        alert(data.message);
+                    } else {
+                        window.location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                });
+            });
+        });
 
-  //点赞
-  function follow_answer (dom, answer_id) {
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'add_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'add') {
-            var nums = parseInt($(dom).text()) + 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).text()) - 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //点赞
+        function follow_answer(dom, answer_id) {
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'add_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'add') {
+                            var nums = parseInt($(dom).text()) + 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).text()) - 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-  //取消点赞
-  function unfollow_answer (dom, answer_id) {
-    if (parseInt($(dom).prev().text()) == 0) {
-      return;
-    };
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'cancel_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).prev().text()) - 1;
-            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else {
-            return;
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //取消点赞
+        function unfollow_answer(dom, answer_id) {
+            if (parseInt($(dom).prev().text()) == 0) {
+                return;
+            }
+            ;
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'cancel_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).prev().text()) - 1;
+                            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else {
+                            return;
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-</script>
+    </script>
 
 {% endblock %}

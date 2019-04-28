@@ -6,129 +6,182 @@
 
 {% block content %}
 
-<div class="container">
-  <div class="row">
-    <div class="col-sm-8">
-      <div class="site-box">
-        <p><h4>编辑推荐</h4></p>
-        <hr>
-        <div class="recommend">
-          {% for question in recommend_questions_page.object_list %}
-          <h4><a href="{% url 'question_detail' question.id %}">{{ question.title }}</a></h4>
-          {% if question.follow_est_answer.is_anonymous %}
-          <div class="media">
-            <div class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}image/default_user.png" alt="头像" class="media-object"></div>
-            <div class="media-body">
-              <h4 class="media-heading text-muted">匿名回答</h4>
-            </div>
-          </div>
-          {% else %}
-          <div class="media">
-            <a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}" class="media-left"><img width="24" height="24" src="{{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}" alt="头像" class="media-object"></a>
-            <div class="media-body">
-              <h4 class="media-heading"><a target="_blank" href="{% url 'user_home' question.follow_est_answer.author_id %}">{{ question.follow_est_answer.author.nickname }}</a><small>, {{ question.follow_est_answer.author.description }}</small></h4>
-            </div>
-          </div>
-          {% endif %}
-          <p class="answer-content"><a target="_blank" href="{% url 'answer_detail' question.follow_est_answer.id %}">{{ question.follow_est_answer.content|striptags|truncatechars:200|safe }}</a></p>
-          <div class="answer-meta">
-            <button type="button" class="btn btn-primary btnvote-up btn-sm" onclick="follow_answer(this, {{ question.follow_est_answer.id }})"><span class="glyphicon glyphicon-triangle-top"></span> {{ question.follow_est_answer.get_follow_nums }}</button>
-            <button type="button" class="btn btn-default btnvote-down btn-sm" onclick="unfollow_answer(this, {{ question.follow_est_answer.id }})"><span class="glyphicon glyphicon-triangle-bottom"></span></button>
-            <a target="_blank" href="{% url 'answer_detail' question.follow_est_answer.id %}"><button type="button" class="btn btn-default btn-sm">{{ question.follow_est_answer.get_comment_nums }} 条评论</button></a>
-            <!-- <a href="{% url 'answer_detail' question.follow_est_answer.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a> -->
-            <span class="text-muted"><small>{{ question.follow_est_answer.pub_time }}</small></span>        
-          </div>
-          <hr>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="site-box">
+                    <p><h4>编辑推荐</h4></p>
+                    <hr>
+                    <div class="recommend">
+                        {% for question in recommend_questions_page.object_list %}
+                            <h4>
+                                <a href="{% url 'question_detail' question.id %}">
+                                    {{ question.title }}</a></h4>
+                            {% if question.follow_est_answer.is_anonymous %}
+                                <div class="media">
+                                    <div class="media-left"><img width="24"
+                                                                 height="24"
+                                                                 src="{{ MEDIA_URL }}image/default_user.png"
+                                                                 alt="头像"
+                                                                 class="media-object">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading text-muted">
+                                            匿名回答</h4>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="media">
+                                    <a target="_blank"
+                                       href="{% url 'user_home' question.follow_est_answer.author_id %}"
+                                       class="media-left"><img width="24"
+                                                               height="24"
+                                                               src="
 
-          {% endfor %}
+                                                                       {{ MEDIA_URL }}{{ question.follow_est_answer.author.image }}"
+                                                               alt="头像"
+                                                               class="media-object"></a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a
+                                                target="_blank"
+                                                href="{% url 'user_home' question.follow_est_answer.author_id %}">
+                                            {{ question.follow_est_answer.author.nickname }}</a>
+                                            <small>,
+                                                {{ question.follow_est_answer.author.description }}
+                                            </small>
+                                        </h4>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            <p class="answer-content"><a target="_blank"
+                                                         href="{% url 'answer_detail' question.follow_est_answer.id %}">
+                                {{ question.follow_est_answer.content|striptags|truncatechars:200|safe }}</a></p>
+                            <div class="answer-meta">
+                                <button type="button"
+                                        class="btn btn-primary btnvote-up btn-sm"
+                                        onclick="follow_answer(this, {{ question.follow_est_answer.id }})">
+                                    <span class="glyphicon glyphicon-triangle-top"></span>
+                                    {{ question.follow_est_answer.get_follow_nums }}
+                                </button>
+                                <button type="button"
+                                        class="btn btn-default btnvote-down btn-sm"
+                                        onclick="unfollow_answer(this, {{ question.follow_est_answer.id }})">
+                                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                                </button>
+                                <a target="_blank"
+                                   href="{% url 'answer_detail' question.follow_est_answer.id %}">
+                                    <button type="button"
+                                            class="btn btn-default btn-sm">
+                                        {{ question.follow_est_answer.get_comment_nums }}
+                                        条评论
+                                    </button>
+                                </a>
+                                <!-- <a href="{% url 'answer_detail' question.follow_est_answer.id %}"><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-star"></span>收藏</button></a> -->
+                                <span class="text-muted"><small>{{ question.follow_est_answer.pub_time }}</small></span>
+                            </div>
+                            <hr>
+
+                        {% endfor %}
+                    </div>
+
+                    {% include 'zhihu/paginator.html' with page=recommend_questions_page %}
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="site-box">
+                    <h4>热门话题<a href="{% url 'topic_list' %}"
+                               class="text-muted right-info">更多话题</a></h4>
+                    <hr>
+                    {% for topic in hot_topics %}
+                        <div class="meida">
+                            <a target="_blank"
+                               href="{% url 'topic_detail' topic.id %}"
+                               class="media-left"><img width="50" height="50"
+                                                       src="
+
+                                                               {{ MEDIA_URL }}{{ topic.image }}"
+                                                       alt="话题"
+                                                       class="media-object"></a>
+                            <div class="media-body">
+                                <h4 class="media-heading"><a target="_blank"
+                                                             href="{% url 'topic_detail' topic.id %}">
+                                    {{ topic.name }}</a></h4>
+                                <p class="text-muted">{{ topic.get_user_nums }}
+                                    人关注</p>
+                            </div>
+                        </div>
+                        <hr>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-
-        {% include 'zhihu/paginator.html' with page=recommend_questions_page %}
-      </div>
     </div>
-
-    <div class="col-sm-4">
-      <div class="site-box">
-        <h4>热门话题<a href="{% url 'topic_list' %}" class="text-muted right-info">更多话题</a></h4>
-        <hr>
-        {% for topic in hot_topics %}
-        <div class="meida">
-          <a target="_blank" href="{% url 'topic_detail' topic.id %}" class="media-left"><img width="50" height="50" src="{{ MEDIA_URL }}{{ topic.image }}" alt="话题" class="media-object"></a>
-          <div class="media-body">
-            <h4 class="media-heading"><a  target="_blank" href="{% url 'topic_detail' topic.id %}">{{ topic.name }}</a></h4>
-            <p class="text-muted">{{ topic.get_user_nums }} 人关注</p>
-          </div>
-        </div>        
-        <hr>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</div>
 
 {% endblock %}
 
 {% block custom_js %}
-<script>
+    <script>
 
-//点赞
-  function follow_answer (dom, answer_id) {
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'add_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'add') {
-            var nums = parseInt($(dom).text()) + 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).text()) - 1;
-            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //点赞
+        function follow_answer(dom, answer_id) {
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'add_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'add') {
+                            var nums = parseInt($(dom).text()) + 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).text()) - 1;
+                            $(dom).html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-  //取消点赞
-  function unfollow_answer (dom, answer_id) {
-    if (parseInt($(dom).prev().text()) == 0) {
-      return;
-    };
-    var old_path = location.pathname;
-    $.ajax({
-      type: 'GET',
-      async: true,
-      url: "{% url 'cancel_follow_answer' %}",
-      data: {'answer_id':answer_id},
-      cache: false,
-      success: function (data) {
-        if(data.status == 'success') {
-          if(data.reason == 'cancel') {
-            var nums = parseInt($(dom).prev().text()) - 1;
-            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
-          }else {
-            return;
-          }
-        }else{
-          location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+        //取消点赞
+        function unfollow_answer(dom, answer_id) {
+            if (parseInt($(dom).prev().text()) == 0) {
+                return;
+            }
+            ;
+            var old_path = location.pathname;
+            $.ajax({
+                type: 'GET',
+                async: true,
+                url: "{% url 'cancel_follow_answer' %}",
+                data: {'answer_id': answer_id},
+                cache: false,
+                success: function (data) {
+                    if (data.status == 'success') {
+                        if (data.reason == 'cancel') {
+                            var nums = parseInt($(dom).prev().text()) - 1;
+                            $(dom).prev().html('<span class="glyphicon glyphicon-triangle-top"></span> ' + nums);
+                        } else {
+                            return;
+                        }
+                    } else {
+                        location.href = "{% url 'user_login' %}" + '?next=' + old_path;
+                    }
+                },
+                error: function (xhr, err_msg, error) {
+                    alert('请求出错');
+                },
+            });
         }
-      },
-      error: function (xhr, err_msg, error) {
-        alert('请求出错');
-      },
-    });
-  }
 
-</script>
+    </script>
 
 {% endblock %}
