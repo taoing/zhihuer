@@ -48,3 +48,4 @@ uwsgi.ini
 uwsgi.log
 uwsgi.pid
 zhihuer_nginx.conf
+zhihuer.sql

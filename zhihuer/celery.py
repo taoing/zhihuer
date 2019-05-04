@@ -1,3 +1,7 @@
+# 在zhihuer项目目录下,
+# cmd运行: celery -A zhihuer worker -l info (-A 默认寻找目录下的celery模块)
+# 启动celery服务
+
 from __future__ import absolute_import, unicode_literals
 
 import os
