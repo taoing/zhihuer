@@ -568,7 +568,7 @@ def collect_answer(request):
 
 @login_required
 def follow_topic(request, topic_id):
-    '''关注问题'''
+    '''关注话题'''
     try:
         topic = get_object_or_404(Topic, id=topic_id)
         if topic in request.user.topic_set.all():
@@ -659,9 +659,6 @@ def search(request):
     search_type = request.GET.get('search_type')
     keywords = request.GET.get('keywords', '')
     search_type_list = ['question', 'answer', 'topic', 'user']
-    print(search_type)
-    print(keywords)
-    print(len(keywords))
 
     if not search_type:
         return redirect(reverse('index'))
