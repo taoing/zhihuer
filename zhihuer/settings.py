@@ -241,3 +241,58 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # celery时区设置
 CELERY_TIMEZONE = TIME_ZONE
+
+# 尝试配置django的日志模块
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {asctime} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            # logging handler that outputs log messages to terminal
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',  # message level to be written to console
+            'formatter': 'simple',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'level': 'DEBUG',
+            'filename': 'logs/debug.log',
+            'formatter': 'simple',
+        },
+        'rotating_file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',  # 保存到文件, 根据时间自动切
+            'filename': os.path.join(BASE_DIR, 'logs', "zhihuer_debug.log"),
+            'backupCount': 10,  # 备份数为10
+            'when': 'D',  # 每天一切,可选值有S/秒 M/分 H/小时 D/天 W0-W6/周(0=周一) midnight/如果没指定时间就默认在午夜
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        '': {
+            # this sets root level logger to log debug and higher level
+            # logs to console. All other loggers inherit settings from
+            # root level logger.
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False, # this tells logger to send logging message
+                                # to its parent (will send if set to True)
+        },
+        'django.db': {
+            # log raw sql of django orm
+            'handlers': ['console', 'rotating_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}

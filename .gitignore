@@ -49,3 +49,6 @@ uwsgi.log
 uwsgi.pid
 zhihuer_nginx.conf
 zhihuer.sql
+
+# log
+*.log
